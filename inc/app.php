@@ -10,8 +10,7 @@ class app extends route {
 		if (!$arrPage)
 			view::error("Page not found",404);
 		$this->controller = (object)array();
-		
-		ob_start("app::obReplace");
+
 		if (is_callable($arrPage['callback']) && $arrPage['callback'] instanceof Closure){
 			echo call_user_func_array($arrPage['callback'],$arrPage['params']);
 		}elseif (is_array($arrPage['callback'])) {
@@ -27,23 +26,8 @@ class app extends route {
 					view::error("Class \"".$controllerName."\" not found");
 			}
 		}
-		ob_end_flush();	
 	}
 	function __destruct() {
 		$this->disconnectDB();
-	}
-	function obReplace($buffer) {
-		$buffer = preg_replace_callback("/\{{(.*)\}}/", function($var){
-			$nameObj = $var[1];
-				if (preg_match("/(.*)\((.*)\)/",$nameObj,$var2)) {
-					$nameObjFnc = $var2[1];
-					if (method_exists($this->controller,$nameObjFnc))
-						return $this->controller->$nameObjFnc($var2[2]);
-				}
-			if (property_exists($this->controller,$nameObj))
-				return $this->controller->$nameObj;
-			return $var[0];
-		}, $buffer);
-		return $buffer;
 	}
 }

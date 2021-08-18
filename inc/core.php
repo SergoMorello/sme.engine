@@ -1,10 +1,11 @@
 <?php
 abstract class core {
-	static $pagesArr=array(),$pageSelect,$props,$dblink,$dirM,$dirV,$dirC;
+	static $pagesArr=array(),$pageSelect,$props,$dblink,$dirM,$dirV,$dirC,$dirCache;
 	function __construct() {
 		self::$dirM = "m/";
 		self::$dirV = "v/";
 		self::$dirC = "c/";
+		self::$dirCache = ".cache/";
 	}
 	function connectDB() {
 		self::$dblink = new database();
