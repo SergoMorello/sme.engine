@@ -1,11 +1,12 @@
 <?php
 abstract class core {
-	static $pagesArr=array(),$pageSelect,$props,$dblink,$dirM,$dirV,$dirC,$dirCache;
+	static $pagesArr=array(),$pageSelect,$props,$dblink,$dirM,$dirV,$dirC,$dirCache,$dirVSys;
 	function __construct() {
 		self::$dirM = "m/";
 		self::$dirV = "v/";
 		self::$dirC = "c/";
 		self::$dirCache = ".cache/";
+		self::$dirVSys = "inc/v/";
 	}
 	function connectDB() {
 		self::$dblink = new database();
@@ -55,7 +56,7 @@ abstract class core {
 				if (file_exists(self::$dirC.$page['callback'][0].".php"))
 					require_once(self::$dirC.$page['callback'][0].'.php');
 	}
-	private function checkMethod($method) {
+	protected function checkMethod($method) {
 		return strtolower($method)==strtolower($_SERVER['REQUEST_METHOD']) ? true : false;
 	}
 	function getPage() {
@@ -79,18 +80,13 @@ abstract class core {
 						}
 					}
 					if ($numSec==$trueSec) {
-						if (!$this->checkMethod($page['method']))
-							return;
 						self::$props = $dataSec;
 						return self::$pageSelect = $page;
 					}
 					
 				}
-				if ($this->getUrl()==$page['url']) {
-					if (!$this->checkMethod($page['method']))
-						return;
+				if ($this->getUrl()==$page['url'])
 					return self::$pageSelect = $page;
-				}
 			}
 		return array();
 	}

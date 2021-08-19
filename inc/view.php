@@ -1,18 +1,16 @@
 <?php
 class view extends core {
-	private $controller;
-	static $staticController,$_sectionObj;
+	static $_sectionObj;
 	
-	function setController($controller) {
-		self::$staticController = $controller;
-	}
-	private function controller() {
-		return self::$staticController;
-	}
-	private function genCache($view) {
-		$cacheViewName = md5(self::$dirV.$view);
+	private function genCache($view,$dirV) {
+		//return 1;
+		$cacheViewName = md5($dirV.$view);
 		$cacheViewIndex = core::$dirCache.".index";
-		$md5Hash = md5_file(self::$dirV.$view.".php");
+		$md5Hash = md5_file($dirV.$view.".php");
+		$createIndex = function($cacheViewIndex,$cacheViewName,$md5Hash) {
+			if (file_put_contents($cacheViewIndex,json_encode([['name'=>$cacheViewName,'hash'=>$md5Hash]])))
+				return true;
+		};
 		if (file_exists($cacheViewIndex)) {
 			$cacheIndex = json_decode(file_get_contents($cacheViewIndex));
 			$checkIndex = function($cacheIndex,$cacheViewName) {
@@ -22,30 +20,29 @@ class view extends core {
 				}
 			};
 			$keyIndex = $checkIndex($cacheIndex,$cacheViewName);
-			if ($cacheIndex[$keyIndex]->hash!=$md5Hash) {
+			if ($keyIndex && $cacheIndex[$keyIndex]->hash!=$md5Hash) {
 				$cacheIndex[$keyIndex]->hash = $md5Hash;
 				file_put_contents($cacheViewIndex,json_encode($cacheIndex));
 				return true;
 			}
+			return $createIndex($cacheViewIndex,$cacheViewName,$md5Hash);
 		}else{
-			if (file_put_contents($cacheViewIndex,json_encode([['name'=>$cacheViewName,'hash'=>$md5Hash]])))
-				return true;
+			return $createIndex($cacheViewIndex,$cacheViewName,$md5Hash);
 		}
 	}
-	public function addView($view,$data=array()) {
-		if (file_exists(self::$dirV.$view.".php")) {
+	public function addView($view,$data=array(),$system=false) {
+		$pathV = $system ? self::$dirVSys : self::$dirV;
+		if (file_exists($pathV.$view.".php")) {
 			if ($data)
 				foreach($data as $key=>$dataIt)
 					${$key} = $dataIt;
-			$this->controller = $this->controller();
-			$cacheViewName = md5(self::$dirV.$view);
+			$cacheViewName = md5($pathV.$view);
 			$cacheViewPath = core::$dirCache.$cacheViewName;
 			$cacheViewIndex = core::$dirCache.".index";
-			$md5Hash = md5_file(self::$dirV.$view.".php");
+			$md5Hash = md5_file($pathV.$view.".php");
 			
-			
-			if ($this->genCache($view)) {
-				$buffer = $this->compiller(file_get_contents(self::$dirV.$view.'.php'));
+			if ($this->genCache($view,$pathV)) {
+				$buffer = $this->compiller(file_get_contents($pathV.$view.'.php'));
 				file_put_contents($cacheViewPath,$buffer);
 			}
 			ob_start();
@@ -55,8 +52,7 @@ class view extends core {
 				view::error($e->getMessage());
 			}
 			return ob_get_clean();
-		}else
-			view::error("View \"".$view."\" not found");
+		}
 	}
 	function include($page,$data=array()) {
 		$this->addView($page,$data);
@@ -64,7 +60,9 @@ class view extends core {
 	static function error($message,$code=500) {
 		header($_SERVER['SERVER_PROTOCOL']." ".$code);
 		ob_clean();
-		echo $message;
+		$view = new self;
+		$view->sys[] = 'error';
+		echo $view->addView('error',['message'=>$message,'code'=>$code],true);
 		die();
 	}
 	function compiller($buffer) {

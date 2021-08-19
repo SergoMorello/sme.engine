@@ -1,5 +1,5 @@
 <?php
 function dd($data) {
-	print_r($data);
+	echo str_replace("  ","#",str_replace("\n","<br>",print_r($data,true)));
 	die();
 }
