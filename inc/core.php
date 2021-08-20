@@ -16,36 +16,17 @@ abstract class core {
 		self::$dblink->disconnect();
 	}
 	public function getUrl() {
-		$path = $this->data()->get->route;
+		$path = request()->data()->route;
 		return $path=="" ? "/" : "/".$path;
 	}
 	function getPages() {
 		return self::$pagesArr;
 	}
-	function redirect($page) {
-		header("Location:".$page);
-		die();
-	}
-	private function data() {
-		return (object)array("get"=>(object)$_GET,"post"=>(object)((self::$pageSelect['method']=="post") ? $_POST : array()),"cookie"=>(object)$_COOKIE,"props"=>(object)self::$props);
-	}
-	function props() {
-		return $this->guardData($this->data()->props);
-	}
-	function request() {
-		return $this->guardData($this->data()->get);
-	}
-	function input() {
-		return $this->guardData($this->data()->post);
-	}
-	function cookie() {
-		return $this->guardData($this->data()->cookie);
-	}
-	private function guardData($data) {
+	public static function guardData($data) {
 		if (is_array($data) OR $isObj=is_object($data)) {
 			$ret = array();
 			foreach($data as $key=>$val)
-				$ret[$key] = $this->guardData($val);
+				$ret[$key] = self::guardData($val);
 			return $isObj ? (object)$ret : $ret;
 		}
 		return htmlspecialchars(addslashes($data));
@@ -81,6 +62,7 @@ abstract class core {
 					}
 					if ($numSec==$trueSec) {
 						self::$props = $dataSec;
+						$page['props'] = $dataSec;
 						return self::$pageSelect = $page;
 					}
 					
