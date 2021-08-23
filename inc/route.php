@@ -20,9 +20,9 @@ class route extends core {
 		if ($routes)
 			foreach($routes as $route) {
 				if ($this->getUrl()==$route['url'])
-					return $route;	
+					return $route;
 				//Определяем нужный маршрут
-				if ($route['url']!="/" && preg_match('/'.$urlMath($route['url']).'/is', $this->getUrl(), $matchUrl)) {
+				if ($route['url']!="/" && preg_match('/\s'.$urlMath($route['url']).'\s/is', ' '.$this->getUrl().' ', $matchUrl)) {
 					//Получаем названия переменных из маршрута
 					if (preg_match_all("/\{(.*)\}/isU", $route['url'], $matchVars)) {
 						foreach($matchVars[1] as $key=>$varName)
