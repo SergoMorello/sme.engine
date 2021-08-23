@@ -1,12 +1,15 @@
 <?php
 abstract class core {
-	static $dblink,$dirM,$dirV,$dirC,$dirCache,$dirVSys;
+	static $dblink,$dirM,$dirV,$dirC,$dirCache,$dirVSys,$arrError=[];
 	function __construct() {
 		self::$dirM = "m/";
 		self::$dirV = "v/";
 		self::$dirC = "c/";
 		self::$dirCache = ".cache/";
 		self::$dirVSys = "inc/v/";
+		
+		self::newError('error',404,['message'=>'Not found']);
+		self::newError('error',405,['message'=>'Method not allowed']);
 	}
 	function connectDB() {
 		self::$dblink = new database();
@@ -36,5 +39,8 @@ abstract class core {
 	}
 	protected function checkMethod($method) {
 		return strtolower($method)==strtolower($_SERVER['REQUEST_METHOD']) ? true : false;
+	}
+	public static function newError($name,$code,$params) {
+		self::$arrError[] = ['name'=>$name,'code'=>$code,'params'=>$params];
 	}
 }

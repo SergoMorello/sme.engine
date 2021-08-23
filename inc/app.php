@@ -8,9 +8,9 @@ class app extends route {
 		$route = $this->getRoute();
 		
 		if (!$route)
-			view::error("Page not found",404);
+			abort(404);
 		if (!$this->checkMethod($route['method']))
-			view::error("Method not allowed",405);
+			abort(405);
 		
 		if (is_callable($route['callback']) && $route['callback'] instanceof Closure)
 			echo call_user_func_array($route['callback'],array_values($route['props'] ?? []));	
