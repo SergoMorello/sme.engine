@@ -20,7 +20,7 @@ function route($name,$props=[]) {
 		return $url;
 	};
 	$searchRoute = function($name) {
-		foreach(core::$pagesArr as $page)
+		foreach(route::$routes as $page)
 			if ($page['name']==$name)
 				return (object)$page;
 	};

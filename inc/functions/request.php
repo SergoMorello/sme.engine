@@ -8,7 +8,7 @@ class request {
 	}
 	public function route($var) {
 		if (is_string($var))
-			return core::$props[$var];
+			return route::$props[$var];
 	}
 	public function data($var=NULL) {
 		$GET = self::GET();
