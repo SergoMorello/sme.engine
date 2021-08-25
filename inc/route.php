@@ -2,7 +2,7 @@
 class route extends core {
 	static $routes=[],$props=[];
 	function __construct($index=0) {
-		parent::__construct();
+		//parent::__construct();
 		$this->lastIndex = $index;
 	}
 	protected function getRoute() {

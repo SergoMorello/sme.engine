@@ -1,17 +1,13 @@
 <?php
 abstract class core {
-	static $dblink,$dirM,$dirV,$dirC,$dirCache,$dirVSys,$arrError=[];
-	function __construct() {
-		self::$dirM = "m/";
-		self::$dirV = "v/";
-		self::$dirC = "c/";
-		self::$dirCache = ".cache/";
-		self::$dirVSys = "inc/v/";
-		
-		self::newError('error',404,['message'=>'Not found']);
-		self::newError('error',405,['message'=>'Method not allowed']);
-		self::newError('error',500,['message'=>'Internal Server Error']);
-	}
+	static $dblink,$arrError=[],$arrCompillerView=[];
+	
+	const dirM = 'm/';
+	const dirV = 'v/';
+	const dirC = 'c/';
+	const dirCache = '.cache/';
+	const dirVSys = 'inc/v/';
+	
 	function connectDB() {
 		self::$dblink = new database();
 		self::$dblink->connect();
@@ -32,16 +28,21 @@ abstract class core {
 		}
 		return htmlspecialchars(addslashes($data));
 	}
-	function addControllers() { 
+	function addControllers() {
 		foreach(route::$routes as $page)
 			if (is_array($page['callback']))
-				if (file_exists(self::$dirC.$page['callback'][0].".php"))
-					require_once(self::$dirC.$page['callback'][0].'.php');
+				if (file_exists(self::dirC.$page['callback'][0].".php"))
+					require_once(self::dirC.$page['callback'][0].'.php');
 	}
 	protected function checkMethod($method) {
 		return strtolower($method)==strtolower($_SERVER['REQUEST_METHOD']) ? true : false;
 	}
-	public static function newError($name,$code,$params) {
-		self::$arrError[] = ['name'=>$name,'code'=>$code,'params'=>$params];
+	public static function declareError($name,$code,$params) {
+		if (!is_numeric($code))
+			return;
+		self::$arrError[$code] = ['name'=>$name,'code'=>$code,'params'=>$params];
+	}
+	public static function declareCompiller($name,$return) {
+		self::$arrCompillerView[] = ['name'=>$name,'return'=>$return];
 	}
 }

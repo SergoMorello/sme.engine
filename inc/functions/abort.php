@@ -1,7 +1,6 @@
 <?php
 function abort($code) {
-	foreach(core::$arrError as $error) {
-		if ($error['code']==$code)
+	if (isset(core::$arrError[$code]) && $error = core::$arrError[$code])
 			return view::error($error['name'],$error['params'],$code);
-	}
+	die('error');
 }

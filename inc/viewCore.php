@@ -4,7 +4,7 @@ class viewCore extends core {
 	protected function genCache($view,$dirV) {
 		//return 1;
 		$cacheViewName = md5($dirV.$view);
-		$cacheViewIndex = core::$dirCache.".index";
+		$cacheViewIndex = core::dirCache.".index";
 		$md5Hash = md5_file($dirV.$view.".php");
 		$createIndex = function($cacheViewIndex,$obj) {
 			if (file_put_contents($cacheViewIndex,json_encode((is_callable($obj) ? $obj() : $obj))))
@@ -41,7 +41,11 @@ class viewCore extends core {
 		return self::$_section[$name];
 	}
 	protected function compiller($buffer) {
-		$append = "";
+		$appendBuffer = "";
+		
+		$append = function($var) use (&$appendBuffer) {
+			$appendBuffer .= $var;
+		};
 		
 		$splitArg = function($str) {
 			return explode(',',$str);
@@ -61,37 +65,45 @@ class viewCore extends core {
 			if ($var[3]=="endphp")
 				return "?>";
 			
-			if ($var[3]=="endfor" || $var[3]=="endforeach" || $var[3]=="endif")
-				return "<?php } ?>";
-			
-			if ($var[3]=="endsection")
-				return "<?php ob_end_clean(); ?>";
-			
 			
 			if ($var[1]=="for" || $var[1]=="foreach" || $var[1]=="if")
 				return "<?php ".$var[1]."(".$var[2].") { ?> ";
+			
+			if ($var[3]=="endfor" || $var[3]=="endforeach" || $var[3]=="endif")
+				return "<?php } ?>";
 			
 			
 			if ($var[1]=="section" && $arg[0] && !$arg[1])
 				return "<?php ob_start(function(\$b){\$this->setSection(".$arg[0].",\$b);}); ?>";
 			
-			if ($var[1]=="section" && $arg[0] && $arg[1]) {
+			if ($var[1]=="section" && $arg[0] && $arg[1])
 				return "<?php \$this->setSection(".$arg[0].",".$arg[1]."); ?>";
-			}
+			
+			if ($var[3]=="endsection")
+				return "<?php ob_end_clean(); ?>";
 			
 			if ($var[1]=="yield")
 				return "<?php echo \$this->getSection(".$arg[0]."); ?>";	
 			
 			if ($var[1]=="extends") {
 				$varSection = str_replace(['\'','\"'],'',$arg[0]);
-				$append .= "<?php ob_end_clean(); echo \$this->addView(".$arg[0]."); echo \$this->getSection('__view.".$varSection."'); ?>";
+				$append("<?php ob_end_clean(); echo \$this->addView(".$arg[0]."); echo \$this->getSection('__view.".$varSection."'); ?>");
 				return "<?php ob_start(function(\$b){self::\$_section['__view.".$varSection."']=\$b;}); ?>";
 			}
+			
+			if (count(self::$arrCompillerView))
+				foreach(self::$arrCompillerView as $rule) {
+					if ($var[1]==$rule['name'] || $var[3]==$rule['name']) {
+						$argCustom = $arg;
+						$argCustom[count($arg)] = &$append;
+						return $rule['return'](...$argCustom);
+					}
+				}
+			
 			return $var[0];
 		}, $buffer);
 		
-		
-		$buffer .= $append ?? NULL;
+		$buffer .= $appendBuffer ?? NULL;
 		
 		return $buffer;
 	}

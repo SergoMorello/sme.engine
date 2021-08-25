@@ -3,14 +3,14 @@ class view extends viewCore {
 	
 	public function addView($view,$data=array(),$system=false) {
 		$view = str_replace(".","/",$view);
-		$pathV = $system ? self::$dirVSys : self::$dirV;
+		$pathV = $system ? self::dirVSys : self::dirV;
 		if (file_exists($pathV.$view.".php")) {
 			if ($data)
 				foreach($data as $key=>$dataIt)
 					${$key} = $dataIt;
 			$cacheViewName = md5($pathV.$view);
-			$cacheViewPath = core::$dirCache.$cacheViewName;
-			$cacheViewIndex = core::$dirCache.".index";
+			$cacheViewPath = core::dirCache.$cacheViewName;
+			$cacheViewIndex = core::dirCache.".index";
 			$md5Hash = md5_file($pathV.$view.".php");
 			
 			if ($this->genCache($view,$pathV)) {
