@@ -1,6 +1,18 @@
 <?php
+require_once('inc_config.php');
+require_once('inc/inc_database.php');
+require_once('inc/core.php');
+require_once('inc/model.php');
+require_once('inc/controller.php');
+require_once('inc/viewCore.php');
+require_once('inc/view.php');
+require_once('inc/route.php');
+require_once('inc/functions.php');
+require_once('route.php');
+
 class app extends route {
 	function __construct() {
+		header('Content-Type: text/html; charset=utf-8');
 		parent::__construct();
 		$this->connectDB();
 		
@@ -21,8 +33,10 @@ class app extends route {
 					$controller = new $controllerName();
 					if (method_exists($controller,$methodName))
 						echo $controller->$methodName(...array_values($route['props'] ?? []));
+					else
+						view::error('error',['message'=>"Method \"".$methodName."\" not found"]);
 				}else
-					view::error("Class \"".$controllerName."\" not found");
+					view::error('error',['message'=>"Class \"".$controllerName."\" not found"]);
 			}
 		}
 	}

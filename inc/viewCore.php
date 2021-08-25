@@ -1,6 +1,6 @@
 <?php
 class viewCore extends core {
-	static $_sectionObj;
+	static $_sectionObj,$_section;
 	protected function genCache($view,$dirV) {
 		//return 1;
 		$cacheViewName = md5($dirV.$view);
@@ -34,42 +34,65 @@ class viewCore extends core {
 				return [['name'=>$cacheViewName,'hash'=>$md5Hash]];
 			});
 	}
+	public function setSection($name,$buffer) {
+		self::$_section[$name] = $buffer;
+	}
+	public function getSection($name) {
+		return self::$_section[$name];
+	}
 	protected function compiller($buffer) {
-		self::$_sectionObj = (object)[];
+		$append = "";
+		
+		$splitArg = function($str) {
+			return explode(',',$str);
+		};
+		
 		$buffer = preg_replace_callback("/\{\{(.*)\}\}/", function($var){
 			return "<?php echo ".$var[1]."; ?>";
 		}, $buffer);
 		
-		$buffer = preg_replace_callback("/\@([a-z0-9]{1,})(\((\'|\"|)(.*)\\3\)|\(\)|)\s(.*)/isU", function($var) {
-			if ($var[1]=="php")
-				return "<?php ".$var[5];
+		///\@([a-z0-9]{1,})(\((\'|\"|)(.*)\\3\)|\(\)|)\s/isU
+		$buffer = preg_replace_callback("/\@([a-z0-9]{1,})\((.*)\)|\@([a-z0-9]{1,})(?=\b|[\s-])/isU", function($var) use (&$append,&$splitArg) {
+			$arg = $var[2] ? $splitArg($var[2]) : NULL;
+			
+			if ($var[3]=="php")
+				return "<?php ";
+			
+			if ($var[3]=="endphp")
+				return "?>";
+			
+			if ($var[3]=="endfor" || $var[3]=="endforeach" || $var[3]=="endif")
+				return "<?php } ?>";
+			
+			if ($var[3]=="endsection")
+				return "<?php ob_end_clean(); ?>";
+			
+			
 			if ($var[1]=="for" || $var[1]=="foreach" || $var[1]=="if")
-				return "<?php ".$var[1]."(".$var[4].") { ?> ".$var[5];
-			if ($var[1]=="section") {
-				++self::$_sectionObj->int;
-				self::$_sectionObj->start[$var[4]] = self::$_sectionObj->int;
-				return "<?php ob_start(); ".$var[5]." ?>";
+				return "<?php ".$var[1]."(".$var[2].") { ?> ";
+			
+			
+			if ($var[1]=="section" && $arg[0] && !$arg[1])
+				return "<?php ob_start(function(\$b){\$this->setSection(".$arg[0].",\$b);}); ?>";
+			
+			if ($var[1]=="section" && $arg[0] && $arg[1]) {
+				return "<?php \$this->setSection(".$arg[0].",".$arg[1]."); ?>";
 			}
-			if ($var[1]=="getSection")
-				return "<?php echo self::\$_sectionObj->end[self::\$_sectionObj->start['".$var[4]."']]; ?>";
-				
+			
+			if ($var[1]=="yield")
+				return "<?php echo \$this->getSection(".$arg[0]."); ?>";	
+			
 			if ($var[1]=="extends") {
-				return "<?php echo \$this->addView('".$var[4]."'); ?>";
+				$varSection = str_replace(['\'','\"'],'',$arg[0]);
+				$append .= "<?php ob_end_clean(); echo \$this->addView(".$arg[0]."); echo \$this->getSection('__view.".$varSection."'); ?>";
+				return "<?php ob_start(function(\$b){self::\$_section['__view.".$varSection."']=\$b;}); ?>";
 			}
 			return $var[0];
 		}, $buffer);
 		
-		$buffer = preg_replace_callback("/\@end([a-z0-9]{1,})/is", function($var) {
-			if ($var[1]=="php")
-				return "?>";
-			if ($var[1]=="for" || $var[1]=="foreach" || $var[1]=="if")
-				return "<?php } ?>";
-			if ($var[1]=="section") {
-				--self::$_sectionObj->int;
-				return "<?php self::\$_sectionObj->end[".(self::$_sectionObj->int+1)."] = ob_get_clean(); ?>";
-			}
-			return $var[0];
-		}, $buffer);
+		
+		$buffer .= $append ?? NULL;
+		
 		return $buffer;
 	}
 }

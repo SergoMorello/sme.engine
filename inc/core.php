@@ -10,6 +10,7 @@ abstract class core {
 		
 		self::newError('error',404,['message'=>'Not found']);
 		self::newError('error',405,['message'=>'Method not allowed']);
+		self::newError('error',500,['message'=>'Internal Server Error']);
 	}
 	function connectDB() {
 		self::$dblink = new database();
