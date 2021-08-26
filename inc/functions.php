@@ -1,9 +1,0 @@
-<?php
-require_once('inc/functions/response.php');
-require_once('inc/functions/dd.php');
-require_once('inc/functions/cookie.php');
-require_once('inc/functions/session.php');
-require_once('inc/functions/route.php');
-require_once('inc/functions/request.php');
-require_once('inc/functions/redirect.php');
-require_once('inc/functions/abort.php');

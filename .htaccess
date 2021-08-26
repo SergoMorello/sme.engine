@@ -1,6 +1,9 @@
-RewriteEngine On  
-  
-RewriteCond %{SCRIPT_FILENAME} !-d  
-RewriteCond %{SCRIPT_FILENAME} !-f  
+RewriteEngine On
 
-RewriteRule ^(.*)$ ./index.php?route=$1
+#RewriteCond %{SCRIPT_FILENAME} !-d  
+#RewriteCond %{SCRIPT_FILENAME} !-f  
+
+RewriteCond %{REQUEST_URI} !public/
+RewriteRule (.*) public/$1 [L]
+
+#RewriteRule ^(.*)$ ./index.php?route=$1

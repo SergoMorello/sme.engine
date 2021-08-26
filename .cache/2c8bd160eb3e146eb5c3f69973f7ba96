@@ -1,3 +1,0 @@
-<h1>Error:</h1>
-<h2><?php echo $code; ?></h2>
-<h3><?php echo $message; ?></h3>

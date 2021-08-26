@@ -5,7 +5,7 @@ class view extends viewCore {
 		$view = str_replace(".","/",$view);
 		$pathV = $system ? self::dirVSys : self::dirV;
 		if (file_exists($pathV.$view.".php")) {
-			if ($data)
+			if (count($data))
 				foreach($data as $key=>$dataIt)
 					${$key} = $dataIt;
 			$cacheViewName = md5($pathV.$view);
@@ -21,7 +21,9 @@ class view extends viewCore {
 			try {
 				require_once($cacheViewPath);
 			}catch (Error $e) {
-				view::error($e->getMessage());
+				view::error('error',['message'=>$e->getMessage().' on line: '.$e->getLine()]);
+			}catch (Exception $ex) {
+				view::error('error',['message'=>$ex->getMessage()]);
 			}
 			return ob_get_clean();
 		}else

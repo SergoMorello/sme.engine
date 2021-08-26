@@ -2,7 +2,7 @@
 class viewCore extends core {
 	static $_sectionObj,$_section;
 	protected function genCache($view,$dirV) {
-		//return 1;
+		return 1;
 		$cacheViewName = md5($dirV.$view);
 		$cacheViewIndex = core::dirCache.".index";
 		$md5Hash = md5_file($dirV.$view.".php");
@@ -55,50 +55,20 @@ class viewCore extends core {
 			return "<?php echo ".$var[1]."; ?>";
 		}, $buffer);
 		
-		///\@([a-z0-9]{1,})(\((\'|\"|)(.*)\\3\)|\(\)|)\s/isU
 		$buffer = preg_replace_callback("/\@([a-z0-9]{1,})\((.*)\)|\@([a-z0-9]{1,})(?=\b|[\s-])/isU", function($var) use (&$append,&$splitArg) {
 			$arg = $var[2] ? $splitArg($var[2]) : NULL;
-			
-			if ($var[3]=="php")
-				return "<?php ";
-			
-			if ($var[3]=="endphp")
-				return "?>";
-			
-			
-			if ($var[1]=="for" || $var[1]=="foreach" || $var[1]=="if")
-				return "<?php ".$var[1]."(".$var[2].") { ?> ";
-			
-			if ($var[3]=="endfor" || $var[3]=="endforeach" || $var[3]=="endif")
-				return "<?php } ?>";
-			
-			
-			if ($var[1]=="section" && $arg[0] && !$arg[1])
-				return "<?php ob_start(function(\$b){\$this->setSection(".$arg[0].",\$b);}); ?>";
-			
-			if ($var[1]=="section" && $arg[0] && $arg[1])
-				return "<?php \$this->setSection(".$arg[0].",".$arg[1]."); ?>";
-			
-			if ($var[3]=="endsection")
-				return "<?php ob_end_clean(); ?>";
-			
-			if ($var[1]=="yield")
-				return "<?php echo \$this->getSection(".$arg[0]."); ?>";	
-			
-			if ($var[1]=="extends") {
-				$varSection = str_replace(['\'','\"'],'',$arg[0]);
-				$append("<?php ob_end_clean(); echo \$this->addView(".$arg[0]."); echo \$this->getSection('__view.".$varSection."'); ?>");
-				return "<?php ob_start(function(\$b){self::\$_section['__view.".$varSection."']=\$b;}); ?>";
-			}
-			
-			if (count(self::$arrCompillerView))
+
+			if (count(self::$arrCompillerView)) {
+				$argCustom = $arg;
 				foreach(self::$arrCompillerView as $rule) {
-					if ($var[1]==$rule['name'] || $var[3]==$rule['name']) {
-						$argCustom = $arg;
-						$argCustom[count($arg)] = &$append;
-						return $rule['return'](...$argCustom);
+					if ((isset($var[1]) && $var[1]==$rule['name']) || (isset($var[3]) && $var[3]==$rule['name'])) {
+						if (count($argCustom)<=(new ReflectionFunction($rule['return']))->getNumberOfParameters()) {
+							$argCustom[count($arg)] = &$append;
+							return $rule['return'](...$argCustom);
+						}
 					}
 				}
+			}
 			
 			return $var[0];
 		}, $buffer);

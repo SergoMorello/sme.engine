@@ -2,11 +2,11 @@
 class route extends core {
 	static $routes=[],$props=[];
 	function __construct($index=0) {
-		//parent::__construct();
 		$this->lastIndex = $index;
 	}
 	protected function getRoute() {
 		$routes = self::$routes;
+		
 		$allowChars = '0-9A-Za-z';
 		$urlMath = function($url) use (&$allowChars) {
 			return preg_replace([
@@ -22,16 +22,24 @@ class route extends core {
 		};
 		if ($routes)
 			foreach($routes as $route) {
-				if ($this->getUrl()==$route['url'])
+				$url = $this->url();
+				if ($url->get==$route['url'])
 					return $route;
 				//Определяем нужный маршрут
-				if ($route['url']!="/" && preg_match('/\s'.$urlMath($route['url']).'[\/|]{0,}\s/is', ' '.$this->getUrl().' ', $matchUrl)) {
+				if ($route['url']!="/" && preg_match('/\s'.$urlMath($route['url']).'[\/|]{0,}\s/is', ' '.$url->get.' ', $matchUrl)) {
 					//Получаем названия переменных из маршрута
 					if (preg_match_all("/\{(.*)\}/isU", $route['url'], $matchVars)) {
 						foreach($matchVars[1] as $key=>$varName)
-							$route['props'][str_replace('?','',$varName)] = $matchUrl[$key+1];
-						self::$props = $route['props'];
+							$route['props'][$varName] = $matchUrl[$key+1];
+						
 					}
+					//Получаем переменные после знака ?
+					if ($url->props)
+							foreach($url->props as $propName=>$propVal)
+								$route['props'][$propName] = $propVal;
+					
+					self::$props = $route['props'];
+					
 					return $route;
 				}
 			}

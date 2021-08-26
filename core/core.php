@@ -2,11 +2,11 @@
 abstract class core {
 	static $dblink,$arrError=[],$arrCompillerView=[];
 	
-	const dirM = 'm/';
-	const dirV = 'v/';
-	const dirC = 'c/';
-	const dirCache = '.cache/';
-	const dirVSys = 'inc/v/';
+	const dirM = ROOT.'m/';
+	const dirV = ROOT.'v/';
+	const dirC = ROOT.'c/';
+	const dirCache = CORE.'.cache/';
+	const dirVSys = CORE.'v/';
 	
 	function connectDB() {
 		self::$dblink = new database();
@@ -15,9 +15,18 @@ abstract class core {
 	function disconnectDB() {
 		self::$dblink->disconnect();
 	}
-	public function getUrl() {
-		$path = request()->data()->route;
-		return $path=="" ? "/" : "/".$path;
+	public function url() {
+		$splitUrl = explode('?',$_SERVER['REQUEST_URI']);
+		$splitProps = function($props) {
+			$ret = [];
+			$split = explode('&',$props);
+			foreach($split as $sp) {
+				$splitVar = explode('=',$sp);
+				$ret[$splitVar[0]] = core::guardData($splitVar[1]);
+			}
+			return $ret;
+		};
+		return (object)['get'=>core::guardData($splitUrl[0]),'props'=>(isset($splitUrl[1]) ? $splitProps($splitUrl[1]) : [])];
 	}
 	public static function guardData($data) {
 		if (is_array($data) OR $isObj=is_object($data)) {
