@@ -1,6 +1,5 @@
 <?php
-class view extends viewCore {
-	
+class view extends viewCore {	
 	public function addView($view,$data=array(),$system=false) {
 		$view = str_replace(".","/",$view);
 		$pathV = $system ? self::dirVSys : self::dirV;

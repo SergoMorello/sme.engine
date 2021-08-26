@@ -1,4 +1,5 @@
 <?php
+require_once(FUNC.'app.php');
 require_once(FUNC.'response.php');
 require_once(FUNC.'dd.php');
 require_once(FUNC.'cookie.php');

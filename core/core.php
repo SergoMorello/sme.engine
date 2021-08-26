@@ -1,6 +1,6 @@
 <?php
 abstract class core {
-	static $dblink,$arrError=[],$arrCompillerView=[];
+	static $dblink,$arrConfig=[],$arrError=[],$arrCompillerView=[];
 	
 	const dirM = ROOT.'m/';
 	const dirV = ROOT.'v/';
@@ -9,11 +9,22 @@ abstract class core {
 	const dirVSys = CORE.'v/';
 	
 	function connectDB() {
-		self::$dblink = new database();
+		$config = app()->config;
+		
+		if (!$config->DB_ENABLED)
+			return;
+		self::$dblink = new database(
+			$config->DB_TYPE,
+			$config->DB_HOST,
+			$config->DB_USER,
+			$config->DB_PASS,
+			$config->DB_NAME
+		);
 		self::$dblink->connect();
 	}
-	function disconnectDB() {
-		self::$dblink->disconnect();
+	function __destruct() {
+		if ($config->DB_ENABLED)
+			self::$dblink->disconnect();
 	}
 	public function url() {
 		$splitUrl = explode('?',$_SERVER['REQUEST_URI']);
@@ -29,7 +40,7 @@ abstract class core {
 		return (object)['get'=>core::guardData($splitUrl[0]),'props'=>(isset($splitUrl[1]) ? $splitProps($splitUrl[1]) : [])];
 	}
 	public static function guardData($data) {
-		if (is_array($data) OR $isObj=is_object($data)) {
+		if (is_array($data) || $isObj=is_object($data)) {
 			$ret = array();
 			foreach($data as $key=>$val)
 				$ret[$key] = self::guardData($val);
@@ -42,6 +53,29 @@ abstract class core {
 			if (is_array($page['callback']))
 				if (file_exists(self::dirC.$page['callback'][0].".php"))
 					require_once(self::dirC.$page['callback'][0].'.php');
+	}
+	protected function config(...$vars) {
+		if (count($vars)==2) {
+			self::$arrConfig[$vars[0]] = $vars[1];
+			return;
+		}
+		if ($file = file_get_contents(ROOT.'.env')) {
+			$list = explode(PHP_EOL,$file);
+			$arrCfg = [];
+			foreach($list as $li) {
+				if ($li[0]=='#' || !$li)
+					continue;
+				$liEx = explode('=',$li);
+				$liEx[1] = trim($liEx[1]);
+				if ($liEx[1]=='true')
+					$liEx[1] = true;
+				else
+				if ($liEx[1]=='false')
+					$liEx[1] = false;
+				self::$arrConfig[$liEx[0]] = $liEx[1];
+			}
+		}else
+			die('.env not found');
 	}
 	protected function checkMethod($method) {
 		return strtolower($method)==strtolower($_SERVER['REQUEST_METHOD']) ? true : false;

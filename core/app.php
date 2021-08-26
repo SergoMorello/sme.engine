@@ -6,8 +6,7 @@ define('ROOT',$_SERVER['DOCUMENT_ROOT'].'/');
 define('CORE',$_SERVER['DOCUMENT_ROOT'].'/core/');
 define('FUNC',$_SERVER['DOCUMENT_ROOT'].'/core/functions/');
 
-require_once(ROOT.'inc_config.php');
-require_once(CORE.'inc_database.php');
+require_once(CORE.'database.php');
 require_once(CORE.'core.php');
 require_once(CORE.'model.php');
 require_once(CORE.'controller.php');
@@ -19,8 +18,11 @@ require_once(ROOT.'route.php');
 require_once(ROOT.'appService.php');
 
 class app extends route {
+	private $appService;
 	function __construct() {
 		header('Content-Type: text/html; charset=utf-8');
+		
+		$this->defaultConfig();
 		
 		$this->defaultCompiller();
 		
@@ -33,7 +35,25 @@ class app extends route {
 		$this->addControllers();
 		
 		$this->runController();
+	}
+	private function defaultConfig() {
+		$this->config('APP_NAME','SME Engine');
 		
+		$this->config('APP_DEBUG','true');
+		
+		$this->config('DB_ENABLED','false');
+		
+		$this->config('DB_TYPE','mysql');
+		
+		$this->config('DB_HOST','127.0.0.1');
+		
+		$this->config('DB_USER','');
+		
+		$this->config('DB_PASS','');
+		
+		$this->config('DB_NAME','');
+		
+		$this->config();
 	}
 	private function defaultCompiller() {
 		// PHP
@@ -114,14 +134,16 @@ class app extends route {
 		self::declareError('error',500,['message'=>'Internal Server Error']);
 	}
 	private function defaultService() {
-		$appService = new appService;
-		$appService->run($this);
+		$this->appService = new appService;
+		if (method_exists($this->appService,'register'))
+			$this->appService->register();
 	}
 	private function runController() {
 		$route = $this->getRoute();
 		
 		if (!$route)
 			abort(404);
+		
 		if (!$this->checkMethod($route['method']))
 			abort(405);
 		
@@ -132,6 +154,8 @@ class app extends route {
 			if (file_exists(core::dirC.$controllerName.".php")) {
 				if (class_exists($controllerName)) {
 					$controller = new $controllerName();
+					if (method_exists($this->appService,'boot'))
+						$this->appService->boot($this);
 					if (method_exists($controller,$methodName))
 						echo $controller->$methodName(...array_values($route['props'] ?? []));
 					else
@@ -140,8 +164,5 @@ class app extends route {
 					view::error('error',['message'=>"Class \"".$controllerName."\" not found"]);
 			}
 		}
-	}
-	function __destruct() {
-		$this->disconnectDB();
 	}
 }

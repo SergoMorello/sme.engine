@@ -1,2 +1,4 @@
-.cache
+core/.cache/*
 .*
+!.htaccess
+!.env

@@ -1,8 +1,9 @@
 <?php
 class viewCore extends core {
-	static $_sectionObj,$_section;
+	static $_section;
 	protected function genCache($view,$dirV) {
-		return 1;
+		if (app()->config->APP_DEBUG)
+			return 1;
 		$cacheViewName = md5($dirV.$view);
 		$cacheViewIndex = core::dirCache.".index";
 		$md5Hash = md5_file($dirV.$view.".php");

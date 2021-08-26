@@ -1,29 +1,8 @@
 <?php
-if (stristr(htmlentities($_SERVER['PHP_SELF']), "inc_database.php")) {
-	die("<table style='padding: 2px; border: 1px solid #999; background-color: #EEE; font-family: Verdana; font-size: 10px;' align='center'><tr><td><b>Error:</b> This file cannot be opened directly!</td></tr></table>");
-}
-
 class database {
-	var $dblink;
-	var $db_type = "mysql";
-	var $host = "localhost";
-	var $user = "root";
-	var $pass;
-	var $name;
+	private $type,$host,$user,$pass,$name;
 	
-    function __construct() {
-		global $db_type,$db_host,$db_user,$db_pass,$db_name;
-		
-		$this->type = $db_type;
-		$this->host = $db_host;
-		$this->user = $db_user;
-		$this->pass = $db_pass;
-		$this->name = $db_name;
-	}
-	
-	function database() {
-		global $db_type,$db_host,$db_user,$db_pass,$db_name;
-		
+    function __construct($db_type='mysql',$db_host='127.0.0.1',$db_user='root',$db_pass=NULL,$db_name=NULL) {
 		$this->type = $db_type;
 		$this->host = $db_host;
 		$this->user = $db_user;

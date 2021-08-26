@@ -1,6 +1,10 @@
 <?php
 class appService extends core {
-	public function run() {
+	public function boot() {
+		//
+	}
+	
+	public function register() {
 		//
 	}
 }
