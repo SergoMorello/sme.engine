@@ -50,7 +50,6 @@ class route extends core {
 			$gp = self::$groupProps;
 			if (isset($gp['prefix']))
 				$params['url'] = '/'.$gp['prefix'].$params['url'];
-			self::$groupProps = [];
 		}
 		$params['callback'] = is_string($params['callback']) ? explode("@",$params['callback']) : $params['callback'];
 		$index = array_push(self::$routes,$params)-1;
@@ -70,9 +69,15 @@ class route extends core {
 	}
 	public function name($name) {
 		self::$routes[$this->lastIndex]['name'] = $name;
+		return $this;
+	}
+	public function middleware($name) {
+		self::$routes[$this->lastIndex]['middleware'] = (is_array($name) ? $name : [$name]);
+		return $this;
 	}
 	public static function group($params,$callback) {
 		self::$groupProps = $params;
-		return $callback();
+		$callback();
+		self::$groupProps = [];
 	}
 }

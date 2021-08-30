@@ -12,7 +12,7 @@ class database {
 
 	function connect() {
         try {
-            $this->dblink = new PDO($this->type.":host=".$this->host.";dbname=".$this->name."", $this->user, $this->pass);
+            $this->dblink = new PDO($this->type.":host=".$this->host.";dbname=".$this->name, $this->user, $this->pass,array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
 		}catch (PDOException $e) {
             die("<table style='padding: 2px; border: 1px solid #999; background-color: #EEE; font-family: Verdana; font-size: 10px;' align='center'><tr><td><b>Error:</b> ".$e->getMessage()."</td></tr></table>");
 		}
@@ -35,9 +35,8 @@ class database {
 		return $result;
 	}
 	
-	function get_row($query,$utf8=false) {
+	function get_row($query) {
 		$returned = 0;
-		if ($utf8) {$this->dblink->query('SET CHARACTER SET utf8');}
 		if ($result = $this->dblink->query($query)) {
 			$result->setFetchMode(PDO::FETCH_OBJ);
 			$returned = $result->fetch();

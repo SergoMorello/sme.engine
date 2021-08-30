@@ -3,6 +3,7 @@ session_name('smeSession');
 session_start();
 
 define('ROOT',$_SERVER['DOCUMENT_ROOT'].'/');
+define('MIDDLEWARE',$_SERVER['DOCUMENT_ROOT'].'/middleware/');
 define('CORE',$_SERVER['DOCUMENT_ROOT'].'/core/');
 define('FUNC',$_SERVER['DOCUMENT_ROOT'].'/core/functions/');
 
@@ -15,6 +16,7 @@ require_once(CORE.'view.php');
 require_once(CORE.'route.php');
 require_once(CORE.'functions.php');
 require_once(ROOT.'route.php');
+require_once(CORE.'middleware.php');
 require_once(ROOT.'appService.php');
 
 class app extends route {
@@ -30,11 +32,13 @@ class app extends route {
 		
 		$this->defaultService();
 		
+		$this->defaultMiddleware();
+		
 		$this->connectDB();
 		
 		$this->addControllers();
 		
-		$this->runController();
+		$this->run();
 	}
 	private function defaultConfig() {
 		$this->config('APP_NAME','SME Engine');
@@ -133,12 +137,17 @@ class app extends route {
 		// 500
 		self::declareError('error',500,['message'=>'Internal Server Error']);
 	}
+	private function defaultMiddleware() {
+		middleware::declare('validate',function(){
+			die();
+		});
+	}
 	private function defaultService() {
 		$this->appService = new appService;
 		if (method_exists($this->appService,'register'))
 			$this->appService->register();
 	}
-	private function runController() {
+	private function run() {
 		$route = $this->getRoute();
 		
 		if (!$route)
@@ -146,6 +155,9 @@ class app extends route {
 		
 		if (!$this->checkMethod($route['method']))
 			abort(405);
+		
+		if (middleware::check($route['middleware']))
+			return;
 		
 		if (is_callable($route['callback']) && $route['callback'] instanceof Closure)
 			echo call_user_func_array($route['callback'],array_values($route['props'] ?? []));	

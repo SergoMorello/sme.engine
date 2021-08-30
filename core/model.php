@@ -137,13 +137,14 @@ class model extends core {
 		return $this;
 	}
 	public function save() {
+		
 		$vars = get_object_vars($this);
 		unset($vars['table'],$vars['query']);
 		if ($this->query) {
 			$arrQuery = array();
 			foreach($vars as $key=>$value)
 				$arrQuery[] = $key."='".$value."'";
-			self::$dblink->query("UPDATE `".$this->getTableName()."` SET ".implode(",",$arrQuery).$this->srtWhere());
+			self::$dblink->query("UPDATE `".$this->getTableName()."` SET ".implode(",",$arrQuery)." WHERE ".$this->srtWhere());
 		}else
 			$this->id = self::$dblink->query("INSERT INTO `".$this->getTableName()."` (id,".implode(",",array_keys($vars)).") VALUES (NULL,'".implode("','",$vars)."')",true);
 		$this->clearQuery();
@@ -151,7 +152,7 @@ class model extends core {
 	}
 	public function delete() {
 		if ($this->query) {
-			$ret = self::$dblink->query("DELETE FROM `".$this->getTableName()."`".$this->srtWhere());
+			$ret = self::$dblink->query("DELETE FROM `".$this->getTableName()."`".(count($this->query->where) ? " WHERE " : NULL).$this->srtWhere());
 			$this->clearQuery();
 			return $ret;
 		}
