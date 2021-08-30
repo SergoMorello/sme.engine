@@ -1,6 +1,6 @@
 <?php
 class route extends core {
-	static $routes=[],$props=[];
+	static $routes=[],$props=[],$groupProps=[];
 	function __construct($index=0) {
 		$this->lastIndex = $index;
 	}
@@ -46,6 +46,12 @@ class route extends core {
 		return array();
 	}
 	private static function setRoute($params) {
+		if (count(self::$groupProps)) {
+			$gp = self::$groupProps;
+			if (isset($gp['prefix']))
+				$params['url'] = '/'.$gp['prefix'].$params['url'];
+			self::$groupProps = [];
+		}
 		$params['callback'] = is_string($params['callback']) ? explode("@",$params['callback']) : $params['callback'];
 		$index = array_push(self::$routes,$params)-1;
 		return new self($index);
@@ -64,5 +70,9 @@ class route extends core {
 	}
 	public function name($name) {
 		self::$routes[$this->lastIndex]['name'] = $name;
+	}
+	public static function group($params,$callback) {
+		self::$groupProps = $params;
+		return $callback();
 	}
 }
