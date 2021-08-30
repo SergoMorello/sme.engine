@@ -129,13 +129,19 @@ class app extends route {
 	}
 	private function defaultErrors() {
 		// 404
-		self::declareError('error',404,['message'=>'Not found']);
+		abort::declare(404,function(){
+			return view::error('error',['message'=>'Not found'],404);
+		});
 		
 		// 405
-		self::declareError('error',405,['message'=>'Method not allowed']);
+		abort::declare(405,function(){
+			return view::error('error',['message'=>'Method not allowed'],405);
+		});
 		
 		// 500
-		self::declareError('error',500,['message'=>'Internal Server Error']);
+		abort::declare(500,function(){
+			return view::error('error',['message'=>'Internal Server Error'],500);
+		});
 	}
 	private function defaultMiddleware() {
 		middleware::declare('validate',function(){
@@ -159,8 +165,12 @@ class app extends route {
 		if (middleware::check($route['middleware']))
 			return;
 		
+		$return = function($result) {
+			echo (is_array($result) || is_object($result)) ? json_encode($result,true) : $result;
+		};
+		
 		if (is_callable($route['callback']) && $route['callback'] instanceof Closure)
-			echo call_user_func_array($route['callback'],array_values($route['props'] ?? []));	
+			$return(call_user_func_array($route['callback'],array_values($route['props'] ?? [])));
 		elseif (is_array($route['callback'])) {
 			list($controllerName,$methodName) = $route['callback'];
 			if (file_exists(core::dirC.$controllerName.".php")) {
@@ -169,7 +179,7 @@ class app extends route {
 					if (method_exists($this->appService,'boot'))
 						$this->appService->boot($this);
 					if (method_exists($controller,$methodName))
-						echo $controller->$methodName(...array_values($route['props'] ?? []));
+						$return($controller->$methodName(...array_values($route['props'] ?? [])));
 					else
 						view::error('error',['message'=>"Method \"".$methodName."\" not found"]);
 				}else

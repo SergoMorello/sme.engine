@@ -36,8 +36,7 @@ class view extends compiller {
 		ob_clean();
 		$view = new self;
 		$props['code'] = $code;
-		echo $view->addView($page,$props,true);
-		die();
+		die($view->addView($page,$props,true));
 	}
 }
 function View($page="",$data=array(),$code=200) {
