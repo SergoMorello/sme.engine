@@ -5,7 +5,7 @@ abstract class core {
 	const dirM = ROOT.'m/';
 	const dirV = ROOT.'v/';
 	const dirC = ROOT.'c/';
-	const dirCache = CORE.'.cache/';
+	const dirCache = ROOT.'.cache/';
 	const dirVSys = CORE.'v/';
 	
 	function connectDB() {
@@ -84,8 +84,5 @@ abstract class core {
 		if (!is_numeric($code))
 			return;
 		self::$arrError[$code] = ['name'=>$name,'code'=>$code,'params'=>$params];
-	}
-	public static function declareCompiller($name,$return) {
-		self::$arrCompillerView[] = ['name'=>$name,'return'=>$return];
 	}
 }

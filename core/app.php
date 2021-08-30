@@ -10,7 +10,7 @@ require_once(CORE.'database.php');
 require_once(CORE.'core.php');
 require_once(CORE.'model.php');
 require_once(CORE.'controller.php');
-require_once(CORE.'viewCore.php');
+require_once(CORE.'compiller.php');
 require_once(CORE.'view.php');
 require_once(CORE.'route.php');
 require_once(CORE.'functions.php');
@@ -57,67 +57,67 @@ class app extends route {
 	}
 	private function defaultCompiller() {
 		// PHP
-		self::declareCompiller('php',function(){
+		compiller::declare('php',function(){
 			return "<?php ";
 		});
 		
 		// END PHP
-		self::declareCompiller('endphp',function(){
+		compiller::declare('endphp',function(){
 			return " ?>";
 		});
 		
 		// IF
-		self::declareCompiller('if',function($arg){
+		compiller::declare('if',function($arg){
 			return "<?php if(".$arg.") { ?>";
 		});
 		
 		// END IF
-		self::declareCompiller('endif',function(){
+		compiller::declare('endif',function(){
 			return "<?php } ?>";
 		});
 		
 		// FOR
-		self::declareCompiller('for',function($arg){
+		compiller::declare('for',function($arg){
 			return "<?php for(".$arg.") { ?>";
 		});
 		
 		// END FOR
-		self::declareCompiller('endfor',function(){
+		compiller::declare('endfor',function(){
 			return "<?php } ?>";
 		});
 		
 		// FOREACH
-		self::declareCompiller('foreach',function($arg){
+		compiller::declare('foreach',function($arg){
 			return "<?php foreach(".$arg.") { ?>";
 		});
 		
 		// END FOREACH
-		self::declareCompiller('endforeach',function(){
+		compiller::declare('endforeach',function(){
 			return "<?php } ?>";
 		});
 		
 		// SECTION SINGLE
-		self::declareCompiller('section',function($arg){
+		compiller::declare('section',function($arg){
 			return "<?php ob_start(function(\$b){\$this->setSection(".$arg.",\$b);}); ?>";
 		});
 		
 		// SECTION
-		self::declareCompiller('section',function($arg1,$arg2){
+		compiller::declare('section',function($arg1,$arg2){
 			return "<?php \$this->setSection(".$arg1.",".$arg2."); ?>";
 		});
 		
 		// END SECTION
-		self::declareCompiller('endsection',function(){
+		compiller::declare('endsection',function(){
 			return "<?php ob_end_clean(); ?>";
 		});
 		
 		// YIELD
-		self::declareCompiller('yield',function($arg){
+		compiller::declare('yield',function($arg){
 			return "<?php echo \$this->getSection(".$arg."); ?>";
 		});
 		
 		// EXTENDS
-		self::declareCompiller('extends',function($arg,$append){
+		compiller::declare('extends',function($arg,$append){
 			$varSection = str_replace(['\'','\"'],'',$arg);
 			$append("<?php ob_end_clean(); echo \$this->addView(".$arg."); echo \$this->getSection('__view.".$varSection."'); ?>");
 			return "<?php ob_start(function(\$b){self::\$_section['__view.".$varSection."']=\$b;}); ?>";

@@ -1,5 +1,5 @@
 <?php
-class view extends viewCore {	
+class view extends compiller {	
 	public function addView($view,$data=array(),$system=false) {
 		$view = str_replace(".","/",$view);
 		$pathV = $system ? self::dirVSys : self::dirV;
@@ -13,7 +13,7 @@ class view extends viewCore {
 			$md5Hash = md5_file($pathV.$view.".php");
 			
 			if ($this->genCache($view,$pathV)) {
-				$buffer = $this->compiller(file_get_contents($pathV.$view.'.php'));
+				$buffer = $this->compile(file_get_contents($pathV.$view.'.php'));
 				file_put_contents($cacheViewPath,$buffer);
 			}
 			ob_start();
