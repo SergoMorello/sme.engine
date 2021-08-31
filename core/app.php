@@ -129,8 +129,8 @@ class app extends route {
 		});
 	}
 	private function defaultMiddleware() {
-		middleware::declare('validate',function(){
-			die();
+		middleware::declare('validate',function($ob){
+			die(response('field '.$ob[0].' - '.$ob[1],500));
 		});
 	}
 	private function defaultService() {

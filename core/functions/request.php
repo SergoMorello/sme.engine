@@ -19,7 +19,7 @@ class request {
 	}
 	public function input($var) {
 		if (is_string($var))
-			return self::POST()[$var];
+			return isset(self::POST()[$var]) ? self::POST()[$var] : NULL;
 	}
 	public function file($var) {
 		if (!is_string($var))
@@ -81,13 +81,11 @@ class request {
 			return true;
 		};
 		foreach($data as $var=>$access) {
-			if (isset(self::POST()[$var])) {
-				if (!$accessCheck(self::POST()[$var],$access)) {
-					if ($return)
-						return true;
-					else
-						middleware::check(['validate'],self::POST()[$var]);
-				}
+			if (!$accessCheck($this->input($var),$access)) {
+				if ($return)
+					return true;
+				else
+					middleware::check(['validate'],[$var,$access]);
 			}
 		}
 	}
