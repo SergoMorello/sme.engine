@@ -21,6 +21,35 @@ class request {
 		if (is_string($var))
 			return self::POST()[$var];
 	}
+	public function file($var) {
+		if (!is_string($var))
+			return;
+		$file = $_FILES[$var];
+		return (new class($file) {
+			function __construct($file) {
+				foreach($file as $key=>$value)
+					$this->$key = $value;
+			}
+			public function store($path="",$disk=""){
+				storage::disk($disk)->put($path.'/'.$this->name,$this->getData());
+			}
+			public function storeAs($path,$name,$disk=""){
+				storage::disk($disk)->put($path.'/'.$name,$this->getData());
+			}
+			public function getData() {
+				return file_get_contents($this->tmp_name);
+			}
+			public function getPath() {
+				return $this->tmp_name;
+			}
+		});
+		return (object)$file;
+	}
+	public function hasFile($var) {
+		if (isset($_FILES[$var]))
+			return true;
+		return false;
+	}
 	public function has($var) {
 		if (isset(self::POST()[$var]))
 			return true;

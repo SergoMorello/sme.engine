@@ -23,6 +23,7 @@ class route extends core {
 		if ($routes)
 			foreach($routes as $route) {
 				$url = $this->url();
+				
 				if ($url->get==$route['url'])
 					return $route;
 				//Определяем нужный маршрут
@@ -49,7 +50,7 @@ class route extends core {
 		if (count(self::$groupProps)) {
 			$gp = self::$groupProps;
 			if (isset($gp['prefix']))
-				$params['url'] = '/'.$gp['prefix'].$params['url'];
+				$params['url'] = '/'.$gp['prefix'].(substr($params['url'],-1)=='/' ? substr_replace($params['url'],'',strlen($params['url'])-1) : $params['url']);
 		}
 		$params['callback'] = is_string($params['callback']) ? explode("@",$params['callback']) : $params['callback'];
 		$index = array_push(self::$routes,$params)-1;

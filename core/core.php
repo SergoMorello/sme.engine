@@ -1,12 +1,12 @@
 <?php
 abstract class core {
-	static $dblink,$arrConfig=[],$arrError=[],$arrCompillerView=[];
+	static $dblink,$arrConfig=[],$arrError=[],$arrCompillerView=[],$arrStorages=[];
 	
-	const dirM = ROOT.'m/';
-	const dirV = ROOT.'v/';
-	const dirC = ROOT.'c/';
-	const dirCache = ROOT.'.cache/';
-	const dirVSys = CORE.'v/';
+	const dirM = ROOT.'model/';
+	const dirV = ROOT.'view/';
+	const dirC = ROOT.'controller/';
+	const dirCache = STORAGE.'.cache/';
+	const dirVSys = CORE.'view/';
 	
 	function connectDB() {
 		$config = app()->config;
@@ -53,29 +53,6 @@ abstract class core {
 			if (is_array($page['callback']))
 				if (file_exists(self::dirC.$page['callback'][0].".php"))
 					require_once(self::dirC.$page['callback'][0].'.php');
-	}
-	protected function config(...$vars) {
-		if (count($vars)==2) {
-			self::$arrConfig[$vars[0]] = $vars[1];
-			return;
-		}
-		if ($file = file_get_contents(ROOT.'.env')) {
-			$list = explode(PHP_EOL,$file);
-			$arrCfg = [];
-			foreach($list as $li) {
-				if ($li[0]=='#' || !$li)
-					continue;
-				$liEx = explode('=',$li);
-				$liEx[1] = trim($liEx[1]);
-				if ($liEx[1]=='true')
-					$liEx[1] = true;
-				else
-				if ($liEx[1]=='false')
-					$liEx[1] = false;
-				self::$arrConfig[$liEx[0]] = $liEx[1];
-			}
-		}else
-			die('.env not found');
 	}
 	protected function checkMethod($method) {
 		return strtolower($method)==strtolower($_SERVER['REQUEST_METHOD']) ? true : false;

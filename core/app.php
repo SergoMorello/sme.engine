@@ -4,11 +4,13 @@ session_start();
 
 define('ROOT',$_SERVER['DOCUMENT_ROOT'].'/');
 define('MIDDLEWARE',$_SERVER['DOCUMENT_ROOT'].'/middleware/');
+define('STORAGE',$_SERVER['DOCUMENT_ROOT'].'/storage/');
 define('CORE',$_SERVER['DOCUMENT_ROOT'].'/core/');
 define('FUNC',$_SERVER['DOCUMENT_ROOT'].'/core/functions/');
 
 require_once(CORE.'database.php');
 require_once(CORE.'core.php');
+require_once(CORE.'config.php');
 require_once(CORE.'model.php');
 require_once(CORE.'controller.php');
 require_once(CORE.'compiller.php');
@@ -17,6 +19,7 @@ require_once(CORE.'route.php');
 require_once(CORE.'functions.php');
 require_once(ROOT.'route.php');
 require_once(CORE.'middleware.php');
+require_once(CORE.'storage.php');
 require_once(ROOT.'appService.php');
 
 class app extends route {
@@ -24,7 +27,7 @@ class app extends route {
 	function __construct() {
 		header('Content-Type: text/html; charset=utf-8');
 		
-		$this->defaultConfig();
+		config::init();
 		
 		$this->defaultCompiller();
 		
@@ -39,25 +42,6 @@ class app extends route {
 		$this->addControllers();
 		
 		$this->run();
-	}
-	private function defaultConfig() {
-		$this->config('APP_NAME','SME Engine');
-		
-		$this->config('APP_DEBUG','true');
-		
-		$this->config('DB_ENABLED','false');
-		
-		$this->config('DB_TYPE','mysql');
-		
-		$this->config('DB_HOST','127.0.0.1');
-		
-		$this->config('DB_USER','');
-		
-		$this->config('DB_PASS','');
-		
-		$this->config('DB_NAME','');
-		
-		$this->config();
 	}
 	private function defaultCompiller() {
 		// PHP
