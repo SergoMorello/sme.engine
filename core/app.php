@@ -19,6 +19,7 @@ require_once(CORE.'route.php');
 require_once(CORE.'functions.php');
 require_once(ROOT.'route.php');
 require_once(CORE.'middleware.php');
+require_once(CORE.'cache.php');
 require_once(CORE.'storage.php');
 require_once(ROOT.'appService.php');
 

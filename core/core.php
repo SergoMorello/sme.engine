@@ -6,6 +6,7 @@ abstract class core {
 	const dirV = ROOT.'view/';
 	const dirC = ROOT.'controller/';
 	const dirCache = STORAGE.'.cache/';
+	const dirCompiller = STORAGE.'.cache/compiller/';
 	const dirVSys = CORE.'view/';
 	
 	function connectDB() {

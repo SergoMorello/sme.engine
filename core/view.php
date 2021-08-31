@@ -8,8 +8,8 @@ class view extends compiller {
 				foreach($data as $key=>$dataIt)
 					${$key} = $dataIt;
 			$cacheViewName = md5($pathV.$view);
-			$cacheViewPath = core::dirCache.$cacheViewName;
-			$cacheViewIndex = core::dirCache.".index";
+			$cacheViewPath = core::dirCompiller.$cacheViewName;
+			$cacheViewIndex = core::dirCompiller.".index";
 			$md5Hash = md5_file($pathV.$view.".php");
 			
 			if ($this->genCache($view,$pathV)) {

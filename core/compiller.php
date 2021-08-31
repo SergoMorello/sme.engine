@@ -5,12 +5,15 @@ class compiller extends core {
 		if (!file_exists(core::dirCache))
 					if (!mkdir(core::dirCache))
 						die('cache dir, error create');
+		if (!file_exists(core::dirCompiller))
+					if (!mkdir(core::dirCompiller))
+						die('cache dir, error create');
 		
 		if (app()->config->APP_DEBUG)
 			return 1;
 		
 		$cacheViewName = md5($dirV.$view);
-		$cacheViewIndex = core::dirCache.".index";
+		$cacheViewIndex = core::dirCompiller.".index";
 		$md5Hash = md5_file($dirV.$view.".php");
 		$createIndex = function($cacheViewIndex,$obj) {
 			if (file_put_contents($cacheViewIndex,json_encode((is_callable($obj) ? $obj() : $obj))))

@@ -24,8 +24,7 @@ class request {
 	public function file($var) {
 		if (!is_string($var))
 			return;
-		$file = $_FILES[$var];
-		return (new class($file) {
+		return (new class($_FILES[$var]) {
 			function __construct($file) {
 				foreach($file as $key=>$value)
 					$this->$key = $value;
