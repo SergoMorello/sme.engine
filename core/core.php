@@ -19,7 +19,8 @@ abstract class core {
 			$config->DB_HOST,
 			$config->DB_USER,
 			$config->DB_PASS,
-			$config->DB_NAME
+			$config->DB_NAME,
+			$config->APP_DEBUG
 		);
 		self::$dblink->connect();
 	}
@@ -48,6 +49,11 @@ abstract class core {
 			return $isObj ? (object)$ret : $ret;
 		}
 		return htmlspecialchars(addslashes($data));
+	}
+	public static function isBase64($data) {
+		if (base64_encode(base64_decode($data, true))==$data)
+			return true;
+		return false;
 	}
 	function addControllers() {
 		foreach(route::$routes as $page)

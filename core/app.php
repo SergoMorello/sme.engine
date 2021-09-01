@@ -129,8 +129,11 @@ class app extends route {
 		});
 	}
 	private function defaultMiddleware() {
-		middleware::declare('validate',function($name,$valid){
-			die(response('field '.$name.' - '.$valid,500));
+		middleware::declare('validate',function($errors){
+			$list = [];
+			foreach($errors as $error)
+				$list[] = $error['var'].' need '.$error['access'];
+			die(response('Error fields: '.implode(', ',$list),500));
 		});
 	}
 	private function defaultService() {

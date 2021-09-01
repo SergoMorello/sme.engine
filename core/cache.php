@@ -3,7 +3,7 @@
 class cache extends core {
 	public static function put($key,$value,$time=0) {
 		$name = self::index()->set($key,$time);
-		file_put_contents(self::dirCache.$name,(is_callable($value) ? $value() : $value));
+		return file_put_contents(self::dirCache.$name,(is_callable($value) ? $value() : $value));
 	}
 	private static function index() {
 		return (new class{
@@ -15,7 +15,7 @@ class cache extends core {
 					$this->update();
 				
 				foreach($this->get() as $line)
-					if (time()>$line->time)
+					if ($line->time>0 && time()>$line->time)
 						if ($obj = $this->delete($line->key))
 							unlink(core::dirCache.$obj->name);
 			}

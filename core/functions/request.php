@@ -77,20 +77,27 @@ class request {
 							return false;
 					break;
 					case "file":
-						if (empty($var->tmp_name))
+						if (isset($var->tmp_name) && empty($var->tmp_name))
+							return false;
+					break;
+					case "base64":
+						if (!core::isBase64($var))
 							return false;
 					break;
 				}
 			}
 			return true;
 		};
-		foreach($data as $var=>$access) {
-			if (!$accessCheck($this->input($var),$access)) {
-				if ($return)
-					return true;
-				else
-					middleware::check(['validate'],$var,$access);
-			}
+		$arrErr = [];
+		foreach($data as $var=>$access)
+			if (!$accessCheck($this->input($var),$access))
+				$arrErr[] = ['var'=>$var,'access'=>$access];
+			
+		if (count($arrErr)) {
+			if ($return)
+				return true;
+			else
+				middleware::check(['validate'],$arrErr);
 		}
 	}
 }

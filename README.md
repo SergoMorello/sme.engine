@@ -180,8 +180,8 @@
 ##### Так же можно сохранять файлы сразу из при их получении из формы
 
 `...`  
-`<input type="file" name="file" />` 
-`<input type="text" name="fileName" value="default"/>` 
+`<input type="file" name="file" />`  
+`<input type="text" name="fileName" value="default"/>`  
 `...`  
 
 `request()->file('file')->storeAs('',request()->input('fileName').'.jpg');`  
