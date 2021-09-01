@@ -1,17 +1,17 @@
 <?php
 class middleware extends core {
 	static $addMiddleware=[];
-	public static function check($arrCheck,$obj=NULL) {
+	public static function check($arrCheck,...$arg) {
 		if (!is_array($arrCheck))
 			return;
 		foreach($arrCheck as $mdw) {
 			foreach(self::$addMiddleware as $mw) {
 				if ($mdw==$mw['name']) {
 					if (is_callable($mw['obj']) && $mw['obj'] instanceof Closure)
-						return $mw['obj']($obj);
+						return $mw['obj'](...$arg);
 					else{
 						require_once(MIDDLEWARE.$mw['name'].'.php');
-						return (new $mw['name'])->handle($obj);
+						return (new $mw['name'])->handle(...$arg);
 					}
 				}
 			}

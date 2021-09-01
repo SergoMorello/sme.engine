@@ -156,3 +156,57 @@
 
 `$db->find(1);`  
 `$db->delete();`
+
+### Storage
+
+#### Класс для работы с хранилищем (в стадии разработки)
+
+##### Сохранить файл на диск
+
+`storage::disk('local')->put('file.txt','какие то данные');`
+
+##### Получить файл с диска
+
+`storage::disk('local')->get('file.txt');`
+
+##### Удалить файл
+
+`storage::disk('local')->delete('file.txt');`
+
+##### Проверить существует ли файл
+
+`storage::disk('local')->exists('file.txt');`
+
+##### Так же можно сохранять файлы сразу из при их получении из формы
+
+`...`  
+`<input type="file" name="file" />` 
+`<input type="text" name="fileName" value="default"/>` 
+`...`  
+
+`request()->file('file')->storeAs('',request()->input('fileName').'.jpg');`  
+
+
+### Cache
+
+#### В кэше можно хранить любые данные и файлы от одной секунды до бесконечности
+
+##### Сохранить данные в кэше put(`ключ`,`данные`,`время хранения в секундах`)
+
+`cache::put('message','Hello World!',60);`
+
+##### Получить данные
+
+`cache::get('message');`
+
+###### или получить и сразу удалить
+
+`cache::pull('message');`
+
+##### Удалить
+
+`cache::forget('message');`
+
+##### Проверить сущеутвование по ключу
+
+`cache::has('message');`

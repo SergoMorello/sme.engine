@@ -13,6 +13,11 @@ class cache extends core {
 			private function check() {
 				if (!file_exists(core::dirCache.'.index'))
 					$this->update();
+				
+				foreach($this->get() as $line)
+					if (time()>$line->time)
+						if ($obj = $this->delete($line->key))
+							unlink(core::dirCache.$obj->name);
 			}
 			private function findKey($obj,$key) {
 				foreach($obj as $keyIt=>$line)
@@ -42,7 +47,7 @@ class cache extends core {
 			}
 			public function set($key,$time) {
 				$obj = $this->get();
-				
+				$time = $time>0 ? time()+$time : 0;
 				$name = md5($key);
 				if (($keyIt = $this->findKey($obj,$key))>=0)
 					$obj[$keyIt]->time = $time;
@@ -62,9 +67,11 @@ class cache extends core {
 			}
 		});
 	}
-	public static function get($key) {
+	public static function get($key,$default="") {
 		if ($cache = self::index()->get($key))
 			return file_get_contents(self::dirCache.$cache->name);
+		else
+			return empty($default) ? NULL : $default;
 	}
 	public static function pull($key) {
 		$res = self::get($key);

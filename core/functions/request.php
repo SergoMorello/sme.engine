@@ -19,7 +19,7 @@ class request {
 	}
 	public function input($var) {
 		if (is_string($var))
-			return isset(self::POST()[$var]) ? self::POST()[$var] : NULL;
+			return isset(self::POST()[$var]) ? self::POST()[$var] : (isset($_FILES[$var]) ? self::file($var) : NULL);
 	}
 	public function file($var) {
 		if (!is_string($var))
@@ -76,6 +76,10 @@ class request {
 						if (empty($var))
 							return false;
 					break;
+					case "file":
+						if (empty($var->tmp_name))
+							return false;
+					break;
 				}
 			}
 			return true;
@@ -85,7 +89,7 @@ class request {
 				if ($return)
 					return true;
 				else
-					middleware::check(['validate'],[$var,$access]);
+					middleware::check(['validate'],$var,$access);
 			}
 		}
 	}

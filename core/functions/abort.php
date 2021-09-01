@@ -8,6 +8,6 @@ class abort {
 }
 function abort($code) {
 	if (isset(core::$arrError[$code]) && $error = core::$arrError[$code])
-		return $error['callback']($code);
+		die($error['callback']($code));
 	die('error');
 }
