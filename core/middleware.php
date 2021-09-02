@@ -2,8 +2,7 @@
 class middleware extends core {
 	static $addMiddleware=[];
 	public static function check($arrCheck,...$arg) {
-		if (!is_array($arrCheck))
-			return;
+		$arrCheck = is_array($arrCheck) ? $arrCheck : [$arrCheck];
 		foreach($arrCheck as $mdw) {
 			foreach(self::$addMiddleware as $mw) {
 				if ($mdw==$mw['name']) {

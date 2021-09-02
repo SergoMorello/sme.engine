@@ -28,7 +28,7 @@ abstract class core {
 		if ($config->DB_ENABLED)
 			self::$dblink->disconnect();
 	}
-	public function url() {
+	public static function url() {
 		$splitUrl = explode('?',$_SERVER['REQUEST_URI']);
 		$splitProps = function($props) {
 			$ret = [];

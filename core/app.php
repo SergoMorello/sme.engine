@@ -16,6 +16,7 @@ require_once(CORE.'controller.php');
 require_once(CORE.'compiller.php');
 require_once(CORE.'view.php');
 require_once(CORE.'route.php');
+require_once(CORE.'http.php');
 require_once(CORE.'functions.php');
 require_once(ROOT.'route.php');
 require_once(CORE.'middleware.php');
@@ -133,7 +134,11 @@ class app extends route {
 			$list = [];
 			foreach($errors as $error)
 				$list[] = $error['var'].' need '.$error['access'];
-			die(response('Error fields: '.implode(', ',$list),500));
+			die(response('Error fields: '.implode(', ',$list),403));
+		});
+		
+		middleware::declare('httpError',function($error){
+			die(response($error,403));
 		});
 	}
 	private function defaultService() {
@@ -154,7 +159,7 @@ class app extends route {
 			return;
 		
 		$return = function($result) {
-			echo (is_array($result) || is_object($result)) ? json_encode($result,true) : $result;
+			echo (is_array($result) || is_object($result)) ? response::json($result) : $result;
 		};
 		
 		if (is_callable($route['callback']) && $route['callback'] instanceof Closure)

@@ -1,5 +1,11 @@
 <?php
-function route($name,$props=[]) {
+function route($name=NULL,$props=[]) {
+	if (is_null($name))
+		return (new class{
+			public function current() {
+				return core::url();
+			}
+		});
 	$replaceVars = function($url,$vars=[]) {
 		$numVars = count($vars);
 		$i = 0;

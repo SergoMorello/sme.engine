@@ -58,6 +58,9 @@ class request {
 			return true;
 		return false;
 	}
+	public static function json() {
+		return json_decode(file_get_contents('php://input'));
+	}
 	public function validate($data,$return=false) {
 		if (!is_array($data))
 			return;
@@ -66,38 +69,38 @@ class request {
 				switch($ac) {
 					case "string":
 						if (!empty($var) && !is_string($var))
-							return false;
+							return $ac;
 					break;
 					case "number":
 						if (!empty($var) && !is_numeric($var))
-							return false;
+							return $ac;
 					break;
 					case "required":
 						if (empty($var))
-							return false;
+							return $ac;
 					break;
 					case "file":
 						if (isset($var->tmp_name) && empty($var->tmp_name))
-							return false;
+							return $ac;
 					break;
 					case "base64":
 						if (!core::isBase64($var))
-							return false;
+							return $ac;
 					break;
 				}
 			}
-			return true;
+			return false;
 		};
 		$arrErr = [];
 		foreach($data as $var=>$access)
-			if (!$accessCheck($this->input($var),$access))
-				$arrErr[] = ['var'=>$var,'access'=>$access];
+			if ($accessErr = $accessCheck($this->input($var),$access))
+				$arrErr[] = ['var'=>$var,'access'=>$accessErr];
 			
 		if (count($arrErr)) {
 			if ($return)
 				return true;
 			else
-				middleware::check(['validate'],$arrErr);
+				middleware::check('validate',$arrErr);
 		}
 	}
 }
