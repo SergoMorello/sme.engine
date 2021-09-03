@@ -53,7 +53,13 @@ class route extends core {
 			if (isset($gp['prefix']))
 				$params['url'] = '/'.$gp['prefix'].(substr($params['url'],-1)=='/' ? substr_replace($params['url'],'',strlen($params['url'])-1) : $params['url']);
 		}
-		$params['callback'] = is_string($params['callback']) ? explode("@",$params['callback']) : $params['callback'];
+		$params['callback'] = is_string($params['callback']) ? (function($callback) {
+			$split = explode("@",$callback);
+			return (object)[
+				'controller'=>$split[0],
+				'method'=>$split[1]
+			];
+		})($params['callback'])	: $params['callback'];
 		$index = array_push(self::$routes,$params)-1;
 		return new self($index);
 	}

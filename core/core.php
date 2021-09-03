@@ -58,9 +58,9 @@ abstract class core {
 	}
 	function addControllers() {
 		foreach(route::$routes as $page)
-			if (is_array($page['callback']))
-				if (file_exists(self::dirC.$page['callback'][0].".php"))
-					require_once(self::dirC.$page['callback'][0].'.php');
+			if (!is_callable($page['callback']))
+				if (file_exists(self::dirC.$page['callback']->controller.".php"))
+					require_once(self::dirC.$page['callback']->controller.'.php');
 	}
 	protected function checkMethod($method) {
 		return strtolower($method)==strtolower($_SERVER['REQUEST_METHOD']) ? true : false;

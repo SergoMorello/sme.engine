@@ -192,17 +192,9 @@ class app extends route {
 		};
 		
 		try {
-			if (is_callable($route['callback']) && $route['callback'] instanceof Closure)
-				$return(call_user_func_array($route['callback'],array_values($route['props'] ?? [])));
-			elseif (is_array($route['callback'])) {
-				list($controllerName,$methodName) = $route['callback'];
-				$controller = new $controllerName();
-				if (method_exists($this->appService,'boot'))
-					$this->appService->boot($this);
-				$return($controller->$methodName(...array_values($route['props'] ?? [])));
-			}
+			$callback = is_callable($route['callback']) ? $route['callback'] : [new $route['callback']->controller,$route['callback']->method];
+			$return(call_user_func_array($callback,array_values($route['props'] ?? [])));
 		} catch (Error $e) {
-			dd($e);
 			view::error('error',['message'=>$e->getMessage()]);
 		} catch (Exception $e) {
 			view::error('error',['message'=>$e->getMessage()]);
