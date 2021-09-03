@@ -51,8 +51,12 @@ class http extends core {
 			$url = $url.'/?'.http_build_query($props);
 		$response = (object)[];
 		
-		if (($response->body = @file_get_contents($url, false, $headers))==false)
-			middleware::check('httpError',explode("):",error_get_last()['message'])[1]);
+		try{
+			$response->body = file_get_contents($url, false, $headers);
+		}catch (Exception $ex) {
+			view::error('error',['message'=>'HTTP Client: '.explode("):",$ex->getMessage())[1]]);
+		}
+		
 		$response->header = self::parseHeaders($http_response_header);
 		self::$props = [];
 		return $response;

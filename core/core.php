@@ -25,7 +25,7 @@ abstract class core {
 		self::$dblink->connect();
 	}
 	function __destruct() {
-		if ($config->DB_ENABLED)
+		if (app()->config->DB_ENABLED)
 			self::$dblink->disconnect();
 	}
 	public static function url() {
@@ -42,6 +42,7 @@ abstract class core {
 		return (object)['get'=>core::guardData($splitUrl[0]),'props'=>(isset($splitUrl[1]) ? $splitProps($splitUrl[1]) : [])];
 	}
 	public static function guardData($data) {
+		$isObj = false;
 		if (is_array($data) || $isObj=is_object($data)) {
 			$ret = array();
 			foreach($data as $key=>$val)

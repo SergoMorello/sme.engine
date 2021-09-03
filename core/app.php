@@ -130,15 +130,25 @@ class app extends route {
 		});
 	}
 	private function defaultMiddleware() {
+		
+		set_error_handler(function($errno, $errstr, $errfile, $errline) {
+			if (0 === error_reporting())
+				return false;
+			throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+		});
+		
 		middleware::declare('validate',function($errors){
 			$list = [];
 			foreach($errors as $error)
 				$list[] = $error['var'].' need '.$error['access'];
-			die(response('Error fields: '.implode(', ',$list),403));
+			die(view::error('error',['message'=>'Error fields:','errorLine'=>0,'sourceLines'=>$list]));
 		});
 		
-		middleware::declare('httpError',function($error){
-			die(response($error,403));
+		middleware::declare('viewError',function($error){
+			$sourceLines = function($file) {
+				return explode(PHP_EOL,file_get_contents($file));
+			};
+			die(view::error('error',['message'=>$error->getMessage().' on line: '.$error->getLine().' in '.$error->getFile(),'errorLine'=>$error->getLine(),'sourceLines'=>$sourceLines($error->getFile())]));
 		});
 	}
 	private function defaultService() {
@@ -155,29 +165,28 @@ class app extends route {
 		if (!$this->checkMethod($route['method']))
 			abort(405);
 		
-		if (middleware::check($route['middleware']))
+		if (middleware::check($route['middleware'] ?? NULL))
 			return;
 		
 		$return = function($result) {
 			echo (is_array($result) || is_object($result)) ? response::json($result) : $result;
 		};
 		
-		if (is_callable($route['callback']) && $route['callback'] instanceof Closure)
-			$return(call_user_func_array($route['callback'],array_values($route['props'] ?? [])));
-		elseif (is_array($route['callback'])) {
-			list($controllerName,$methodName) = $route['callback'];
-			if (file_exists(core::dirC.$controllerName.".php")) {
-				if (class_exists($controllerName)) {
-					$controller = new $controllerName();
-					if (method_exists($this->appService,'boot'))
-						$this->appService->boot($this);
-					if (method_exists($controller,$methodName))
-						$return($controller->$methodName(...array_values($route['props'] ?? [])));
-					else
-						view::error('error',['message'=>"Method \"".$methodName."\" not found"]);
-				}else
-					view::error('error',['message'=>"Class \"".$controllerName."\" not found"]);
+		try {
+			if (is_callable($route['callback']) && $route['callback'] instanceof Closure)
+				$return(call_user_func_array($route['callback'],array_values($route['props'] ?? [])));
+			elseif (is_array($route['callback'])) {
+				list($controllerName,$methodName) = $route['callback'];
+				$controller = new $controllerName();
+				$this->appService->boot($this);
+				$return($controller->$methodName(...array_values($route['props'] ?? [])));
 			}
+		} catch (Error $e) {
+			view::error('error',['message'=>$e->getMessage()]);
+		} catch (Exception $ex) {
+			view::error('error',['message'=>$ex->getMessage()]);
+		} catch (ErrorException $ex) {
+			view::error('error',['message'=>$ex->getMessage()]);
 		}
 	}
 }

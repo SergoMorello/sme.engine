@@ -8,3 +8,4 @@ require_once(FUNC.'route.php');
 require_once(FUNC.'request.php');
 require_once(FUNC.'redirect.php');
 require_once(FUNC.'abort.php');
+require_once(FUNC.'asset.php');

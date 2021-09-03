@@ -47,7 +47,7 @@ class compiller extends core {
 		self::$_section[$name] = $buffer;
 	}
 	public function getSection($name) {
-		return self::$_section[$name];
+		return self::$_section[$name] ?? NULL;
 	}
 	protected function compile($buffer) {
 		$buffer .= "\r\n";
@@ -62,16 +62,16 @@ class compiller extends core {
 			return explode(',',$str);
 		};
 		
-		$buffer = preg_replace_callback('/\{\{(.*)\}\}/', function($var){
+		$buffer = preg_replace_callback('/\{\{(.*)\}\}/isU', function($var){
 			return "<?php echo htmlspecialchars(".$var[1]."); ?>";
 		}, $buffer);
 		
-		$buffer = preg_replace_callback('/\{\!\!(.*)\!\!\}/', function($var){
+		$buffer = preg_replace_callback('/\{\!\!(.*)\!\!\}/isU', function($var){
 			return "<?php echo ".$var[1]."; ?>";
 		}, $buffer);
 		
 		$buffer = preg_replace_callback(['/\@([a-z0-9]{1,})[\r\n|\n|\s]/isU','/\@([^()\n\@]{0,})(\(((?>[^()\n]|(?2))*)\))/isU'], function($var) use (&$append,&$splitArg) {
-			$arg = $var[3] ? $splitArg($var[3]) : NULL;
+			$arg = (isset($var[3]) && $var[3]) ? $splitArg($var[3]) : NULL;
 			
 			if (count(self::$arrCompillerView)) {
 				$argCustom = $arg;

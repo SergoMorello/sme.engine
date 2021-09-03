@@ -27,7 +27,7 @@ function route($name=NULL,$props=[]) {
 	};
 	$searchRoute = function($name) {
 		foreach(route::$routes as $page)
-			if ($page['name']==$name)
+			if (isset($page['name']) && $page['name']==$name)
 				return (object)$page;
 	};
 	return $replaceVars($searchRoute($name)->url,$props);

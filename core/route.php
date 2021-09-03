@@ -39,7 +39,8 @@ class route extends core {
 							foreach($url->props as $propName=>$propVal)
 								$route['props'][$propName] = $propVal;
 					
-					self::$props = $route['props'];
+					if (isset($route['props']))
+						self::$props = $route['props'];
 					
 					return $route;
 				}

@@ -3,6 +3,7 @@ class view extends compiller {
 	public function addView($view,$data=array(),$system=false) {
 		$view = str_replace(".","/",$view);
 		$pathV = $system ? self::dirVSys : self::dirV;
+		
 		if (file_exists($pathV.$view.".php")) {
 			if (count($data))
 				foreach($data as $key=>$dataIt)
@@ -19,10 +20,14 @@ class view extends compiller {
 			ob_start();
 			try {
 				require_once($cacheViewPath);
+			}catch (ParseError $p) {
+				middleware::check('viewError',$p);
 			}catch (Error $e) {
-				view::error('error',['message'=>$e->getMessage().' on line: '.$e->getLine()]);
+				middleware::check('viewError',$e);
 			}catch (Exception $ex) {
-				view::error('error',['message'=>$ex->getMessage()]);
+				middleware::check('viewError',$ex);
+			}catch (ErrorException $ex) {
+				middleware::check('viewError',$ex);
 			}
 			return ob_get_clean();
 		}else
@@ -31,7 +36,7 @@ class view extends compiller {
 	function include($page,$data=array()) {
 		$this->addView($page,$data);
 	}
-	static function error($page,$props=[],$code=500) {
+	public static function error($page,$props=[],$code=500) {
 		header($_SERVER['SERVER_PROTOCOL']." ".$code);
 		ob_clean();
 		$view = new self;

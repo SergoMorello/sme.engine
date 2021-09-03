@@ -8,7 +8,7 @@ class storage extends core {
 		return (new storage);
 	}
 	private static function getDisk($name="") {
-		$name = empty($name) ? $props['disk'] : $name;
+		$name = empty($name) ? self::$props['disk'] ?? NULL : $name;
 		
 		foreach(core::$arrStorages as $disk) {
 			if (empty($name))
