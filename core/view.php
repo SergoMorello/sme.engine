@@ -11,7 +11,7 @@ class view extends compiller {
 			$cacheViewName = md5($pathV.$view);
 			$cacheViewPath = core::dirCompiller.$cacheViewName;
 			$cacheViewIndex = core::dirCompiller.".index";
-			$md5Hash = md5_file($pathV.$view.".php");
+			//$md5Hash = md5_file($pathV.$view.".php");
 			
 			if ($this->genCache($view,$pathV)) {
 				$buffer = $this->compile(file_get_contents($pathV.$view.'.php'));
@@ -20,18 +20,18 @@ class view extends compiller {
 			ob_start();
 			try {
 				require_once($cacheViewPath);
-			}catch (ParseError $p) {
-				middleware::check('viewError',$p);
+			}catch (ParseError $e) {
+				middleware::check('viewError',$e);
 			}catch (Error $e) {
 				middleware::check('viewError',$e);
-			}catch (Exception $ex) {
-				middleware::check('viewError',$ex);
-			}catch (ErrorException $ex) {
-				middleware::check('viewError',$ex);
+			}catch (Exception $e) {
+				middleware::check('viewError',$e);
+			}catch (ErrorException $e) {
+				middleware::check('viewError',$e);
 			}
 			return ob_get_clean();
 		}else
-			abort(404);
+			view::error('error',['message'=>'View \''.$view.'\' not found']);
 	}
 	function include($page,$data=array()) {
 		$this->addView($page,$data);

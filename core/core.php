@@ -25,7 +25,7 @@ abstract class core {
 		self::$dblink->connect();
 	}
 	function __destruct() {
-		if (app()->config->DB_ENABLED)
+		if (app()->config->DB_ENABLED && !is_null(self::$dblink))
 			self::$dblink->disconnect();
 	}
 	public static function url() {

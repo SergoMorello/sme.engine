@@ -2,6 +2,12 @@
 
 class config extends core {
 	public static function init() {
+		set_error_handler(function($errno, $errstr, $errfile, $errline) {
+			if (0 === error_reporting())
+				return false;
+			throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+		});
+		
 		self::set('APP_NAME','SME Engine');
 		
 		self::set('APP_DEBUG','true');
@@ -37,7 +43,7 @@ class config extends core {
 			$list = explode(PHP_EOL,$file);
 			$arrCfg = [];
 			foreach($list as $li) {
-				if ($li[0]=='#' || !$li)
+				if ((isset($li[0]) && $li[0]=='#') || !$li)
 					continue;
 				$liEx = explode('=',$li);
 				$liEx[1] = trim($liEx[1]);

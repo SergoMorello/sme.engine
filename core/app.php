@@ -8,6 +8,7 @@ define('STORAGE',$_SERVER['DOCUMENT_ROOT'].'/storage/');
 define('CORE',$_SERVER['DOCUMENT_ROOT'].'/core/');
 define('FUNC',$_SERVER['DOCUMENT_ROOT'].'/core/functions/');
 
+
 require_once(CORE.'database.php');
 require_once(CORE.'core.php');
 require_once(CORE.'config.php');
@@ -18,32 +19,46 @@ require_once(CORE.'view.php');
 require_once(CORE.'route.php');
 require_once(CORE.'http.php');
 require_once(CORE.'functions.php');
-require_once(ROOT.'route.php');
 require_once(CORE.'middleware.php');
 require_once(CORE.'cache.php');
 require_once(CORE.'storage.php');
-require_once(ROOT.'appService.php');
 
 class app extends route {
 	private $appService;
 	function __construct() {
 		header('Content-Type: text/html; charset=utf-8');
-		
+			
 		config::init();
 		
 		$this->defaultCompiller();
 		
 		$this->defaultErrors();
 		
+		self::initFile('appService');
+		
 		$this->defaultService();
 		
 		$this->defaultMiddleware();
+			
+		self::initFile('route');
 		
 		$this->connectDB();
 		
 		$this->addControllers();
 		
 		$this->run();
+		
+	}
+	public static function initFile($name) {
+		try {
+			require_once(ROOT.$name.'.php');
+		} catch (Error $e) {
+			middleware::check('viewError',$e);
+		} catch (Exception $e) {
+			middleware::check('viewError',$e);
+		} catch (ErrorException $e) {
+			middleware::check('viewError',$e);
+		}
 	}
 	private function defaultCompiller() {
 		// PHP
@@ -131,12 +146,6 @@ class app extends route {
 	}
 	private function defaultMiddleware() {
 		
-		set_error_handler(function($errno, $errstr, $errfile, $errline) {
-			if (0 === error_reporting())
-				return false;
-			throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
-		});
-		
 		middleware::declare('validate',function($errors){
 			$list = [];
 			foreach($errors as $error)
@@ -152,9 +161,19 @@ class app extends route {
 		});
 	}
 	private function defaultService() {
+		try {
 		$this->appService = new appService;
 		if (method_exists($this->appService,'register'))
 			$this->appService->register();
+		}catch (ParseError $e) {
+			middleware::check('viewError',$e);
+		} catch (Error $e) {
+			middleware::check('viewError',$e);
+		} catch (Exception $e) {
+			middleware::check('viewError',$e);
+		} catch (ErrorException $e) {
+			middleware::check('viewError',$e);
+		}
 	}
 	private function run() {
 		$route = $this->getRoute();
@@ -178,15 +197,17 @@ class app extends route {
 			elseif (is_array($route['callback'])) {
 				list($controllerName,$methodName) = $route['callback'];
 				$controller = new $controllerName();
-				$this->appService->boot($this);
+				if (method_exists($this->appService,'boot'))
+					$this->appService->boot($this);
 				$return($controller->$methodName(...array_values($route['props'] ?? [])));
 			}
 		} catch (Error $e) {
+			dd($e);
 			view::error('error',['message'=>$e->getMessage()]);
-		} catch (Exception $ex) {
-			view::error('error',['message'=>$ex->getMessage()]);
-		} catch (ErrorException $ex) {
-			view::error('error',['message'=>$ex->getMessage()]);
+		} catch (Exception $e) {
+			view::error('error',['message'=>$e->getMessage()]);
+		} catch (ErrorException $e) {
+			view::error('error',['message'=>$e->getMessage()]);
 		}
 	}
 }
