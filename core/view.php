@@ -11,7 +11,6 @@ class view extends compiller {
 			$cacheViewName = md5($pathV.$view);
 			$cacheViewPath = core::dirCompiller.$cacheViewName;
 			$cacheViewIndex = core::dirCompiller.".index";
-			//$md5Hash = md5_file($pathV.$view.".php");
 			
 			if ($this->genCache($view,$pathV)) {
 				$buffer = $this->compile(file_get_contents($pathV.$view.'.php'));
@@ -33,9 +32,6 @@ class view extends compiller {
 		}else
 			view::error('error',['message'=>'View \''.$view.'\' not found']);
 	}
-	function include($page,$data=array()) {
-		$this->addView($page,$data);
-	}
 	public static function error($page,$props=[],$code=500) {
 		header($_SERVER['SERVER_PROTOCOL']." ".$code);
 		ob_clean();
@@ -46,7 +42,7 @@ class view extends compiller {
 }
 function View($page="",$data=array(),$code=200) {
 	if (!$page)
-		view::error("Name page, no use");
+		view::error('error',['message'=>'Name page, no use']);
 	header($_SERVER['SERVER_PROTOCOL']." ".$code);
 	$view = new view;
 	return $view->addView($page,$data);

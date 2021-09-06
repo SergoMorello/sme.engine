@@ -3,5 +3,5 @@
 function asset($path) {
 	if (!is_string($path))
 		return;
-	return $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].'/'.$path;
+	return ((!empty($_SERVER['HTTPS'])) ? 'https' : 'http').'://'.$_SERVER['HTTP_HOST'].'/'.$path;
 }

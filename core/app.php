@@ -2,11 +2,11 @@
 session_name('smeSession');
 session_start();
 
-define('ROOT',$_SERVER['DOCUMENT_ROOT'].'/');
-define('MIDDLEWARE',$_SERVER['DOCUMENT_ROOT'].'/middleware/');
-define('STORAGE',$_SERVER['DOCUMENT_ROOT'].'/storage/');
-define('CORE',$_SERVER['DOCUMENT_ROOT'].'/core/');
-define('FUNC',$_SERVER['DOCUMENT_ROOT'].'/core/functions/');
+define('ROOT',realpath(__DIR__ .'/..').'/');
+define('MIDDLEWARE',ROOT.'/middleware/');
+define('STORAGE',ROOT.'/storage/');
+define('CORE',ROOT.'/core/');
+define('FUNC',ROOT.'/core/functions/');
 
 
 require_once(CORE.'database.php');
