@@ -45,14 +45,19 @@ class config extends core {
 			foreach($list as $li) {
 				if ((isset($li[0]) && $li[0]=='#') || !$li)
 					continue;
-				$liEx = explode('=',$li);
-				$liEx[1] = trim($liEx[1]);
-				if ($liEx[1]=='true')
-					$liEx[1] = true;
-				else
-				if ($liEx[1]=='false')
-					$liEx[1] = false;
-				core::$arrConfig[$liEx[0]] = $liEx[1];
+				$key = NULL;
+				$value = NULL;
+				$it_li = explode('=',$li);
+				if (count($it_li)==2) {
+					list($key,$value) = $it_li;
+					$value = trim($value);
+					if ($value=='true')
+						$value = true;
+					else
+					if ($value=='false')
+						$value = false;
+				}
+				core::$arrConfig[$key] = $value;
 			}
 		}else
 			die('.env not found');

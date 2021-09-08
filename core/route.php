@@ -1,10 +1,11 @@
 <?php
 class route extends core {
-	static $routes=[],$props=[],$groupProps=[];
-	function __construct($index=0) {
+	static $routes=[], $props=[], $groupProps=[];
+	protected function __construct($index=0) {
 		$this->lastIndex = $index;
 	}
-	protected function getRoute() {
+	
+	public static function getRoute() {
 		$routes = self::$routes;
 		
 		$allowChars = '0-9A-Za-z';
@@ -22,7 +23,7 @@ class route extends core {
 		};
 		if ($routes)
 			foreach($routes as $route) {
-				$url = $this->url();
+				$url = core::url();
 				
 				if ($url->get==$route['url'])
 					return $route;
@@ -47,6 +48,7 @@ class route extends core {
 			}
 		return array();
 	}
+	
 	private static function setRoute($params) {
 		if (count(self::$groupProps)) {
 			$gp = self::$groupProps;
@@ -63,27 +65,34 @@ class route extends core {
 		$index = array_push(self::$routes,$params)-1;
 		return new self($index);
 	}
-	public static function get($url,$callback) {
+	
+	public static function get($url, $callback) {
 		return self::setRoute(array("url"=>$url,"callback"=>$callback,"method"=>"get"));
 	}
-	public static function post($url,$callback) {
+	
+	public static function post($url, $callback) {
 		return self::setRoute(array("url"=>$url,"callback"=>$callback,"method"=>"post"));
 	}
-	public static function put($url,$callback) {
+	
+	public static function put($url, $callback) {
 		return self::setRoute(array("url"=>$url,"callback"=>$callback,"method"=>"put"));
 	}
-	public static function delete($url,$callback) {
+	
+	public static function delete($url, $callback) {
 		return self::setRoute(array("url"=>$url,"callback"=>$callback,"method"=>"delete"));
 	}
+	
 	public function name($name) {
 		self::$routes[$this->lastIndex]['name'] = $name;
 		return $this;
 	}
+	
 	public function middleware($name) {
 		self::$routes[$this->lastIndex]['middleware'] = (is_array($name) ? $name : [$name]);
 		return $this;
 	}
-	public static function group($params,$callback) {
+	
+	public static function group($params, $callback) {
 		self::$groupProps = $params;
 		$callback();
 		self::$groupProps = [];

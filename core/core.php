@@ -1,19 +1,20 @@
 <?php
 abstract class core {
-	static $dblink,$arrConfig=[],$arrError=[],$arrCompillerView=[],$arrStorages=[];
+	static $dblink,$arrConfig=[],$arrError=[],$arrCompilerView=[],$arrStorages=[];
 	
 	const dirM = ROOT.'model/';
 	const dirV = ROOT.'view/';
 	const dirC = ROOT.'controller/';
 	const dirCache = STORAGE.'.cache/';
-	const dirCompiller = STORAGE.'.cache/compiller/';
+	const dirCompiler = STORAGE.'.cache/compiller/';
 	const dirVSys = CORE.'view/';
 	
-	function connectDB() {
+	protected function connectDB() {
 		$config = app()->config;
 		
 		if (!$config->DB_ENABLED)
 			return;
+		
 		self::$dblink = new database(
 			$config->DB_TYPE,
 			$config->DB_HOST,
@@ -22,9 +23,16 @@ abstract class core {
 			$config->DB_NAME,
 			$config->APP_DEBUG
 		);
-		self::$dblink->connect();
+		try {
+			self::$dblink->connect(true);
+		} catch (PDOException $e) {
+			if (app()->config->APP_DEBUG)
+				view::error('error',['message'=>iconv('windows-1251','utf-8',$e->getMessage())]);
+			else
+				view::error('error',['message'=>'Connect DB']);
+		}
 	}
-	function __destruct() {
+	public function __destruct() {
 		if (app()->config->DB_ENABLED && !is_null(self::$dblink))
 			self::$dblink->disconnect();
 	}
@@ -56,7 +64,7 @@ abstract class core {
 			return true;
 		return false;
 	}
-	function addControllers() {
+	protected function addControllers() {
 		foreach(route::$routes as $page)
 			if (!is_callable($page['callback']))
 				if (file_exists(self::dirC.$page['callback']->controller.".php"))
@@ -64,10 +72,5 @@ abstract class core {
 	}
 	protected function checkMethod($method) {
 		return strtolower($method)==strtolower($_SERVER['REQUEST_METHOD']) ? true : false;
-	}
-	public static function declareError($name,$code,$params) {
-		if (!is_numeric($code))
-			return;
-		self::$arrError[$code] = ['name'=>$name,'code'=>$code,'params'=>$params];
 	}
 }

@@ -1,19 +1,19 @@
 <?php
-class compiller extends core {
+class compiler extends core {
 	static $_section;
 	protected function genCache($view,$dirV) {
 		if (!file_exists(core::dirCache))
 					if (!mkdir(core::dirCache))
 						die('cache dir, error create');
-		if (!file_exists(core::dirCompiller))
-					if (!mkdir(core::dirCompiller))
+		if (!file_exists(core::dirCompiler))
+					if (!mkdir(core::dirCompiler))
 						die('cache dir, error create');
 		
 		if (app()->config->APP_DEBUG)
 			return 1;
 		
 		$cacheViewName = md5($dirV.$view);
-		$cacheViewIndex = core::dirCompiller.".index";
+		$cacheViewIndex = core::dirCompiler.".index";
 		$md5Hash = md5_file($dirV.$view.".php");
 		$createIndex = function($cacheViewIndex,$obj) {
 			if (file_put_contents($cacheViewIndex,json_encode((is_callable($obj) ? $obj() : $obj))))
@@ -73,9 +73,9 @@ class compiller extends core {
 		$buffer = preg_replace_callback(['/\@([a-z0-9]{1,})[\r\n|\n|\s]/isU','/\@([^()\n\@]{0,})(\(((?>[^()\n]|(?2))*)\))/isU'], function($var) use (&$append,&$splitArg) {
 			$arg = (isset($var[3]) && $var[3]) ? $splitArg($var[3]) : [];
 			
-			if (count(self::$arrCompillerView)) {
+			if (count(self::$arrCompilerView)) {
 				$argCustom = (isset($var[3]) && $var[3]) ? $splitArg($var[3]) : [];
-				foreach(self::$arrCompillerView as $rule) {
+				foreach(self::$arrCompilerView as $rule) {
 					if ((isset($var[1]) && $var[1]==$rule['name'])) {
 						if (count($argCustom)<=(new ReflectionFunction($rule['return']))->getNumberOfParameters()) {
 							$argCustom[count($arg)] = &$append;
@@ -93,6 +93,6 @@ class compiller extends core {
 		return $buffer;
 	}
 	public static function declare($name,$return) {
-		self::$arrCompillerView[] = ['name'=>$name,'return'=>$return];
+		self::$arrCompilerView[] = ['name'=>$name,'return'=>$return];
 	}
 }
