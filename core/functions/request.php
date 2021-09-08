@@ -1,5 +1,5 @@
 <?php
-class request {
+class request extends core {
 	protected static function POST() {
 		return core::guardData($_POST);
 	}

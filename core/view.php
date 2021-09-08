@@ -7,9 +7,6 @@ class view extends compiler {
 		
 		if (file_exists($pathV.$view.".php")) {
 			
-			if (count($data)>0)
-				extract($data);
-			
 			$cacheViewPath = core::dirCompiler.md5($pathV.$view);
 			
 			if (compiler::genCache($view,$pathV))
@@ -18,11 +15,17 @@ class view extends compiler {
 					compiler::compile(file_get_contents($pathV.$view.'.php'))
 				);
 			
+			$connect = function($__file, $__data, $__system) {
+				if (count($__data)>0)
+					extract($__data);
+				ob_start();
+				require_once($__file);
+				return ob_get_clean();
+			};
+			
 			try {
 				
-				ob_start();
-				require_once($cacheViewPath);
-				return ob_get_clean();
+				return $connect($cacheViewPath, $data, $system);
 				
 			}catch (ParseError $e) {
 				

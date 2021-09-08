@@ -25,7 +25,7 @@ require_once(CORE.'storage.php');
 
 class app extends core {
 	private $appService;
-	function __construct() {
+	public function __construct() {
 		header('Content-Type: text/html; charset=utf-8');
 			
 		config::init();
@@ -42,11 +42,16 @@ class app extends core {
 			
 		self::initFile('route');
 		
-		$this->connectDB();
+		core::connectDB();
 		
-		$this->addControllers();
+		core::addControllers();
 		
 		$this->run();
+		
+	}
+	public function __destruct() {
+		
+		core::disconnectDB();
 		
 	}
 	public static function initFile($name) {
@@ -133,7 +138,7 @@ class app extends core {
 		compiler::declare('extends',function($arg, $append) {
 			$varSection = str_replace(['\'','\"'],'',$arg);
 			
-			$append("<?php ob_end_clean(); echo \$this->addView(".$arg."); echo \$this->getSection('__view.".$varSection."'); ?>");
+			$append("<?php ob_end_clean(); echo \$this->addView(".$arg.", \$__data, \$__system); echo \$this->getSection('__view.".$varSection."'); ?>");
 			
 			return "<?php ob_start(function(\$b){self::\$_section['__view.".$varSection."']=\$b;}); ?>";
 		});
