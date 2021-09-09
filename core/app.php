@@ -138,9 +138,16 @@ class app extends core {
 		compiler::declare('extends',function($arg, $append) {
 			$varSection = str_replace(['\'','\"'],'',$arg);
 			
-			$append("<?php ob_end_clean(); echo \$this->addView(".$arg.", \$__data, \$__system); echo \$this->getSection('__view.".$varSection."'); ?>");
+			$append("<?php ob_end_clean(); echo \$this->addView(".$arg.", [], \$__system); echo \$this->getSection('__view.".$varSection."'); ?>");
 			
 			return "<?php ob_start(function(\$b){self::\$_section['__view.".$varSection."']=\$b;}); ?>";
+		});
+		
+		// INCLUDE
+		compiler::declare('include',function($arg1, $arg2) {
+			$arg2 = is_callable($arg2) ? '[]' : $arg2;
+			
+			return "<?php echo \$this->addView(".$arg1.", ".$arg2.", \$__system); ?>";
 		});
 	}
 	private function defaultErrors() {
