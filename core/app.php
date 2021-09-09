@@ -27,7 +27,13 @@ class app extends core {
 	private $appService;
 	public function __construct() {
 		header('Content-Type: text/html; charset=utf-8');
-			
+		
+		set_error_handler(function($errno, $errstr, $errfile, $errline) {
+			if (0 === error_reporting())
+				return false;
+			throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+		});
+		
 		config::init();
 		
 		$this->defaultCompiller();

@@ -9,7 +9,7 @@ class session {
 	}
 }
 function session($data=[]) {
-	if (!count($data))
+	if (is_array($data) && !count($data))
 		return new session;
 	if (is_array($data)) {
 		foreach($data as $key=>$val) {

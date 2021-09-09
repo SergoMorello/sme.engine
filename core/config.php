@@ -2,12 +2,6 @@
 
 class config extends core {
 	public static function init() {
-		set_error_handler(function($errno, $errstr, $errfile, $errline) {
-			if (0 === error_reporting())
-				return false;
-			throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
-		});
-		
 		core::setConfig('APP_NAME','SME Engine');
 		
 		core::setConfig('APP_DEBUG',true);
