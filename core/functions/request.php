@@ -64,6 +64,7 @@ class request extends core {
 	public function validate($data,$return=false) {
 		if (!is_array($data))
 			return;
+		
 		$accessCheck = function ($var,$access) {
 			foreach(explode('|',$access) as $ac) {
 				switch($ac) {
@@ -94,8 +95,11 @@ class request extends core {
 		$arrErr = [];
 		foreach($data as $var=>$access)
 			if ($accessErr = $accessCheck($this->input($var),$access))
-				$arrErr[] = ['var'=>$var,'access'=>$accessErr];
-			
+				$arrErr[] = [
+					'name'=>$var,
+					'access'=>$accessErr
+				];
+		
 		if (count($arrErr)) {
 			if ($return)
 				return true;

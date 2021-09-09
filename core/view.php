@@ -15,17 +15,46 @@ class view extends compiler {
 					compiler::compile(file_get_contents($pathV.$view.'.php'))
 				);
 			
-			$connect = function($__file, $__data, $__system) {
+			$errors = function() {
+				return (new class{
+					
+					private $errors;
+					
+					public function __construct() {
+						$this->errors = session('__withErrors');
+					}
+					
+					public function any() {
+						return count($this->errors) ? true : false;
+					}
+					
+					public function all() {
+						return $this->errors;
+					}
+				});
+			};
+			
+			$connect = function($__file, $__data, $__system, $__errors) {
+				$errors = $__errors();
+				
 				if (count($__data)>0)
 					extract($__data);
+				
 				ob_start();
+				
 				require_once($__file);
+				
+				session()->delete([
+					'__oldInputs',
+					'__withErrors'
+				]);
+				
 				return ob_get_clean();
 			};
 			
 			try {
 				
-				return $connect($cacheViewPath, $data, $system);
+				return $connect($cacheViewPath, $data, $system, $errors);
 				
 			}catch (ParseError $e) {
 				

@@ -183,12 +183,8 @@ class app extends core {
 		middleware::declare('validate',function($errors){
 			$list = [];
 			foreach($errors as $error)
-				$list[] = $error['var'].' need '.$error['access'];
-			die(view::error('error',[
-				'message'=>'Error fields:',
-				'errorLine'=>0,
-				'sourceLines'=>$list
-			]));
+				$list[] = 'field '.$error['name'].' must be '.$error['access'];
+			die(redirect()->back()->withErrors($list));
 		});
 		
 		middleware::declare('viewError',function($error){

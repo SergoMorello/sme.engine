@@ -1,6 +1,7 @@
 <?php
 class middleware extends core {
 	static $addMiddleware=[];
+	
 	public static function check($arrCheck,...$arg) {
 		$arrCheck = is_array($arrCheck) ? $arrCheck : [$arrCheck];
 		foreach($arrCheck as $mdw) {
@@ -16,6 +17,7 @@ class middleware extends core {
 			}
 		}
 	}
+	
 	public static function declare($name,$obj=NULL) {
 		self::$addMiddleware[] = ['name'=>$name,'obj'=>$obj];
 	}
