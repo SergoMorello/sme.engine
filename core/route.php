@@ -1,6 +1,6 @@
 <?php
 class route extends core {
-	static $routes=[], $props=[], $groupProps=[];
+	static $routes=[], $props=[], $groupProps=[], $current=[];
 	protected function __construct($index=0) {
 		$this->lastIndex = $index;
 	}
@@ -26,7 +26,7 @@ class route extends core {
 				$url = core::url();
 				
 				if ($url->get==$route['url'])
-					return $route;
+					return self::setCurrent($route);
 				//Определяем нужный маршрут
 				if ($route['url']!="/" && preg_match('/\s'.$urlMath($route['url']).'[\/|]{0,}\s/is', ' '.$url->get.' ', $matchUrl)) {
 					//Получаем названия переменных из маршрута
@@ -43,10 +43,15 @@ class route extends core {
 					if (isset($route['props']))
 						self::$props = $route['props'];
 					
-					return $route;
+					return self::setCurrent($route);
 				}
 			}
 		return array();
+	}
+	
+	private static function setCurrent($route) {
+		self::$current = $route;
+		return $route;
 	}
 	
 	private static function setRoute($params) {

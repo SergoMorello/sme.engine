@@ -62,6 +62,31 @@ class compiler extends core {
 			return explode(',',$str);
 		};
 		
+		$convertSpec = [
+			[
+				'{',
+				'}',
+				'@',
+				':',
+				'$',
+				'<?',
+				'?>'
+			],
+			[
+				'&lcub;',
+				'&rcub;',
+				'&commat;',
+				'&colon;',
+				'&dollar;',
+				'&lt;&quest;',
+				'&quest;&rt;'
+			]
+		];
+		
+		$buffer = preg_replace_callback('/\@nc(.*)@endnc/isU', function($var) use (&$convertSpec){
+			return str_replace($convertSpec[0],$convertSpec[1],$var[1]);
+		}, $buffer);
+		
 		$buffer = preg_replace_callback('/\{\{(.*)\}\}/isU', function($var){
 			return "<?php echo htmlspecialchars(".$var[1]."); ?>";
 		}, $buffer);
@@ -89,6 +114,10 @@ class compiler extends core {
 		}, $buffer);
 		
 		$buffer .= $appendBuffer ?? NULL;
+		
+		unset($convertSpec[0][5],$convertSpec[0][6],$convertSpec[1][5],$convertSpec[1][6]);
+		
+		$buffer = str_replace($convertSpec[1],$convertSpec[0],$buffer);
 		
 		return $buffer;
 	}

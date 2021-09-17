@@ -5,6 +5,9 @@ function route($name=NULL,$props=[]) {
 			public function current() {
 				return core::url();
 			}
+			public function getName() {
+				return route::$current['name'] ?? "";
+			}
 		});
 	$replaceVars = function($url,$vars=[]) {
 		$numVars = count($vars);
