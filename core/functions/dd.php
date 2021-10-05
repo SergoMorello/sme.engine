@@ -4,6 +4,8 @@ function dd($data) {
 		return str_replace("  ","#",str_replace("\n","<br>\r\n",print_r($data,true)));
 	};
 	header('Content-Type: text/html');
+	while(ob_list_handlers())
+		ob_end_clean();
 	$ret = "<div style='color:#353535;padding: 10px;font-size:15px;border-bottom:1px dotted #212121;'>".$replacer($data)."</div>";
 	$ret .= "<div style='color:#727272;font-size:12px;'>";
 	$ret .= "<h3 style='color:#545454;'>OTHER:</h3>";

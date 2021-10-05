@@ -2,8 +2,8 @@
 
 class cache extends core {
 	public static function put($key,$value,$time=0) {
-		$name = self::index()->set($key,$time);
-		return file_put_contents(self::dirCache.$name,(is_callable($value) ? $value() : $value));
+		$cache = self::index()->set($key, $value, $time);
+		return file_put_contents(self::dirCache.$cache->name,$cache->value);
 	}
 	private static function index() {
 		return (new class{
@@ -45,16 +45,42 @@ class cache extends core {
 					if ($line->key==$key)
 						return $line;
 			}
-			public function set($key,$time) {
+			private function dataType($value) {
+				$ret = (object)[
+							'type'=>'string',
+							'value'=>$value
+						];
+				if (is_callable($value)) {
+					$ret->type = 'callable';
+					$ret->value = $value();
+				}else
+				if (is_array($value)) {
+					$ret->type = 'array';
+					$ret->value = serialize($value);
+				}else
+				if (is_object($value)) {
+					$ret->type = 'object';
+					$ret->value = serialize($value);
+				}
+				return $ret;
+			}
+			public function set($key, $value, $time) {
 				$obj = $this->get();
 				$time = $time>0 ? time()+$time : 0;
 				$name = md5($key);
-				if (($keyIt = $this->findKey($obj,$key))>=0)
-					$obj[$keyIt]->time = $time;
-				else
-					$obj[] = (object)['key'=>$key,'time'=>$time,'name'=>$name];
+				$valType = $this->dataType($value);
+				if (($keyIt = $this->findKey($obj,$key))>=0) {
+					$objIt = $obj[$keyIt];
+					$objIt->time = $time;
+					$objIt->type = $valType->type;
+					$objIt->value = $valType->value;
+				}else
+					$obj[] = (object)['key'=>$key,'time'=>$time,'type'=>$valType->type,'name'=>$name];
 				$this->update($obj);
-				return $name;
+				return (object)[
+						'name'=>$name,
+						'value'=>$valType->value
+						];
 			}
 			public function delete($key) {
 				$obj = $this->get();
@@ -68,9 +94,12 @@ class cache extends core {
 		});
 	}
 	public static function get($key,$default="") {
-		if ($cache = self::index()->get($key))
-			return file_get_contents(self::dirCache.$cache->name);
-		else
+		if ($cache = self::index()->get($key)) {
+			$return = file_get_contents(self::dirCache.$cache->name);
+			if ($cache->type=='array' || $cache->type=='object')
+				return unserialize($return);
+			return $return;
+		}else
 			return empty($default) ? NULL : $default;
 	}
 	public static function pull($key) {

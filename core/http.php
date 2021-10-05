@@ -1,7 +1,7 @@
 <?php
 
 class http extends core {
-	static $props=[];
+	static $props=[],$response;
 	private static function parseHeaders($headers) {
 		if (!is_array($headers))
 			return;
@@ -52,9 +52,12 @@ class http extends core {
 		$response = (object)[];
 		
 		try{
-			$response->body = file_get_contents($url, false, $headers);
+			$response->body = self::$response = file_get_contents($url, false, $headers);
 		}catch (Exception $ex) {
-			view::error('error',['message'=>'HTTP Client: '.explode("):",$ex->getMessage())[1]]);
+			view::error('error',[
+					'message'=>'HTTP Client: '.explode("):",$ex->getMessage())[1],
+					'errorLine'=>0,
+					'sourceLines'=>['URL: '.$url,'Response: '.self::$response]]);
 		}
 		
 		$response->header = self::parseHeaders($http_response_header);

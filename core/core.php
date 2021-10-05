@@ -72,8 +72,29 @@ abstract class core {
 	protected function addControllers() {
 		foreach(route::$routes as $page)
 			if (!is_callable($page['callback']))
-				if (file_exists(self::dirC.$page['callback']->controller.".php"))
-					require_once(self::dirC.$page['callback']->controller.'.php');
+				if (file_exists(self::dirC.$page['callback']->controller.".php")) {
+					try {
+						
+						require_once(self::dirC.$page['callback']->controller.'.php');
+						
+					} catch (ParseError $e) {
+			
+						middleware::check('viewError',$e);
+					
+					} catch (Error $e) {
+						
+						middleware::check('viewError',$e);
+						
+					} catch (Exception $e) {
+						
+						middleware::check('viewError',$e);
+						
+					} catch (ErrorException $e) {
+						
+						middleware::check('viewError',$e);
+						
+					}
+				}
 	}
 	
 	protected function checkMethod($method) {

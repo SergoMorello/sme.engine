@@ -1,6 +1,9 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm mb-3 bg-body rounded">
 	<div class="container-fluid">
-		<a class="navbar-brand" href="{{route('home')}}">{{app()->config->APP_NAME}}</a>
+		<a class="navbar-brand" href="{{route('home')}}">
+			<img src="{{asset('ico/32x32.png')}}" alt="" width="32" height="32" class="d-inline-block align-text-top">
+			{{app()->config->APP_NAME}}
+		</a>
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>

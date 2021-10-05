@@ -259,7 +259,7 @@ class app extends core {
 				array_values($route['props'] ?? [])
 			));
 			
-		} catch (Error $e) {
+		}  catch (Error $e) {
 			
 			view::error('error',['message'=>$e->getMessage()]);
 			

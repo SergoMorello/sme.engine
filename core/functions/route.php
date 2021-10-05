@@ -33,5 +33,6 @@ function route($name=NULL,$props=[]) {
 			if (isset($page['name']) && $page['name']==$name)
 				return (object)$page;
 	};
-	return $replaceVars($searchRoute($name)->url,$props);
+	if (!empty($searchRoute($name)))
+		return $replaceVars($searchRoute($name)->url,$props);
 }
