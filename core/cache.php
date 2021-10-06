@@ -73,7 +73,6 @@ class cache extends core {
 					$objIt = $obj[$keyIt];
 					$objIt->time = $time;
 					$objIt->type = $valType->type;
-					$objIt->value = $valType->value;
 				}else
 					$obj[] = (object)['key'=>$key,'time'=>$time,'type'=>$valType->type,'name'=>$name];
 				$this->update($obj);
