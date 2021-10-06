@@ -1,15 +1,18 @@
 <?php
-class appHelper {
-	public $config;
-	function __construct() {
-		$this->config = (object)core::$arrConfig;
-	}
-	public function config($param) {
-		if (isset(core::$arrConfig[$param]))
-			return core::$arrConfig[$param];
-	}
-}
-
-function app() {
-	return new appHelper;
+function app($class='') {
+	$helper = new class {
+		function __construct() {
+			foreach(app::$classes as $class)
+				$this->{$class['name']} = $class['obj'];
+		}
+		public function _getClass($class) {
+			if (count(app::$classes))
+				foreach(app::$classes as $cls)
+					if ($class==$cls['name'])
+						return $cls['obj'];
+		}
+	};
+	if ($class)
+		return $helper->_getClass($class);
+	return $helper;
 }

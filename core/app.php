@@ -24,7 +24,11 @@ require_once(CORE.'cache.php');
 require_once(CORE.'storage.php');
 
 class app extends core {
+	
 	private $appService;
+	
+	static $classes = [];
+	
 	public function __construct() {
 		header('Content-Type: text/html; charset=utf-8');
 		
@@ -40,17 +44,19 @@ class app extends core {
 		
 		$this->defaultErrors();
 		
-		self::initFile('appService');
+		self::include('appService');
 		
 		$this->defaultService();
 		
 		$this->defaultMiddleware();
 			
-		self::initFile('route');
+		self::include('route');
 		
 		core::connectDB();
 		
 		core::addControllers();
+		
+		$this->bootService();
 		
 		$this->run();
 		
@@ -60,10 +66,23 @@ class app extends core {
 		core::disconnectDB();
 		
 	}
-	public static function initFile($name) {
+	
+	public static function singleton($name, $callback) {
+		self::$classes[] = [
+			'name'=>$name,
+			'obj'=>$callback()
+		];
+	}
+	
+	public static function include($name) {
+		$name = str_replace('.','/',$name);
 		try {
 			
 			require_once(ROOT.$name.'.php');
+			
+		} catch (ParseError $e) {
+			
+			middleware::check('viewError',$e);
 			
 		} catch (Error $e) {
 			
@@ -194,7 +213,7 @@ class app extends core {
 		});
 		
 		middleware::declare('viewError',function($error){
-			if (app()->config->APP_DEBUG) {
+			if (config::get('APP_DEBUG')) {
 				$sourceLines = function($file) {
 					return explode(PHP_EOL,file_get_contents($file));
 				};
@@ -215,6 +234,30 @@ class app extends core {
 			
 			if (method_exists($this->appService,'register'))
 				$this->appService->register();
+			
+		} catch (ParseError $e) {
+			
+			middleware::check('viewError',$e);
+			
+		} catch (Error $e) {
+			
+			middleware::check('viewError',$e);
+			
+		} catch (Exception $e) {
+			
+			middleware::check('viewError',$e);
+			
+		} catch (ErrorException $e) {
+			
+			middleware::check('viewError',$e);
+			
+		}
+	}
+	private function bootService() {
+		try {
+			
+			if (method_exists($this->appService,'boot'))
+				$this->appService->boot();
 			
 		} catch (ParseError $e) {
 			
@@ -259,17 +302,21 @@ class app extends core {
 				array_values($route['props'] ?? [])
 			));
 			
-		}  catch (Error $e) {
+		} catch (ParseError $e) {
 			
-			view::error('error',['message'=>$e->getMessage()]);
+			middleware::check('viewError',$e);
+		
+		} catch (Error $e) {
+			
+			middleware::check('viewError',$e);
 			
 		} catch (Exception $e) {
 			
-			view::error('error',['message'=>$e->getMessage()]);
+			middleware::check('viewError',$e);
 			
 		} catch (ErrorException $e) {
 			
-			view::error('error',['message'=>$e->getMessage()]);
+			middleware::check('viewError',$e);
 			
 		}
 	}

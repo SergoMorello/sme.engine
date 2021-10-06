@@ -10,23 +10,22 @@ abstract class core {
 	const dirVSys = CORE.'view/';
 	
 	protected function connectDB() {
-		$config = app()->config;
 		
-		if (!$config->DB_ENABLED)
+		if (!config::get('DB_ENABLED'))
 			return;
 		
 		self::$dblink = new database(
-			$config->DB_TYPE,
-			$config->DB_HOST,
-			$config->DB_USER,
-			$config->DB_PASS,
-			$config->DB_NAME,
-			$config->APP_DEBUG
+			config::get('DB_TYPE'),
+			config::get('DB_HOST'),
+			config::get('DB_USER'),
+			config::get('DB_PASS'),
+			config::get('DB_NAME'),
+			config::get('APP_DEBUG')
 		);
 		try {
 			self::$dblink->connect(true);
 		} catch (PDOException $e) {
-			if (app()->config->APP_DEBUG)
+			if (config::get('APP_DEBUG'))
 				view::error('error',['message'=>iconv('windows-1251','utf-8',$e->getMessage())]);
 			else
 				view::error('error',['message'=>'Connect DB']);
@@ -34,7 +33,7 @@ abstract class core {
 	}
 	
 	protected function disconnectDB() {
-		if (app()->config->DB_ENABLED && !is_null(core::$dblink))
+		if (config::get('DB_ENABLED') && !is_null(core::$dblink))
 			core::$dblink->disconnect();
 	}
 	
@@ -67,6 +66,14 @@ abstract class core {
 		if (base64_encode(base64_decode($data, true))==$data)
 			return true;
 		return false;
+	}
+	
+	protected static function isJson($string) {
+		if (is_string($string)) {
+            @json_decode($string);
+            return (json_last_error() === 0);
+        }
+        return false;
 	}
 	
 	protected function addControllers() {

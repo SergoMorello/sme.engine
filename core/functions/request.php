@@ -17,9 +17,24 @@ class request extends core {
 		elseif (is_null($var))
 			return (object)$GET;
 	}
-	public function input($var) {
-		if (is_string($var))
+	public static function input($var) {
+		if (is_string($var)) {
+			$splitVars = explode('.',$var);
+			if (isset($_POST[$splitVars[0]]) && core::isJson($_POST[$splitVars[0]])) {
+				$json = json_decode($_POST[$splitVars[0]]);
+				unset($splitVars[0]);
+				
+				foreach($splitVars as $var) {
+					if (is_numeric($var) && isset($json[$var]))
+						$json = $json[$var];
+					if (is_string($var) && isset($json->$var))
+						$json = $json->$var;
+				}
+				
+				return $json;
+			}
 			return isset(self::POST()[$var]) ? self::POST()[$var] : (isset($_FILES[$var]) ? self::file($var) : NULL);
+		}
 	}
 	public function file($var) {
 		if (!is_string($var))
@@ -88,13 +103,22 @@ class request extends core {
 						if (!core::isBase64($var))
 							return $ac;
 					break;
+					case "json":
+						if (!core::isJson($var))
+							return $ac;
+					break;
 				}
 			}
 			return false;
 		};
 		$arrErr = [];
 		foreach($data as $var=>$access)
-			if ($accessErr = $accessCheck($this->input($var),$access))
+			if ($accessErr = $accessCheck(
+							stripslashes(
+								htmlspecialchars_decode(
+									isset(self::POST()[$var]) ? self::POST()[$var] : (isset($_FILES[$var]) ? self::file($var) : NULL)
+								)
+							),$access))
 				$arrErr[] = [
 					'name'=>$var,
 					'access'=>$accessErr

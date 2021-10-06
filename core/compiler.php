@@ -9,7 +9,7 @@ class compiler extends core {
 					if (!mkdir(core::dirCompiler))
 						die('cache dir, error create');
 		
-		if (app()->config->APP_DEBUG)
+		if (config::get('APP_DEBUG'))
 			return 1;
 		
 		$cacheViewName = md5($dirV.$view);

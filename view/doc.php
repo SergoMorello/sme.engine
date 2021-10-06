@@ -1,6 +1,6 @@
 @extends('lay.html')
 
-@section('title','Документация | '.app()->config->APP_NAME)
+@section('title','Документация | '.config()->APP_NAME)
 
 @section('content')
 	@include('inc.menu')
