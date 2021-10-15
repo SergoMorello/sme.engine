@@ -2,3 +2,6 @@
 .*
 !.htaccess
 !.env
+!storage/.local
+!storage/.cache
+!storage/.cache/compiler

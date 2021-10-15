@@ -8,43 +8,54 @@
 
 ####	В файле /route.php
 
-`route::get('/','mainController@index')->name('home')`;
+```php 
+route::get('/','mainController@index')->name('home');
+```
 
 #####	Создаём маршрут по пути `/` и вызываем метод `index` в контроллере `mainController`, так же даём имя маршруту `home` в цепочке методов `->name()`
 
 #####	Так же можно создать маршрут с анонимной функцией
-
-`route::get('/',function() {`  
-`	//Тут мы что то выполняем например можем показать какой то вид View('home')`  
-`	return View('home');`  
-`})->name('home')`
+```php
+route::get('/',function() {  
+  //Тут мы что то выполняем например можем показать какой то вид View('home') 
+  return View('home');
+})->name('home');
+```
 
 #### Для отправки переменных в маршруте поместите их в фигурных скобках прямо в URL
-
-`route::get('/catalog/item/{id}',functio...`
+```php
+route::get('/catalog/item/{id}',functio...
+```
 
 ###	Controller:
 
 ####	В папке /controller создаём файл контроллера, например `mainController.php` шаблон есть в файле `def.php`
 
 #####	Создаём нужный нам метод, например `index()`
-
-`public function index() {`  
-`	//Тут мы что то выполняем например можем показать какой то вид View('home')`  
-`	return View('home');`  
-`}`
+```php
+public function index() {
+  //Тут мы что то выполняем например можем показать какой то вид View('home')
+  return View('home');
+}
+```
 
 
 ##### Для получения данных от клиента используется глобальная функция `request()`
 
 ######	Получаем переменную из маршрута:
-`request()->route('id');`
+```php
+request()->route('id');
+```
 ######	Или
-`route::get('/catalog/item/{id}',function($id) {`  
-`//В переменной $id будет первая переменная из маршрута`
+```php
+route::get('/catalog/item/{id}',function($id) {
+  //В переменной $id будет первая переменная из маршрута
+```
 
 ######	Получаем переменную из формы:
-`request()->input('name');`  
+```php
+request()->input('name');
+```
 
 ###	View:
 
@@ -52,46 +63,61 @@
 
 #####	Передать переменную в вид из контроллера или анонимной функции маршрута
 
-`View('home',['message'=>'hello','message2'=>'world']);`  
+```php
+View('home',['message'=>'hello','message2'=>'world']);
+```
 
 #####	В видах мы можем делать как и обычные вставки php `<?php ?>` так и компилируемые с помощью спецсимволов `{{Переменная или функция}}` или `@функция`
 
-`<h1>Hello World!!!</h1>`  
-`<strong>yes {{$message}} {{$message2}}!</strong>`  
-`Time: {{date('H:i:s')}}`
-
+```php
+<h1>Hello World!!!</h1>
+<strong>yes {{$message}} {{$message2}}!</strong>
+Time: {{date('H:i:s')}}
+```
 #####	Наследование `lay` - папка, `html` - файл
 
-`@extends('lay.html')`
+```php
+@extends('lay.html')
+```
 
 #####	Обьявить секцию
 
-`@section('content')`  
-`<div>Контент</div>`  
-`@endsection`  
+```php
+@section('content')  
+<div>Контент</div> 
+@endsection
+```
 
 ######	или
 
-`@section('head','Текст')`
+```php
+@section('head','Текст')
+```
 
 #####	Получить секцию
 
-`@yield('content')`
+```php
+@yield('content')
+```
 
 
 #####	Обьявить переменную:
 
-`@php`  
-`$var = 123;`  
-`@endphp`  
+```php
+@php  
+$var = 123; 
+@endphp
+```
 
 #####	Перебрать массив
 
-`<ul>`  
-`@foreach($items as $item)`  
-`<li>{{$item}}</li>`  
-`@endforeach`  
-`</ul>`
+```php
+<ul>
+@foreach($items as $item)
+<li>{{$item}}</li>
+@endforeach
+</ul>
+```
 
 #####	Добавление собственных функций в компилятор
 
@@ -99,18 +125,22 @@
 
 ######	declareCompiller(`имя функции`,`анонимная функция(`агрументы переданные в функцию`,`последним всегда будет анонимная функция для добавления в конец буффера`)`)
 
-`self::declareCompiller('calc',function($arg1,$arg2,$appendFnc){`  
-` $appendFnc('<?php echo '.($arg1+$arg2).'; ?>');`  
-` return "<?php echo ".$arg1."; ?>";`  
-`});`  
+```php
+compiler::declare('plus',function($arg1,$arg2,$appendFnc){ 
+  $appendFnc('<?php echo '.$arg1.'; ?>');
+  return "<?php echo ".($arg1+$arg2)."; ?>";
+});
+```
 
 #####	Готово, вызываем в виде
 
-`@calc(2,4)`  
+```php
+@plus(2,4)
+```
 
-######	Результат, в том месте где была вызвана функция будет выведено `2`
+######	Результат, в том месте где была вызвана функция будет выведено `6`
 
-######	в самом низу страницы будет выведено `6`
+######	в самом низу страницы будет выведено `2`
 
 ###	Model:
 
@@ -118,44 +148,71 @@
 
 #####	По умолчанию имя таблицы должно быть таким же как и название класса модели, но можно переназначить с помощью свойства класса `$table`
 
-`protected $table='other_table';`
+```php
+protected $table='other_table';
+```
 
 #####	Для работы с моделью нужно подключить её в контроллере
 
-`public function index() {`  
-`$this->model("db");`
+```php
+public function index() {
+$this->model("db");
+```
+##### Или если нужно использовать в замыкании маршрута
 
-#####	Чтобы обратится к моделе используем свойство класса model->`имя модели`:
+```php
+controller::model("db");
+```
 
-`$db = $this->model->db;`
+#####	Чтобы обратится к модели используем тот же метод только без аргументов: model()->`имя модели`:
+
+```php
+$db = $this->model()->db;
+```
+
+##### Так же можно обратится к модели сразу после подключения
+
+```php
+controller::model("db")->find(1)->delete()
+```
 
 #####	Для работы с данными используется цепочка методов родительского класса:
 
-`$db->select('name')->where('id',1)->first();`
+```php
+$db->select('name')->where('id',1)->first();
+```
 
 #### Примеры:
 
 #####	Получаем массив:
 
-`$db->select('name','test','status')->where('uid',1)->get();`
+```php
+$db->select('name','test','status')->where('uid',1)->get();
+```
 
 #####	Создаём запись:
 
-`$db->name = 'name';`  
-`$db->price = '123';`  
-`$db->save();`
+```php
+$db->name = 'name';
+$db->price = '123';
+$db->save();
+```
 
 #####	Редактируем запись (метод `find()` используется для получения записи по `ID`):
 
-`$db->find(1);`  
-`$db->name = 'name2';`  
-`$db->price = '1234';`  
-`$db->save();`
+```php
+$db->find(1);
+$db->name = 'name2';
+$db->price = '1234';
+$db->save();
+```
 
 #####	Удаление записи:
 
-`$db->find(1);`  
-`$db->delete();`
+```php
+$db->find(1);
+$db->delete();
+```
 
 ### Storage
 
@@ -163,28 +220,39 @@
 
 ##### Сохранить файл на диск
 
-`storage::disk('local')->put('file.txt','какие то данные');`
+```php
+storage::disk('local')->put('file.txt','какие то данные');
+```
 
 ##### Получить файл с диска
 
-`storage::disk('local')->get('file.txt');`
+```php
+storage::disk('local')->get('file.txt');
+```
 
 ##### Удалить файл
 
-`storage::disk('local')->delete('file.txt');`
+```php
+storage::disk('local')->delete('file.txt');
+```
 
 ##### Проверить существует ли файл
 
-`storage::disk('local')->exists('file.txt');`
+```php
+storage::disk('local')->exists('file.txt');
+```
 
 ##### Так же можно сохранять файлы сразу из при их получении из формы
 
-`...`  
-`<input type="file" name="file" />`  
-`<input type="text" name="fileName" value="default"/>`  
-`...`  
-
-`request()->file('file')->storeAs('',request()->input('fileName').'.jpg');`  
+```php
+...
+<input type="file" name="file" />
+<input type="text" name="fileName" value="default"/>
+...
+```
+```php
+request()->file('file')->storeAs('',request()->input('fileName').'.jpg');
+```
 
 
 ### Cache
@@ -193,20 +261,132 @@
 
 ##### Сохранить данные в кэше put(`ключ`,`данные`,`время хранения в секундах`)
 
-`cache::put('message','Hello World!',60);`
+```php
+cache::put('message','Hello World!',60);
+```
 
 ##### Получить данные
 
-`cache::get('message');`
+```php
+cache::get('message');
+```
 
 ###### или получить и сразу удалить
 
-`cache::pull('message');`
+```php
+cache::pull('message');
+```
 
 ##### Удалить
 
-`cache::forget('message');`
+```php
+cache::forget('message');
+```
 
 ##### Проверить сущеутвование по ключу
 
-`cache::has('message');`
+```php
+cache::has('message');
+```
+
+### Http client
+
+#### Простой GET запрос
+```php
+$response = http::get('http://url');
+```
+##### В ответ получаем обьект:
+
+```php
+$response->body(); //Тело ответа
+$response->json(); //Если запрашивали json можно сразу преобразовать в массив
+$response->header('имя заголовка'); //Получить заголовок из ответа
+$response->headers(); //Получить все заголовки в виде массива
+$response->ok(); //Если всё хорошо то true
+$response->successful(); //Если код от 200 до 299
+$response->failed(); //Если код от 400 до 499
+$response->clientError(); //Если код 400
+$response->serverError(); //Если код 500
+```
+
+#### POST запрос с параметрами
+```php
+http::post('http://url',['name'=>'value']);
+```
+
+#### Basic авторизация
+```php
+http::withBasicAuth('user', 'password')->get('http://url');
+```
+##### или Digest авторизация
+```php
+http::withDigestAuth('user', 'password')->get('http://url');
+```
+#####  если значем Realm статичен, можем указать
+```php
+http::withDigestAuth('user', 'password')->withRealm('realm')->get('http://url');
+```
+
+#### Таймаут в секундах
+```php
+http::timeout('20')->get('http://url');
+```
+
+### Exceptions
+
+#### Обьявить исключение можно в appService.php
+```php
+exceptions::declare('имя_исключения',function($data=""){
+  return response('что то сломалось '.$data);
+});
+```
+#### Вызываем исключение
+```php
+exceptions::throw('имя_исключения', 'Обновите страницу');
+```
+##### Или через хелпер
+```php
+abort('имя_исключения');
+```
+##### Так же мы можем переназначать системные исключения
+###### Например переназначим исключение валидации на вывод json
+```php
+exceptions::declare('validate',function($errors){
+  return response()->json([
+          'status'=>false,
+          'errors'=>$errors
+   ]);
+});
+```
+
+### Console
+#### Запуск приложения из консоли
+
+##### Например напишем отображение времени в консоли
+
+###### Создаём маршрут с методом `console` с замыканием
+```php
+route::console('time',function(){
+  while(true) { //Создаём вечный цикл
+    echo date('H:i:s')."\r"; //Выводим текущее время и смещаем каретку в начало
+    sleep(1); //Ставим задержку на выполнение в 1 секунду
+  }
+});
+```
+###### Запускаем в консоле
+```php
+php console time
+```
+
+###### Передача аргументов из консоли
+```php
+route::console('hello:{arg1}',function($arg1){
+  echo 'Hello '.$arg1;
+  //или
+  echo 'Hello '.request()->route('arg1');
+...
+```
+###### Выполняем
+```php
+php console hello:world
+```
