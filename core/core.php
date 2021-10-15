@@ -26,9 +26,9 @@ abstract class core {
 			self::$dblink->connect(true);
 		} catch (PDOException $e) {
 			if (config::get('APP_DEBUG'))
-				view::error('error',['message'=>iconv('windows-1251','utf-8',$e->getMessage())]);
+				exceptions::throw('error',['message'=>iconv('windows-1251','utf-8',$e->getMessage())]);
 			else
-				view::error('error',['message'=>'Connect DB']);
+				exceptions::throw('error',['message'=>'Connect DB']);
 		}
 	}
 	
@@ -37,18 +37,33 @@ abstract class core {
 			core::$dblink->disconnect();
 	}
 	
-	protected static function url() {
-		$splitUrl = explode('?',$_SERVER['REQUEST_URI']);
-		$splitProps = function($props) {
-			$ret = [];
-			$split = explode('&',$props);
-			foreach($split as $sp) {
-				$splitVar = explode('=',$sp);
-				$ret[$splitVar[0]] = core::guardData($splitVar[1]);
-			}
-			return $ret;
-		};
-		return (object)['get'=>core::guardData($splitUrl[0]),'props'=>(isset($splitUrl[1]) ? $splitProps($splitUrl[1]) : [])];
+	protected static function request() {
+		if (app::$console) {
+			
+			$argvConsole = $_SERVER['argv'];
+			if (!isset($argvConsole[1]))
+				return exceptions::throw('consoleError',[
+						'message'=>'Comand list:',
+						'routes'=>route::list('console')
+					]);
+			$get = $argvConsole[1];
+			unset($argvConsole[0], $argvConsole[1]);
+			return (object)['get'=>core::guardData($get),'props'=>$argvConsole];
+			
+		}else{
+			
+			$splitUrl = explode('?',$_SERVER['REQUEST_URI']);
+			$splitProps = function($props) {
+				$ret = [];
+				$split = explode('&',$props);
+				foreach($split as $sp) {
+					$splitVar = explode('=',$sp);
+					$ret[$splitVar[0]] = core::guardData($splitVar[1]);
+				}
+				return $ret;
+			};
+			return (object)['get'=>core::guardData($splitUrl[0]),'props'=>(isset($splitUrl[1]) ? $splitProps($splitUrl[1]) : [])];
+		}
 	}
 	
 	protected static function guardData($data) {
@@ -86,26 +101,30 @@ abstract class core {
 						
 					} catch (ParseError $e) {
 			
-						middleware::check('viewError',$e);
+						exceptions::throw('viewError',$e);
 					
 					} catch (Error $e) {
 						
-						middleware::check('viewError',$e);
+						exceptions::throw('viewError',$e);
 						
 					} catch (Exception $e) {
 						
-						middleware::check('viewError',$e);
+						exceptions::throw('viewError',$e);
 						
 					} catch (ErrorException $e) {
 						
-						middleware::check('viewError',$e);
+						exceptions::throw('viewError',$e);
 						
 					}
 				}
 	}
 	
 	protected function checkMethod($method) {
-		return strtolower($method)==strtolower($_SERVER['REQUEST_METHOD']) ? true : false;
+		if (app::$console)
+			return strtolower($method)=='console' ? true : false;
+		else
+			return strtolower($method)==strtolower($_SERVER['REQUEST_METHOD']) ? true : false;
+			
 	}
 	
 	protected static function setConfig(...$vars) {

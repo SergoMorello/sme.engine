@@ -3,6 +3,7 @@ session_name('smeSession');
 session_start();
 
 define('ROOT',realpath(__DIR__ .'/..').'/');
+define('EXCEPTIONS',ROOT.'/exceptions/');
 define('MIDDLEWARE',ROOT.'/middleware/');
 define('STORAGE',ROOT.'/storage/');
 define('CORE',ROOT.'/core/');
@@ -19,6 +20,7 @@ require_once(CORE.'view.php');
 require_once(CORE.'route.php');
 require_once(CORE.'http.php');
 require_once(CORE.'functions.php');
+require_once(CORE.'exceptions.php');
 require_once(CORE.'middleware.php');
 require_once(CORE.'cache.php');
 require_once(CORE.'storage.php');
@@ -27,9 +29,9 @@ class app extends core {
 	
 	private $appService;
 	
-	static $classes = [];
+	static $console, $classes = [];
 	
-	public function __construct() {
+	public function __construct($console=false) {
 		header('Content-Type: text/html; charset=utf-8');
 		
 		set_error_handler(function($errno, $errstr, $errfile, $errline) {
@@ -37,6 +39,8 @@ class app extends core {
 				return false;
 			throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
 		});
+		
+		self::$console = $console;
 		
 		config::init();
 		
@@ -49,6 +53,8 @@ class app extends core {
 		$this->defaultService();
 		
 		$this->defaultMiddleware();
+		
+		new request;
 			
 		self::include('route');
 		
@@ -82,19 +88,19 @@ class app extends core {
 			
 		} catch (ParseError $e) {
 			
-			middleware::check('viewError',$e);
+			exceptions::throw('exception',$e);
 			
 		} catch (Error $e) {
 			
-			middleware::check('viewError',$e);
+			exceptions::throw('exception',$e);
 			
 		} catch (Exception $e) {
 			
-			middleware::check('viewError',$e);
+			exceptions::throw('exception',$e);
 			
 		} catch (ErrorException $e) {
 			
-			middleware::check('viewError',$e);
+			exceptions::throw('exception',$e);
 			
 		}
 	}
@@ -176,56 +182,138 @@ class app extends core {
 		});
 	}
 	private function defaultErrors() {
-		// 404
-		abort::declare(404,function(){
-			return view::error(
-				'error',
-				['message'=>'Not found'],
-				404
-			);
-		});
 		
-		// 405
-		abort::declare(405,function(){
-			return view::error(
-				'error',
-				['message'=>'Method not allowed'],
-				405
-			);
-		});
-		
-		// 500
-		abort::declare(500,function(){
-			return view::error(
-				'error',
-				['message'=>'Internal Server Error'],
-				500
-			);
-		});
+		if (app::$console) {
+			
+			// 401
+			exceptions::declare(401,function(){
+				return response('Not found');
+			});
+			
+			// 404
+			exceptions::declare(404,function(){
+				return response('Not found');
+			});
+			
+			// 405
+			exceptions::declare(405,function(){
+				return response('Method not allowed');
+			});
+			
+			// 500
+			exceptions::declare(500,function(){
+				return response('Internal Server Error');
+			});
+			
+		}else{
+			// 401
+			exceptions::declare(401,function(){
+				return view::error(
+					'error',
+					['message'=>'Not found'],
+					401
+				);
+			});
+			
+			// 404
+			exceptions::declare(404,function(){
+				return view::error(
+					'error',
+					['message'=>'Not found'],
+					404
+				);
+			});
+			
+			// 405
+			exceptions::declare(405,function(){
+				return view::error(
+					'error',
+					['message'=>'Method not allowed'],
+					405
+				);
+			});
+			
+			// 500
+			exceptions::declare(500,function(){
+				return view::error(
+					'error',
+					['message'=>'Internal Server Error'],
+					500
+				);
+			});
+		}
 	}
 	private function defaultMiddleware() {
 		
-		middleware::declare('validate',function($errors){
-			$list = [];
-			foreach($errors as $error)
-				$list[] = 'field '.$error['name'].' must be '.$error['access'];
-			die(redirect()->back()->withErrors($list));
-		});
-		
-		middleware::declare('viewError',function($error){
-			if (config::get('APP_DEBUG')) {
-				$sourceLines = function($file) {
-					return explode(PHP_EOL,file_get_contents($file));
-				};
+		if (app::$console) {
+			
+			exceptions::declare('validate',function($errors){
+				$list = [];
+				foreach($errors as $error)
+					$list[] = 'field '.$error['name'].' must be '.$error['access'];
+				return response(implode("\r\n",$list));
+			});
+			
+			exceptions::declare('exception',function($error){
 				
+				return response($error->getMessage()."
+					\r\non line: ".$error->getLine().' in '.$error->getFile()
+				);
+			});
+			
+			exceptions::declare('httpError',function($e){
+				return response($e['message']."
+				\r\n".implode("\r\n",$e['lines'])
+				);
+			});
+			
+			exceptions::declare('consoleError',function($e){
+				$routes = [];
+				foreach($e['routes'] as $route)
+					$routes[] = $route['url'];
+				return response($e['message']."
+				\r\n".implode("\r\n",$routes)
+				);
+			});
+			
+		}else{
+			exceptions::declare('validate',function($errors){
+				$list = [];
+				foreach($errors as $error)
+					$list[] = 'field '.$error['name'].' must be '.$error['access'];
+				die(redirect()->back()->withErrors($list));
+			});
+			
+			exceptions::declare('exception',function($error, $short=false){
+				
+				if (config::get('APP_DEBUG') && $error->getCode()==0 && !$short) {
+					$sourceLines = function($file) {
+						return explode(PHP_EOL,file_get_contents($file));
+					};
+					
+					die(view::error('error',[
+						'message'=>$error->getMessage().' on line: '.$error->getLine().' in '.$error->getFile(),
+						'errorLine'=>$error->getLine(),
+						'sourceLines'=>$sourceLines($error->getFile())
+					]));
+				}else
+					die(view::error('error',['message'=>$error->getMessage()]));
+			});
+			
+			exceptions::declare('httpError',function($e){
 				die(view::error('error',[
-					'message'=>$error->getMessage().' on line: '.$error->getLine().' in '.$error->getFile(),
-					'errorLine'=>$error->getLine(),
-					'sourceLines'=>$sourceLines($error->getFile())
+					'message'=>$e['message'],
+					'errorLine'=>0,
+					'sourceLines'=>$e['lines']
 				]));
-			}else
-				die(view::error('error',['message'=>$error->getMessage()]));
-		});
+			});
+			
+			exceptions::declare('error',function($e){
+				return view::error('error',[
+					'message'=>$e['message']
+				]);
+			});
+		}
 	}
 	private function defaultService() {
 		try {
@@ -237,19 +325,19 @@ class app extends core {
 			
 		} catch (ParseError $e) {
 			
-			middleware::check('viewError',$e);
+			exceptions::throw('exception',$e);
 			
 		} catch (Error $e) {
 			
-			middleware::check('viewError',$e);
+			exceptions::throw('exception',$e);
 			
 		} catch (Exception $e) {
 			
-			middleware::check('viewError',$e);
+			exceptions::throw('exception',$e);
 			
 		} catch (ErrorException $e) {
 			
-			middleware::check('viewError',$e);
+			exceptions::throw('exception',$e);
 			
 		}
 	}
@@ -261,19 +349,19 @@ class app extends core {
 			
 		} catch (ParseError $e) {
 			
-			middleware::check('viewError',$e);
+			exceptions::throw('exception',$e);
 			
 		} catch (Error $e) {
 			
-			middleware::check('viewError',$e);
+			exceptions::throw('exception',$e);
 			
 		} catch (Exception $e) {
 			
-			middleware::check('viewError',$e);
+			exceptions::throw('exception',$e);
 			
 		} catch (ErrorException $e) {
 			
-			middleware::check('viewError',$e);
+			exceptions::throw('exception',$e);
 			
 		}
 	}
@@ -304,19 +392,19 @@ class app extends core {
 			
 		} catch (ParseError $e) {
 			
-			middleware::check('viewError',$e);
+			exceptions::throw('exception',$e);
 		
 		} catch (Error $e) {
 			
-			middleware::check('viewError',$e);
+			exceptions::throw('exception',$e);
 			
 		} catch (Exception $e) {
 			
-			middleware::check('viewError',$e);
+			exceptions::throw('exception',$e);
 			
 		} catch (ErrorException $e) {
 			
-			middleware::check('viewError',$e);
+			exceptions::throw('exception',$e);
 			
 		}
 	}

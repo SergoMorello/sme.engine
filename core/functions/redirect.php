@@ -1,7 +1,7 @@
 <?php
 class redirect extends request {
-	public function route($name,$props=[]) {
-		return $this->rdr(route($name,$props));
+	public static function route($name,$props=[]) {
+		return self::rdr(route($name,$props));
 	}
 	public static function rdr($url) {
 		header("Location:".$url);

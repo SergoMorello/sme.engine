@@ -23,22 +23,22 @@ class route extends core {
 		};
 		if ($routes)
 			foreach($routes as $route) {
-				$url = core::url();
+				$request = core::request();
 				
-				if ($url->get==$route['url'])
+				//Получаем переменные после знака ?
+				if ($request->props)
+					$route['props'] = $request->props;
+				
+				if ($request->get==$route['url'])
 					return self::setCurrent($route);
 				//Определяем нужный маршрут
-				if ($route['url']!="/" && preg_match('/\s'.$urlMath($route['url']).'[\/|]{0,}\s/is', ' '.$url->get.' ', $matchUrl)) {
+				if ($route['url']!="/" && preg_match('/\s'.$urlMath($route['url']).'[\/|]{0,}\s/is', ' '.$request->get.' ', $matchUrl)) {
 					//Получаем названия переменных из маршрута
 					if (preg_match_all("/\{(.*)\}/isU", $route['url'], $matchVars)) {
 						foreach($matchVars[1] as $key=>$varName)
 							$route['props'][$varName] = $matchUrl[$key+1];
 						
 					}
-					//Получаем переменные после знака ?
-					if ($url->props)
-							foreach($url->props as $propName=>$propVal)
-								$route['props'][$propName] = $propVal;
 					
 					if (isset($route['props']))
 						self::$props = $route['props'];
@@ -46,7 +46,16 @@ class route extends core {
 					return self::setCurrent($route);
 				}
 			}
+			
 		return array();
+	}
+	
+	public static function list($method='') {
+		$ret = [];
+		foreach(self::$routes as $route)
+			if ($route['method']==$method || empty($method))
+				$ret[] = $route;
+		return $ret;
 	}
 	
 	private static function setCurrent($route) {
@@ -59,6 +68,8 @@ class route extends core {
 			$gp = self::$groupProps;
 			if (isset($gp['prefix']))
 				$params['url'] = '/'.$gp['prefix'].(substr($params['url'],-1)=='/' ? substr_replace($params['url'],'',strlen($params['url'])-1) : $params['url']);
+			if (isset($gp['middleware']))
+				$params['middleware'] = $gp['middleware'];
 		}
 		$params['callback'] = is_string($params['callback']) ? (function($callback) {
 			$split = explode("@",$callback);
@@ -85,6 +96,10 @@ class route extends core {
 	
 	public static function delete($url, $callback) {
 		return self::setRoute(array("url"=>$url,"callback"=>$callback,"method"=>"delete"));
+	}
+	
+	public static function console($url, $callback) {
+		return self::setRoute(array("url"=>$url,"callback"=>$callback,"method"=>"console"));
 	}
 	
 	public function name($name) {

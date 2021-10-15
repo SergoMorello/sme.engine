@@ -1,7 +1,8 @@
 <?php
 class response {
 	private static function setCode($code) {
-		header($_SERVER['SERVER_PROTOCOL']." ".$code);
+		if (isset($_SERVER['SERVER_PROTOCOL']))
+			header($_SERVER['SERVER_PROTOCOL']." ".$code);
 	}
 	public static function json($arr=[],$code=200) {
 		$arr = (array)$arr;	

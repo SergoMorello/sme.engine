@@ -58,23 +58,23 @@ class view extends compiler {
 				
 			}catch (ParseError $e) {
 				
-				middleware::check('viewError',$e);
+				exceptions::throw('exception',$e);
 				
 			}catch (Error $e) {
 				
-				middleware::check('viewError',$e);
+				exceptions::throw('exception',$e);
 				
 			}catch (Exception $e) {
 				
-				middleware::check('viewError',$e);
+				exceptions::throw('exception',$e);
 				
 			}catch (ErrorException $e) {
 				
-				middleware::check('viewError',$e);
+				exceptions::throw('exception',$e);
 				
 			}
 		}else
-			view::error('error',['message'=>'View \''.$view.'\' not found']);
+			throw new Exception('View \''.$view.'\' not found',1);
 	}
 	
 	public static function error($page,$props=[],$code=500) {

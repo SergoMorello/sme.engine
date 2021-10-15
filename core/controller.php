@@ -1,21 +1,24 @@
 <?php
 class controller extends core {
 	
-	protected $model;
+	private static $model;
 	
-	protected function model($model) {
+	public static function model($model=null) {
+		
+		if (empty($model))
+			return self::$model;
 		
 		if (file_exists(self::dirM.$model.".php")) {
 			
 			require_once(self::dirM.$model.'.php');
 			
 			if (class_exists($model))
-				$this->model = (object)[$model=>new $model];
+				return self::$model = (object)[$model=>new $model];
 			else
-				view::error('error',['message'=>'Class \"'.$model.'\" not found']);
+				throw new Exception('Class "'.$model.'" not found',1);
 			
 		}else
-			view::error('error',['message'=>'Model \"'.$model.'\" not found']);
+			throw new Exception('Model "'.$model.'" not found',1);
 		
 	}
 }

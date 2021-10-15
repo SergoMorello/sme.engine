@@ -1,22 +1,27 @@
 <?php
 class request extends core {
-	protected static function POST() {
-		return core::guardData($_POST);
+	
+	private static $_server, $_get, $_post;
+	
+	public function __construct() {
+		self::$_server = $_SERVER;
+		self::$_get = core::guardData($_GET);
+		self::$_post = core::guardData($_POST);
 	}
-	protected static function GET() {
-		return core::guardData($_GET);
-	}
-	public function route($var) {
+	
+	public static function route($var) {
 		if (is_string($var))
 			return route::$props[$var];
 	}
-	public function data($var=NULL) {
-		$GET = self::GET();
-		if (is_string($var))
-			return $GET[$var];
-		elseif (is_null($var))
-			return (object)$GET;
+	
+	public static function server($var='') {
+		if (!is_string($var))
+			return null;
+		if (empty($var))
+			return (object)self::$_server;
+		return self::$_server[$var] ?? null;
 	}
+	
 	public static function input($var) {
 		if (is_string($var)) {
 			$splitVars = explode('.',$var);
@@ -33,10 +38,11 @@ class request extends core {
 				
 				return $json;
 			}
-			return isset(self::POST()[$var]) ? self::POST()[$var] : (isset($_FILES[$var]) ? self::file($var) : NULL);
+			return self::$_post[$var] ?? self::$_get[$var] ?? (isset($_FILES[$var]) ? self::file($var) : NULL);
 		}
 	}
-	public function file($var) {
+	
+	public static function file($var) {
 		if (!is_string($var))
 			return;
 		return (new class($_FILES[$var]) {
@@ -59,24 +65,28 @@ class request extends core {
 		});
 		return (object)$file;
 	}
-	public function hasFile($var) {
+	
+	public static function hasFile($var) {
 		if (isset($_FILES[$var]))
 			return true;
 		return false;
 	}
-	public function has($var) {
-		if (isset(self::POST()[$var]))
+	
+	public static function has($var) {
+		if (isset(self::$_post[$var]))
 			return true;
 		if (isset(route::$props[$var]))
 			return true;
-		if (isset(self::GET()[$var]))
+		if (isset(self::$_get[$var]))
 			return true;
 		return false;
 	}
+	
 	public static function json() {
 		return json_decode(file_get_contents('php://input'));
 	}
-	public function validate($data,$return=false) {
+	
+	public static function validate($data,$return=false) {
 		if (!is_array($data))
 			return;
 		
@@ -114,11 +124,8 @@ class request extends core {
 		$arrErr = [];
 		foreach($data as $var=>$access)
 			if ($accessErr = $accessCheck(
-							stripslashes(
-								htmlspecialchars_decode(
-									isset(self::POST()[$var]) ? self::POST()[$var] : (isset($_FILES[$var]) ? self::file($var) : NULL)
-								)
-							),$access))
+									isset(self::$_post[$var]) ? stripslashes(htmlspecialchars_decode(self::$_post[$var])) : (isset($_FILES[$var]) ? self::file($var) : NULL)
+								,$access))
 				$arrErr[] = [
 					'name'=>$var,
 					'access'=>$accessErr
@@ -128,7 +135,7 @@ class request extends core {
 			if ($return)
 				return true;
 			else
-				middleware::check('validate',$arrErr);
+				exceptions::throw('validate',$arrErr);
 		}
 	}
 }

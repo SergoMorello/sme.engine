@@ -62,7 +62,7 @@ class model extends core {
 	}
 	private function srtSelect() {
 		$ret = "";
-		if (count($this->query->select))
+		if (isset($this->query->select) && count($this->query->select))
 			foreach($this->query->select as $select) {
 				$ret .= '`'.implode("` AS `",$select).'`';
 				if (end($this->query->select)!=$select)
@@ -73,23 +73,23 @@ class model extends core {
 		return $ret;
 	}
 	private function srtWhere() {
-		if (count($this->query->where))
+		if (isset($this->query->where) && count($this->query->where))
 			return implode(" AND ",$this->query->where);
 	}
 	private function srtWhereIn() {
-		if (count($this->query->whereIn))
+		if (isset($this->query->whereIn) && count($this->query->whereIn))
 			return implode(" AND ",$this->query->whereIn);
 	}
 	private function strLimit() {
-		if ($this->query->limit[0])
+		if (isset($this->query->limit[0]) && $this->query->limit[0])
 			return " LIMIT ".$this->query->limit[0];
 	}
 	private function srtOrderBy() {
-		if (count($this->query->orderBy))
+		if (isset($this->query->orderBy) && count($this->query->orderBy))
 			return " ORDER BY ".implode(", ",$this->query->orderBy);
 	}
 	private function srtGroupBy() {
-		if (count($this->query->groupBy))
+		if (isset($this->query->groupBy) && count($this->query->groupBy))
 			return " GROUP BY ".$this->query->groupBy[0];
 	}
 	private function strQuerySelect() {
@@ -99,11 +99,11 @@ class model extends core {
 		
 		$ret .= " FROM "."`".$this->getTableName()."`";
 		
-		$ret .= (count($this->query->where) || count($this->query->whereIn)) ? " WHERE " : " ";
+		$ret .= ((isset($this->query->where) && count($this->query->where)) || (isset($this->query->whereIn) && count($this->query->whereIn))) ? " WHERE " : " ";
 		
 		$ret .= $this->srtWhere();
 		
-		$ret .= (count($this->query->where) && count($this->query->whereIn)) ? " AND " : " ";
+		$ret .= ((isset($this->query->where) && count($this->query->where)) && (isset($this->query->whereIn) && count($this->query->whereIn))) ? " AND " : " ";
 		
 		$ret .= $this->srtWhereIn();
 		
