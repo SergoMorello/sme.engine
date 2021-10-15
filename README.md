@@ -322,7 +322,7 @@ http::withBasicAuth('user', 'password')->get('http://url');
 ```php
 http::withDigestAuth('user', 'password')->get('http://url');
 ```
-#####  если значем Realm статичен, можем указать
+#####  если Realm статичен, можем указать
 ```php
 http::withDigestAuth('user', 'password')->withRealm('realm')->get('http://url');
 ```
@@ -373,7 +373,7 @@ route::console('time',function(){
   }
 });
 ```
-###### Запускаем в консоле
+###### Запускаем в консоли
 ```php
 php console time
 ```
