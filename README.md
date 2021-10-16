@@ -69,20 +69,20 @@ View('home',['message'=>'hello','message2'=>'world']);
 
 #####	В видах мы можем делать как и обычные вставки php `<?php ?>` так и компилируемые с помощью спецсимволов `{{Переменная или функция}}` или `@функция`
 
-```php
+```blade
 <h1>Hello World!!!</h1>
 <strong>yes {{$message}} {{$message2}}!</strong>
 Time: {{date('H:i:s')}}
 ```
 #####	Наследование `lay` - папка, `html` - файл
 
-```php
+```blade
 @extends('lay.html')
 ```
 
 #####	Обьявить секцию
 
-```php
+```blade
 @section('content')  
 <div>Контент</div> 
 @endsection
@@ -90,20 +90,20 @@ Time: {{date('H:i:s')}}
 
 ######	или
 
-```php
+```blade
 @section('head','Текст')
 ```
 
 #####	Получить секцию
 
-```php
+```blade
 @yield('content')
 ```
 
 
 #####	Обьявить переменную:
 
-```php
+```blade
 @php  
 $var = 123; 
 @endphp
@@ -111,7 +111,7 @@ $var = 123;
 
 #####	Перебрать массив
 
-```php
+```blade
 <ul>
 @foreach($items as $item)
 <li>{{$item}}</li>
@@ -123,7 +123,7 @@ $var = 123;
 
 ###### 	В файле `appService.php` в методе `register` или же подключить свой класс через appService
 
-######	declareCompiller(`имя функции`,`анонимная функция(`агрументы переданные в функцию`,`последним всегда будет анонимная функция для добавления в конец буффера`)`)
+######	compiler::declare(`имя функции`,`анонимная функция(`агрументы переданные в функцию`,`последним всегда будет анонимная функция для добавления в конец буффера`)`)
 
 ```php
 compiler::declare('plus',function($arg1,$arg2,$appendFnc){ 
@@ -134,7 +134,7 @@ compiler::declare('plus',function($arg1,$arg2,$appendFnc){
 
 #####	Готово, вызываем в виде
 
-```php
+```blade
 @plus(2,4)
 ```
 
