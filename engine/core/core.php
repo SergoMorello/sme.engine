@@ -2,12 +2,12 @@
 abstract class core {
 	static $dblink, $arrConfig=[], $arrError=[], $arrCompilerView=[], $arrStorages=[];
 	
-	const dirM = ROOT.'model/';
-	const dirV = ROOT.'view/';
-	const dirC = ROOT.'controller/';
+	const dirM = APP.'model/';
+	const dirV = APP.'view/';
+	const dirC = APP.'controller/';
 	const dirCache = STORAGE.'.cache/';
 	const dirCompiler = STORAGE.'.cache/compiler/';
-	const dirVSys = CORE.'view/';
+	const dirVSys = ENGINE.'view/';
 	
 	protected function connectDB() {
 		
@@ -125,32 +125,5 @@ abstract class core {
 		else
 			return strtolower($method)==strtolower($_SERVER['REQUEST_METHOD']) ? true : false;
 			
-	}
-	
-	protected static function setConfig(...$vars) {
-		if (count($vars)==2) {
-			core::$arrConfig[$vars[0]] = $vars[1];
-			return;
-		}
-		if ($file = file_get_contents(ROOT.'.env')) {
-			$list = explode(PHP_EOL,$file);
-			$arrCfg = [];
-			foreach($list as $li) {
-				if ((isset($li[0]) && $li[0]=='#') || !$li)
-					continue;
-				$key = NULL;
-				$value = NULL;
-				$it_li = explode('=',$li);
-				if (count($it_li)==2) {
-					list($key,$value) = $it_li;
-					$value = trim($value);
-					$vall = strtolower($value);
-					if ($vall=='true' || $vall=='false')
-						$value = $vall=='true' ? true : false;
-				}
-				core::$arrConfig[$key] = $value;
-			}
-		}else
-			die('.env not found');
 	}
 }

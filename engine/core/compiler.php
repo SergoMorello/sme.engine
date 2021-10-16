@@ -1,7 +1,7 @@
 <?php
 class compiler extends core {
 	static $_section;
-	protected function genCache($view,$dirV) {
+	protected static function genCache($view,$dirV) {
 		if (!file_exists(core::dirCache))
 					if (!mkdir(core::dirCache))
 						die('cache dir, error create');
@@ -49,7 +49,7 @@ class compiler extends core {
 	public function getSection($name) {
 		return self::$_section[$name] ?? NULL;
 	}
-	protected function compile($buffer) {
+	protected static function compile($buffer) {
 		$buffer .= "\r\n";
 		
 		$appendBuffer = "";

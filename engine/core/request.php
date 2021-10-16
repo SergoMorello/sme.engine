@@ -10,7 +10,7 @@ class request extends core {
 	}
 	
 	public static function route($var) {
-		if (is_string($var))
+		if (is_string($var) && isset(route::$props[$var]))
 			return route::$props[$var];
 	}
 	
@@ -138,7 +138,4 @@ class request extends core {
 				exceptions::throw('validate',$arrErr);
 		}
 	}
-}
-function request() {
-	return new request;
 }

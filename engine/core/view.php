@@ -1,7 +1,7 @@
 <?php
 class view extends compiler {	
 
-	public function addView($view, $data=array(), $system=false) {
+	private function addView($view, $data=array(), $system=false) {
 		$view = str_replace(".","/",$view);
 		$pathV = $system ? self::dirVSys : self::dirV;
 		
@@ -77,20 +77,17 @@ class view extends compiler {
 			throw new Exception('View \''.$view.'\' not found',1);
 	}
 	
+	public static function show($page, $data=[]) {
+		response::сode(200);
+		return (new self)->addView($page,$data);
+	}
+	
 	public static function error($page,$props=[],$code=500) {
-		header($_SERVER['SERVER_PROTOCOL']." ".$code);
+		response::сode($code);
 		while(ob_list_handlers())
 			ob_end_clean();
-		$view = new self;
 		$props['code'] = $code;
-		die($view->addView($page,$props,true));
+		return (new self)->addView($page,$props,true);
 	}
 }
 
-function View($page="",$data=array(),$code=200) {
-	if (!$page)
-		view::error('error',['message'=>'Name page, no use']);
-	header($_SERVER['SERVER_PROTOCOL']." ".$code);
-	$view = new view;
-	return $view->addView($page,$data);
-}

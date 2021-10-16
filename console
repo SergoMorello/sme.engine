@@ -1,6 +1,6 @@
-#!/usr/local/bin/php
+#!/usr/bin/env php
 <?php
 
-require_once(__DIR__ .'/core/app.php');
+require_once(__DIR__ .'/engine/init.php');
 
 new app(true);
