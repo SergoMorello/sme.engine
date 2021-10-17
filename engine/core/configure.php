@@ -77,6 +77,11 @@ compiler::declare('endforeach',function() {
 	return "<?php } ?>";
 });
 
+// ELSE
+compiler::declare('else',function() {
+	return "<?php }else{ ?>";
+});
+
 // SECTION SINGLE
 compiler::declare('section',function($arg) {
 	return "<?php ob_start(function(\$b){\$this->setSection(".$arg.",\$b);}); ?>";

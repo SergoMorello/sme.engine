@@ -1,18 +1,55 @@
 <?php
 function dd($data) {
-	$replacer = function($data) {
-		return str_replace("  ","#",str_replace("\n","<br>\r\n",print_r($data,true)));
+	$arrTree = function($data) use (&$arrTree) {
+		$ret = [];
+		
+		if (is_array($data) || is_object($data)) {
+
+			if (is_object($data) && $className = get_class($data))
+				$ret[] = (object)[
+					'type'=>'object',
+					'key'=>$className,
+					'value'=>$arrTree(['props'=>get_object_vars($data),'methods'=>get_class_methods($data)])
+				];
+			else
+			foreach($data as $key=>$dt)
+				$ret[] = (object)[
+					'type'=>(is_array($data) ? 'array' : 'object'),
+					'key'=>(is_array($data) ? $key : get_class($data)),
+					'value'=>$arrTree($dt)
+				];
+		}
+		
+		if (is_string($data) || is_numeric($data))
+			$ret[] = (object)[
+				'type'=>(is_string($data) ? 'string' : 'numeric'),
+				'value'=>$data
+			];
+		
+		if (count($ret)==0)
+			$ret[] = (object)[
+				'type'=>'unknown',
+				'value'=>print_r($data,true)
+			];
+		
+		return $ret;
 	};
-	header('Content-Type: text/html');
-	while(ob_list_handlers())
-		ob_end_clean();
-	$ret = "<div style='color:#353535;padding: 10px;font-size:15px;border-bottom:1px dotted #212121;'>".$replacer($data)."</div>";
-	$ret .= "<div style='color:#727272;font-size:12px;'>";
-	$ret .= "<h3 style='color:#545454;'>OTHER:</h3>";
-	$ret .= "<h4 style='color:#545454;'>GET</h4>";
-	$ret .= $replacer($_GET);
-	$ret .= "<h4 style='color:#545454;'>POST</h4>";
-	$ret .= $replacer($_POST);
-	$ret .= "</div>";
-	die($ret);
+	
+	$fncTree = function($data) use (&$fncTree) {
+		$ret = '';
+		foreach($data as $d) {
+			if (is_array($d->value)) {
+				$ret .= '<div class="'.$d->type.'"><span class="type">'.$d->type.'</span><span class="key">'.($d->key ?? 0).':</span>';
+				$ret .= $fncTree($d->value);
+				$ret .= '</div>';
+			}else
+				$ret .= '<div class="'.$d->type.'">'.$d->value.'</div>';
+		}
+		return $ret;
+	};
+	
+	if (app::$console) {
+		die(print_r($data,true));
+	}else
+		die(view::error('dd', ['data'=>$fncTree($arrTree($data))]));
 }
