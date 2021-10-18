@@ -6,14 +6,14 @@ class controller extends core {
 	public static function model($model=null) {
 		
 		if (empty($model))
-			return self::$model;
+			return (object)self::$model;
 		
 		if (file_exists(self::dirM.$model.".php")) {
 			
 			require_once(self::dirM.$model.'.php');
 			
 			if (class_exists($model))
-				return self::$model = (object)[$model=>new $model];
+				return self::$model[$model] = new $model;
 			else
 				throw new Exception('Class "'.$model.'" not found',1);
 			

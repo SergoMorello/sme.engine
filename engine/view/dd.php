@@ -13,11 +13,21 @@
 		padding: 2px 0 2px 10px;
 		font-size: 14px;
 	}
-	.array:first-child, .object:first-child {
-		padding: 0;
-	}
 	.array > div, .object > div {
 		padding: 0 0 0 10px;
+	}
+	.oneLine {
+		white-space: nowrap;
+	}
+	.showArr {
+		display: none;
+	}
+	.oneLine > .value {
+		display: inline-block;
+		padding: 0 0 0 3px;
+	} 
+	.showArr:checked ~ .value {
+		display: block;
 	}
 	.type {
 		color: #CCC;
@@ -27,6 +37,7 @@
 	.key {
 		font-weight: bold;
 		color: #ffc107;
+		cursor: pointer;
 	}
 	.numeric {
 		color: #084298;

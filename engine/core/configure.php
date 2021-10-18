@@ -1,5 +1,13 @@
 <?php
-header('Content-Type: text/html; charset=utf-8');
+
+if (app::$console) {
+	ini_set('default_charset','IBM866');
+	mb_internal_encoding('UTF-8'); 
+
+	mb_http_output('IBM866');
+	ob_start("mb_output_handler"); 
+}else
+	header('Content-Type: text/html; charset=utf-8');
 
 set_error_handler(function($errno, $errstr, $errfile, $errline) {
 	if (0 === error_reporting())
@@ -24,6 +32,10 @@ config::set('DB_USER','');
 config::set('DB_PASS','');
 
 config::set('DB_NAME','');
+
+config::set('LOG_ENABLED',false);
+
+config::set('MAX_LOG_SIZE',2097152);
 
 core::$arrStorages = [
 	[
