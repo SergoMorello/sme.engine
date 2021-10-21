@@ -1,4 +1,7 @@
-#	SME
+<h1>
+  <img src="https://sme.inmsk.net/ico/32x32.png">
+  <span>SME</span>
+</h1>
 
 ##	simple mvc engine
 
@@ -333,6 +336,17 @@ http::withDigestAuth('user', 'password')->withRealm('realm')->get('http://url');
 http::timeout('20')->get('http://url');
 ```
 
+#### Вызвать исключение в случае ошибки
+```php
+http::post('http://url',['name'=>'value'])->throw();
+```
+##### Если нужно обработать ошибку, можно использовать замыкание
+```php
+http::post('http://url',['name'=>'value'])->throw(function($response, $error){
+  die("ой, что-то пошло не так");
+});
+```
+
 ### Exceptions
 
 #### Обьявить исключение можно в appService.php
@@ -361,6 +375,14 @@ exceptions::declare('validate',function($errors){
 ```
 
 ### Console
+
+#### Команды
+
+##### Очистить кэш
+```
+php console cache:clear
+```
+
 #### Запуск приложения из консоли
 
 ##### Например напишем отображение времени в консоли
@@ -375,7 +397,7 @@ route::console('time',function(){
 });
 ```
 ###### Запускаем в консоли
-```php
+```
 php console time
 ```
 
@@ -388,6 +410,6 @@ route::console('hello:{arg1}',function($arg1){
 ...
 ```
 ###### Выполняем
-```php
+```
 php console hello:world
 ```
