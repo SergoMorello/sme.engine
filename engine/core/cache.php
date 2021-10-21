@@ -92,6 +92,7 @@ class cache extends core {
 			}
 		});
 	}
+	
 	public static function get($key,$default="") {
 		if ($cache = self::index()->get($key)) {
 			$return = file_get_contents(self::dirCache.$cache->name);
@@ -101,16 +102,25 @@ class cache extends core {
 		}else
 			return empty($default) ? NULL : $default;
 	}
+	
 	public static function pull($key) {
 		$res = self::get($key);
 		self::forget($key);
 		return $res;
 	}
+	
 	public static function forget($key) {
 		if ($obj = self::index()->delete($key))
 			return unlink(self::dirCache.$obj->name);
 	}
+	
 	public static function has($key) {
 		return self::index()->get($key) ? true : false;
+	}
+	
+	public static function flush() {
+		foreach(self::index()->get() as $cache)
+			self::forget($cache->key);
+		return true;
 	}
 }

@@ -5,7 +5,7 @@ if (app::$console) {
 	mb_internal_encoding('UTF-8'); 
 
 	mb_http_output('IBM866');
-	ob_start("mb_output_handler"); 
+	ob_start("mb_output_handler");
 }else
 	header('Content-Type: text/html; charset=utf-8');
 
@@ -256,5 +256,13 @@ if (app::$console) {
 		return view::error('error',[
 			'message'=>$e['message']
 		]);
+	});
+}
+
+if (app::$console) {
+	// Console
+	route::console("cache:clear",function() {
+		if (cache::flush())
+			log::info('Cache cleared');
 	});
 }

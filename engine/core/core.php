@@ -66,6 +66,12 @@ abstract class core {
 		}
 	}
 	
+	public static function call($callback, $props=[]) {
+		$callback = explode("@",$callback);
+		$callback = is_callable($callback[0]) ? $callback[0] : [new $callback[0],$callback[1]];
+		return call_user_func_array($callback, $props);
+	}
+	
 	protected static function guardData($data) {
 		$isObj = false;
 		if (is_array($data) || $isObj=is_object($data)) {

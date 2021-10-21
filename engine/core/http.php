@@ -3,6 +3,7 @@
 class http extends core {
 	static $props=[],$response,$static=[];
 	
+	
 	private static function parseHeaders($headers) {
 		if (!is_array($headers))
 			return;
@@ -111,8 +112,13 @@ class http extends core {
 			$url = $url.'/?'.http_build_query($props);
 		
 		
-		$response = new class{
-			private $_body, $_headers, $_errors;
+		$response = new class($url){
+			private $_url, $_body, $_headers, $_errors;
+			
+			public function __construct($url='') {
+				$this->_url = $url;
+			}
+			
 			public function _setBody($body) {
 				$this->_body = $body;
 			}
@@ -122,6 +128,8 @@ class http extends core {
 			}
 			
 			public function _setErrors($errors) {
+				if (isset($errors['message']))
+					$errors['message'] = mb_convert_encoding($errors['message'], 'UTF-8');
 				$this->_errors = $errors;
 			}
 			
@@ -172,6 +180,24 @@ class http extends core {
 				$code = intval($this->header('reponse_code'));
 				return ($code==500) ? true : false;
 			}
+			
+			public function throw($callback=null) {
+				if ($this->ok()) {
+					$code = intval($this->header('reponse_code'));
+					if ($code>=400 && $code<=500)
+						$this->_setErrors(['message'=>$this->body()]);
+				}
+				if (count($this->error())>0) {
+					if (is_null($callback))
+						exceptions::throw('httpError',[
+						'message'=>'HTTP Client: '.explode("):",$this->error()['message'])[1],
+						'lines'=>['URL: '.$this->_url,'Response: '.$this->body()]]);
+						
+					if (is_callable($callback))
+						$callback($this, $this->error());
+				}
+				return $this;
+			}
 		};
 		
 		$response->_setBody(@file_get_contents($url, false, $context));
@@ -179,12 +205,8 @@ class http extends core {
 		if (isset($http_response_header))
 			$response->_setHeaders(self::parseHeaders($http_response_header));
 		
-		if (isset($response->error()['message']))
-			exceptions::throw('httpError',[
-					'message'=>'HTTP Client: '.explode("):",$response->error()['message'])[1],
-					'lines'=>['URL: '.$url,'Response: '.$response->body()]]);
-		
 		self::$props = [];
+		
 		return $response;
 	}
 	

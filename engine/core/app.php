@@ -4,25 +4,29 @@ class app extends core {
 	
 	private $appService;
 	
-	static $console, $classes = [];
+	static $app, $console, $classes = [];
 	
 	public function __construct($console=false) {
 		
+		self::$app = $this;
+		
 		self::$console = $console;
 		
-		self::include('engine/core/configure');
+		self::include('engine.core.configure');
 		
-		self::include('app/appService');
+		self::include('app.appService');
 		
 		$this->appService = new appService;
 		
 		$this->defaultService('register');
 		
+		$this->singletonInit();
+		
 		new request;
 			
-		self::include('routes/web');
+		self::include('routes.web');
 		
-		self::include('routes/console');
+		self::include('routes.console');
 		
 		core::connectDB();
 		
@@ -44,6 +48,11 @@ class app extends core {
 			'name'=>$name,
 			'obj'=>$callback()
 		];
+	}
+	
+	private function singletonInit() {
+		foreach(app::$classes as $class)
+			$this->{$class['name']} = $class['obj'];
 	}
 	
 	public static function include($name) {

@@ -31,6 +31,7 @@ class route extends core {
 				
 				if ($request->get==$route['url'])
 					return self::setCurrent($route);
+				
 				//Определяем нужный маршрут
 				if ($route['url']!="/" && preg_match('/\s'.$urlMath($route['url']).'[\/|]{0,}\s/is', ' '.$request->get.' ', $matchUrl)) {
 					//Получаем названия переменных из маршрута
