@@ -420,7 +420,7 @@ php console cache:clear
 
 ##### Например напишем отображение времени в консоли
 
-###### Создаём маршрут с методом `console` с замыканием
+###### В файле `route/console.php` создаём маршрут с методом `console` с замыканием
 ```php
 route::console('time',function(){
   while(true) { //Создаём вечный цикл
