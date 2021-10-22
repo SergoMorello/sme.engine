@@ -35,13 +35,31 @@ class http extends core {
 		$http['content'] = json_encode($props);
 		
 		
-		if (isset(self::$props['asForm']) && self::$props['asForm']==true) {
+		if (isset(self::$props['asForm'])) {
 			$http['header'] = "Content-Type: application/x-www-form-urlencoded";
 			$http['content'] = http_build_query($props);
 		}
 		
+		if (isset(self::$props['asMultipart'])) {
+			$boundary = "--------------------------".time();
+			
+			$http['header'] = "Content-Type: multipart/form-data; boundary=".$boundary;
+			
+			$http['content'] = '';
+			
+			$nl = PHP_EOL;
+			
+			if (count($props)>0)
+				foreach($props as $key=>$value) {
+					$http['content'] .= '--'.$boundary.$nl;
+					$http['content'] .= 'Content-Disposition: form-data; name="'.$key.'"'.$nl.$nl;
+					$http['content'] .= $value.$nl.$nl;
+				}
+			$http['content'] .= '--'.$boundary.'--';
+		}
+		
 		if (isset(self::$props['withBody'])) {
-			$http['header'] = self::$props['withBody']['contentType'];
+			$http['header'] = "Content-Type: ".self::$props['withBody']['contentType'];
 			$http['content'] = self::$props['withBody']['body'];
 		}
 		
@@ -151,9 +169,9 @@ class http extends core {
 				return $this->_errors;
 			}
 			
-			public function json() {
+			public function json($array=true) {
 				if (explode(';',$this->header('Content-Type'))[0]=='application/json')
-					return json_decode($this->body(),true);
+					return json_decode($this->body(), $array);
 				return $this->body();
 			}
 			
@@ -212,6 +230,11 @@ class http extends core {
 	
 	public static function asForm() {
 		self::$props['asForm'] = true;
+		return new self;
+	}
+	
+	public static function asMultipart() {
+		self::$props['asMultipart'] = true;
 		return new self;
 	}
 	

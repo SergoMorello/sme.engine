@@ -7,7 +7,20 @@
 
 ###	Это нечто похожее на laravel но намного быстрее и проще
 
-###	Route:
+[Route](#route)  
+[Controller](#controller)  
+[View](#view)  
+[Model](#model)  
+[Storage](#storage)  
+[Cache](#cache)  
+[Http client](#http_client)  
+[Exceptions](#exceptions)  
+[Log](#log)  
+[Console](#console)  
+
+###
+
+<h3 id="route">Route:</h3>
 
 ####	В файле /route/web.php
 
@@ -29,8 +42,7 @@ route::get('/',function() {
 ```php
 route::get('/catalog/item/{id}',functio...
 ```
-
-###	Controller:
+<h3 id="controller">Controller:</h3>
 
 ####	В папке /controller создаём файл контроллера, например `mainController.php` шаблон есть в файле `def.php`
 
@@ -59,8 +71,7 @@ route::get('/catalog/item/{id}',function($id) {
 ```php
 request()->input('name');
 ```
-
-###	View:
+<h3 id="view">View:</h3>
 
 ####	В папке /app/view создаём файл вида, например `home.php`
 
@@ -145,7 +156,8 @@ compiler::declare('plus',function($arg1,$arg2,$appendFnc){
 
 ######	в самом низу страницы будет выведено `2`
 
-###	Model:
+
+<h3 id="model">Model:</h3>
 
 ####	В папке /app/model создаём файл модели, например `db.php` шаблон есть в файле `def.php`
 
@@ -218,7 +230,8 @@ $db->find(1);
 $db->delete();
 ```
 
-### Storage
+
+<h3 id="storage">Storage:</h3>
 
 #### Класс для работы с хранилищем (в стадии разработки)
 
@@ -258,8 +271,7 @@ storage::disk('local')->exists('file.txt');
 request()->file('file')->storeAs('',request()->input('fileName').'.jpg');
 ```
 
-
-### Cache
+<h3 id="cache">Cache:</h3>
 
 #### В кэше можно хранить любые данные и файлы от одной секунды до бесконечности
 
@@ -293,7 +305,7 @@ cache::forget('message');
 cache::has('message');
 ```
 
-### Http client
+<h3 id="http_client">Http client:</h3>
 
 #### Простой GET запрос
 ```php
@@ -316,6 +328,16 @@ $response->serverError(); //Если код 500
 #### POST запрос с параметрами
 ```php
 http::post('http://url',['name'=>'value']);
+```
+
+##### По умолчанию запрос выполняется в виде json обьекта с типом `application/json`
+##### Если нужно выполнить обычный `application/x-www-form-urlencoded` то добавьте метод asForm перед выполнением запроса
+```php
+http::asForm()->post('http://url',['name'=>'value']);
+```
+##### Если нужен `multipart/form-data`
+```php
+http::asMultipart()->post('http://url',['name'=>'value']);
 ```
 
 #### Basic авторизация
@@ -347,7 +369,8 @@ http::post('http://url',['name'=>'value'])->throw(function($response, $error){
 });
 ```
 
-### Exceptions
+
+<h3 id="exceptions">Exceptions:</h3>
 
 #### Обьявить исключение можно в appService.php
 ```php
@@ -374,7 +397,7 @@ exceptions::declare('validate',function($errors){
 });
 ```
 
-### Log
+<h3 id="log">Log:</h3>
 
 #### Логирование
 
@@ -407,7 +430,7 @@ log::error('Ошибка');
 log::thisLine(true)->info(date('s'));
 ```
 
-### Console
+<h3 id="console">Console:</h3>
 
 #### Команды
 
