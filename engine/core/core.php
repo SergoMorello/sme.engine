@@ -46,8 +46,9 @@ abstract class core {
 						'message'=>'Comand list:',
 						'routes'=>route::list('console')
 					]);
-			$get = $argvConsole[1];
-			unset($argvConsole[0], $argvConsole[1]);
+			unset($argvConsole[0]);
+			$get = implode(' ', $argvConsole);
+			unset($argvConsole[1]);
 			return (object)['get'=>core::guardData($get),'props'=>$argvConsole];
 			
 		}else{
@@ -62,7 +63,7 @@ abstract class core {
 				}
 				return $ret;
 			};
-			return (object)['get'=>core::guardData($splitUrl[0]),'props'=>(isset($splitUrl[1]) ? $splitProps($splitUrl[1]) : [])];
+			return (object)['get'=>core::guardData($splitUrl[0]).'/','props'=>(isset($splitUrl[1]) ? $splitProps($splitUrl[1]) : [])];
 		}
 	}
 	
