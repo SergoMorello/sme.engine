@@ -12,5 +12,5 @@ route::group(['prefix'=>'test'],function(){
 	route::get("/qq/{id?}", function(){
 		dd(request::route('id'));
 		return 123;
-	});
+	})->where(['id'=>'[0-9]+']);
 });

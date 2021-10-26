@@ -1,5 +1,8 @@
 <?php
 
+session_name('smeSession');
+session_start();
+
 if (app::$console) {
 	ini_set('default_charset','IBM866');
 	mb_internal_encoding('UTF-8'); 
@@ -261,6 +264,11 @@ if (app::$console) {
 
 if (app::$console) {
 	// Console
+	route::console("serve",function($port=8000, $ip='127.0.0.1') {
+		log::info('Start dev server on: http://'.$ip.':'.$port);
+		exec('php -S '.$ip.':'.$port.' -t public/');
+	});
+	
 	route::console("cache:clear",function() {
 		if (cache::flush())
 			log::info('Cache cleared');

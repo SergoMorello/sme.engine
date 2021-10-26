@@ -7,12 +7,14 @@ class route extends core {
 	private function __construct($params) {
 		
 		if (count(self::$groupProps)) {
+			
 			$gp = self::$groupProps;
 			if (isset($gp['prefix']))
 				$params['url'] = '/'.$gp['prefix'].(substr($params['url'],-1)=='/' ? substr_replace($params['url'],'',strlen($params['url'])-1) : $params['url']);
 			if (isset($gp['middleware']))
 				$params['middleware'] = $gp['middleware'];
 		}
+		
 		$params['callback'] = is_string($params['callback']) ? (function($callback) {
 			$split = explode("@",$callback);
 			return (object)[
@@ -37,13 +39,13 @@ class route extends core {
 				'`/`is',
 				'`\{['.$allowChars.']{0,10}\}`isU',
 				'`\\\/\{['.$allowChars.']{0,10}\?\}`isU',
-				'` {['.$allowChars.']{0,10}\?\}`isU'
+				'`([\s]{0,}){['.$allowChars.']{0,10}\?\}`isU'
 			],
 			[
 				'\/',
 				'(['.$allowChars.']{1,})',
 				'[\/|]{0,1}(['.$allowChars.']{0,})',
-				'(['.$allowChars.']{0,})'
+				'\\1(['.$allowChars.']{0,})|\\1'
 			],$url);
 		};
 		if ($routes)
@@ -56,14 +58,24 @@ class route extends core {
 				
 				if ($request->get==$route['url'])
 					return self::setCurrent($route);
-				
-				//dd($urlMatch($request->get));
+
 				//Определяем нужный маршрут
 				if (preg_match('/\s'.$urlMatch($route['url']).'[\/|]{0,}\s/is', ' '.$request->get.' ', $matchUrl)) {
+					
 					//Получаем названия переменных из маршрута
 					if (preg_match_all("/\{(.*)\}/isU", $route['url'], $matchVars)) {
-						foreach($matchVars[1] as $key=>$varName)
-							$route['props'][str_replace('?','',$varName)] = $matchUrl[$key+1] ?? null;
+						
+						foreach($matchVars[1] as $key=>$varName) {
+							
+							$varName = str_replace('?','',$varName);
+							$varValue = $matchUrl[$key+1] ?? null;
+							
+							//Проверяем регуляркой что внутри переменных
+							if (isset($route['where'][$varName]) && !empty($varValue) && !preg_match('/'.$route['where'][$varName].'/',$varValue))
+								return [];
+							
+							$route['props'][$varName] = $varValue;
+						}
 					}
 					
 					if (isset($route['props']))
@@ -73,7 +85,7 @@ class route extends core {
 				}
 			}
 			
-		return array();
+		return [];
 	}
 	
 	public static function list($method='') {
@@ -136,6 +148,11 @@ class route extends core {
 	
 	public function middleware($name) {
 		$this->route['middleware'] = (is_array($name) ? $name : [$name]);
+		return $this;
+	}
+	
+	public function where($where) {
+		$this->route['where'] = $where;
 		return $this;
 	}
 	

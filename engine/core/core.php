@@ -76,7 +76,7 @@ abstract class core {
 	protected static function guardData($data) {
 		$isObj = false;
 		if (is_array($data) || $isObj=is_object($data)) {
-			$ret = array();
+			$ret = [];
 			foreach($data as $key=>$val)
 				$ret[$key] = self::guardData($val);
 			return $isObj ? (object)$ret : $ret;
