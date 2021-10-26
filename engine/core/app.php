@@ -23,10 +23,11 @@ class app extends core {
 		$this->singletonInit();
 		
 		new request;
-			
-		self::include('routes.web');
 		
-		self::include('routes.console');
+		if ($console)
+			self::include('routes.console');
+		else
+			self::include('routes.web');
 		
 		core::connectDB();
 		

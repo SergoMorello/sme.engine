@@ -1,5 +1,8 @@
 <?php
 
+session_name('smeSession');
+session_start();
+
 if (app::$console) {
 	ini_set('default_charset','IBM866');
 	mb_internal_encoding('UTF-8'); 

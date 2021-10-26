@@ -434,6 +434,11 @@ log::thisLine(true)->info(date('s'));
 
 #### Команды
 
+##### Запустить Dev server
+```
+php console serve
+```
+
 ##### Очистить кэш
 ```
 php console cache:clear

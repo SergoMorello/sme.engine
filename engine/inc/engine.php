@@ -1,0 +1,40 @@
+<?php
+
+return [
+	'CORE'=>[
+		'database',
+		'core',
+		'config',
+		'model',
+		'controller',
+		'compiler',
+		'view',
+		'response',
+		'route',
+		'http',
+		'exceptions',
+		'middleware',
+		'request',
+		'redirect',
+		'cache',
+		'storage',
+		'app',
+		'log',
+	],
+	'HELPERS'=>[
+		'app',
+		'config',
+		'view',
+		'response',
+		'dd',
+		'cookie',
+		'session',
+		'route',
+		'request',
+		'redirect',
+		'abort',
+		'asset',
+		'old',
+		'log',
+	]
+];
