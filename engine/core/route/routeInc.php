@@ -1,11 +1,58 @@
 <?php
-class route extends core {
-	static $routes=[], $props=[], $groupProps=[], $current=[];
+
+abstract class routeInc extends core {
 	
-	private $route;
+	protected static $routes=[], $props=[], $groupProps=[], $current=[];
 	
-	private function __construct($params) {
-		
+	protected $route;
+	
+	public function name($name) {
+		$this->route['name'] = $name;
+		return $this;
+	}
+	
+	public function middleware($name) {
+		$this->route['middleware'] = (is_array($name) ? $name : [$name]);
+		return $this;
+	}
+	
+	public function where($where) {
+		$this->route['where'] = $where;
+		return $this;
+	}
+	
+	public static function group($params, $callback) {
+		self::$groupProps = $params;
+		$callback();
+		self::$groupProps = [];
+	}
+	
+	public static function list($method='') {
+		$ret = [];
+		foreach(self::$routes as $route)
+			if ($route['method']==$method || empty($method))
+				$ret[] = $route;
+		return $ret;
+	}
+	
+	public static function getRoutes() {
+		return self::$routes;
+	}
+	
+	public static function getCurrent($var=null) {
+		return is_null($var) ? (object)self::$current : (is_string($var) ? self::$current[$var] ?? null : (object)self::$current);
+	}
+	
+	public static function getProps($var=null) {
+		return is_null($var) ? self::$props : (is_string($var) ? self::$props[$var] ?? null : self::$props);
+	}
+	
+	private static function setCurrent($route) {
+		self::$current = $route;
+		return $route;
+	}
+	
+	protected function setRoute($params) {
 		if (count(self::$groupProps)) {
 			
 			$gp = self::$groupProps;
@@ -23,10 +70,13 @@ class route extends core {
 			];
 		})($params['callback'])	: $params['callback'];
 		
+		if (!app::isConfigure())
+			$params['system'] = true;
+		
 		$this->route = $params;
 	}
 	
-	public function __destruct() {
+	protected function saveRoute() {
 		self::$routes[] = $this->route;
 	}
 	
@@ -86,79 +136,5 @@ class route extends core {
 			}
 			
 		return [];
-	}
-	
-	public static function list($method='') {
-		$ret = [];
-		foreach(self::$routes as $route)
-			if ($route['method']==$method || empty($method))
-				$ret[] = $route;
-		return $ret;
-	}
-	
-	private static function setCurrent($route) {
-		self::$current = $route;
-		return $route;
-	}
-	
-	public static function get($url, $callback) {
-		return new self([
-			"url"=>$url,
-			"callback"=>$callback,
-			"method"=>"get"
-			]);
-	}
-	
-	public static function post($url, $callback) {
-		return new self([
-			"url"=>$url,
-			"callback"=>$callback,
-			"method"=>"post"
-			]);
-	}
-	
-	public static function put($url, $callback) {
-		return new self([
-			"url"=>$url,
-			"callback"=>$callback,
-			"method"=>"put"
-			]);
-	}
-	
-	public static function delete($url, $callback) {
-		return new self([
-			"url"=>$url,
-			"callback"=>$callback,
-			"method"=>"delete"
-			]);
-	}
-	
-	public static function console($url, $callback) {
-		return new self([
-			"url"=>$url,
-			"callback"=>$callback,
-			"method"=>"console"
-			]);
-	}
-	
-	public function name($name) {
-		$this->route['name'] = $name;
-		return $this;
-	}
-	
-	public function middleware($name) {
-		$this->route['middleware'] = (is_array($name) ? $name : [$name]);
-		return $this;
-	}
-	
-	public function where($where) {
-		$this->route['where'] = $where;
-		return $this;
-	}
-	
-	public static function group($params, $callback) {
-		self::$groupProps = $params;
-		$callback();
-		self::$groupProps = [];
 	}
 }

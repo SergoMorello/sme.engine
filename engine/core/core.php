@@ -38,13 +38,13 @@ abstract class core {
 	}
 	
 	protected static function request() {
-		if (app::$console) {
+		if (app::isConsole()) {
 			
 			$argvConsole = $_SERVER['argv'];
 			if (!isset($argvConsole[1]))
 				return exceptions::throw('consoleError',[
 						'message'=>'Comand list:',
-						'routes'=>route::list('console')
+						'routes'=>route::list('command')
 					]);
 			unset($argvConsole[0]);
 			$get = implode(' ', $argvConsole);
@@ -59,7 +59,7 @@ abstract class core {
 				$split = explode('&',$props);
 				foreach($split as $sp) {
 					$splitVar = explode('=',$sp);
-					$ret[$splitVar[0]] = core::guardData($splitVar[1]);
+					$ret[$splitVar[0]] = core::guardData($splitVar[1] ?? null);
 				}
 				return $ret;
 			};
@@ -99,7 +99,7 @@ abstract class core {
 	}
 	
 	protected function addControllers() {
-		foreach(route::$routes as $page)
+		foreach(route::getRoutes() as $page)
 			if (!is_callable($page['callback']))
 				if (file_exists(self::dirC.$page['callback']->controller.".php")) {
 					try {
@@ -127,8 +127,8 @@ abstract class core {
 	}
 	
 	protected function checkMethod($method) {
-		if (app::$console)
-			return strtolower($method)=='console' ? true : false;
+		if (app::isConsole())
+			return strtolower($method)=='command' ? true : false;
 		else
 			return strtolower($method)==strtolower($_SERVER['REQUEST_METHOD']) ? true : false;
 			

@@ -1,6 +1,6 @@
 <?php
 //route::console("command","main@index");
 
-route::console('test {id?} {ids?}', function(){
+console::command('test {id?} {ids?}', function(){
 	return request::route('id');
 });

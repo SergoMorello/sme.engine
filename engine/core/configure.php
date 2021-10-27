@@ -3,7 +3,7 @@
 session_name('smeSession');
 session_start();
 
-if (app::$console) {
+if (app::isConsole()) {
 	ini_set('default_charset','IBM866');
 	mb_internal_encoding('UTF-8'); 
 
@@ -136,7 +136,7 @@ compiler::declare('include',function($arg1, $arg2) {
 
 // Exceptions
 
-if (app::$console) {
+if (app::isConsole()) {
 			
 	// 401
 	exceptions::declare(401,function(){
@@ -262,14 +262,21 @@ if (app::$console) {
 	});
 }
 
-if (app::$console) {
+if (app::isConsole()) {
 	// Console
-	route::console("serve",function($port=8000, $ip='127.0.0.1') {
+	console::command("serve",function($port=8000, $ip='127.0.0.1') {
 		log::info('Start dev server on: http://'.$ip.':'.$port);
 		exec('php -S '.$ip.':'.$port.' -t public/');
 	});
 	
-	route::console("cache:clear",function() {
+	console::command("route:list",function() {
+		log::info('Route list:');
+		log::info("URL\tController\tMethod");
+		foreach(route::list() as $list)
+			log::info($list['url']."\t".(is_callable($list['callback']) ? 'fn' : $list['callback']->controller.'@'.$list['callback']->method)."\t".$list['method']);
+	});
+	
+	console::command("cache:clear",function() {
 		if (cache::flush())
 			log::info('Cache cleared');
 	});
