@@ -10,8 +10,8 @@ class request extends core {
 	}
 	
 	public static function route($var) {
-		if (is_string($var) && isset(route::$props[$var]))
-			return route::$props[$var];
+		if (is_string($var))
+			return route::getProps($var);
 	}
 	
 	public static function server($var='') {
@@ -75,7 +75,7 @@ class request extends core {
 	public static function has($var) {
 		if (isset(self::$_post[$var]))
 			return true;
-		if (isset(route::$props[$var]))
+		if (route::getProps($var))
 			return true;
 		if (isset(self::$_get[$var]))
 			return true;

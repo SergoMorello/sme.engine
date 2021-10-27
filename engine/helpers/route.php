@@ -6,7 +6,7 @@ function route($name=NULL,$props=[]) {
 				return core::url();
 			}
 			public function getName() {
-				return route::$current['name'] ?? "";
+				return route::getCurrent('name');
 			}
 		});
 	$replaceVars = function($url,$vars=[]) {
@@ -29,7 +29,7 @@ function route($name=NULL,$props=[]) {
 		return $url;
 	};
 	$searchRoute = function($name) {
-		foreach(route::$routes as $page)
+		foreach(route::getRoutes() as $page)
 			if (isset($page['name']) && $page['name']==$name)
 				return (object)$page;
 	};

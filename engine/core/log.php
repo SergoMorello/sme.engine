@@ -17,14 +17,14 @@ class log extends core {
 	
 	private static function cout($text) {
 		$input = self::input($text);
-		if (!app::$console)
+		if (!app::isConsole())
 			return;
 		fwrite(STDOUT,iconv('UTF-8','IBM866',$input));
 	}
 	
 	private static function cerr($text) {
 		$input = self::input($text);
-		if (!app::$console)
+		if (!app::isConsole())
 			return;
 		fwrite(STDERR,iconv('UTF-8','IBM866',$input));
 	}

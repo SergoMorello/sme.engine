@@ -4,15 +4,26 @@ class app extends core {
 	
 	private $appService;
 	
-	static $app, $console, $classes = [];
+	private static $console,
+		$classes = [],
+		$objApp,
+		$configure=false,
+		$run = false;
 	
 	public function __construct($console=false) {
 		
-		self::$app = $this;
+		if (self::$run)
+			return;
+		
+		self::$objApp = new class extends core{};
+		
+		self::$run = true;
 		
 		self::$console = $console;
 		
 		self::include('engine.core.configure');
+		
+		self::$configure = true;
 		
 		self::include('app.appService');
 		
@@ -26,8 +37,8 @@ class app extends core {
 		
 		if ($console)
 			self::include('routes.console');
-		else
-			self::include('routes.web');
+		
+		self::include('routes.web');
 		
 		core::connectDB();
 		
@@ -39,9 +50,26 @@ class app extends core {
 		
 	}
 	public function __destruct() {
+		if (self::$run)
+			return;
 		
 		core::disconnectDB();
-		
+	}
+	
+	public static function getObj() {
+		return self::$objApp;
+	}
+	
+	public static function getClasses() {
+		return self::$classes;
+	}
+	
+	public static function isConfigure() {
+		return self::$configure;
+	}
+	
+	public static function isConsole() {
+		return self::$console;
 	}
 	
 	public static function singleton($name, $callback) {
@@ -52,8 +80,8 @@ class app extends core {
 	}
 	
 	private function singletonInit() {
-		foreach(app::$classes as $class)
-			$this->{$class['name']} = $class['obj'];
+		foreach(self::$classes as $class)
+			self::$objApp->{$class['name']} = $class['obj'];
 	}
 	
 	public static function include($name) {

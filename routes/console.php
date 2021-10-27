@@ -1,2 +1,2 @@
 <?php
-//route::console("command","main@index");
+//console::command("command","main@index");
