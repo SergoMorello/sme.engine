@@ -17,8 +17,10 @@ class httpResponse {
 	}
 	
 	public function _setErrors($errors) {
-		if (isset($errors['message']))
-			$errors['message'] = mb_convert_encoding($errors['message'], 'UTF-8');
+		if (isset($errors['message'])) {
+			$errors['message'] = preg_replace('/file_get_contents\((.*)\): /i', null, $errors['message']);
+			$errors['message'] = @iconv('CP1251', 'UTF-8', $errors['message']);
+		}
 		$this->_errors = $errors;
 	}
 	

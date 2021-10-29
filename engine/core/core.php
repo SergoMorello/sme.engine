@@ -26,7 +26,7 @@ abstract class core {
 			self::$dblink->connect(true);
 		} catch (PDOException $e) {
 			if (config::get('APP_DEBUG'))
-				exceptions::throw('error',['message'=>iconv('windows-1251','utf-8',$e->getMessage())]);
+				exceptions::throw('error',['message'=>@iconv('CP1251','UTF-8',$e->getMessage())]);
 			else
 				exceptions::throw('error',['message'=>'Connect DB']);
 		}
