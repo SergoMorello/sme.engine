@@ -1,16 +1,16 @@
 <?php
 
-session_name('smeSession');
-session_start();
-
 if (app::isConsole()) {
 	ini_set('default_charset','IBM866');
 	mb_internal_encoding('UTF-8'); 
 
 	mb_http_output('IBM866');
 	ob_start("mb_output_handler");
-}else
+}else{
+	session_name('smeSession');
+	session_start();
 	header('Content-Type: text/html; charset=utf-8');
+}
 
 set_error_handler(function($errno, $errstr, $errfile, $errline) {
 	if (0 === error_reporting())
@@ -280,4 +280,5 @@ if (app::isConsole()) {
 		if (cache::flush())
 			log::info('Cache cleared');
 	});
+
 }

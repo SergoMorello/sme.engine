@@ -58,7 +58,7 @@ function dd($data) {
 	};
 	
 	if (app::isConsole()) {
-		die(print_r($data,true));
+		die(var_dump($data));
 	}else
 		die(view::error('dd', ['data'=>$fncTree($arrTree($data))]));
 }

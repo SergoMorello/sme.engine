@@ -11,6 +11,28 @@ route::group(['prefix'=>'test'],function(){
 	});
 	
 	route::get("/qq/{id?}", function(){
+		return [
+			'des'=>'',
+			'hide'=>'',
+			'files'=>[
+				[
+					'id'=>'e5c507b8-3ac2-11eb-4a86-fa163e9e9024',
+					'ext'=>'jpg',
+					'edit'=>'20211028135103',
+					'add'=>'20211028135103',
+					'hash'=>'17198178f3b4955c041e639a9895b35a',
+					'default'=>true
+				],
+				[
+					'id'=>'2fcfc7e4-1363-11eb-509a-fa163e9e9024',
+					'ext'=>'pdf',
+					'edit'=>'20211028135103',
+					'add'=>'20211028135103',
+					'hash'=>'396d880ffa4cf3ab3e6fce55765ae0c5',
+					'default'=>false
+				]
+			]
+		];
 		dd(request::route('id'));
 		return 123;
 	})->where(['id'=>'[0-9]+']);

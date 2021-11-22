@@ -33,7 +33,6 @@ abstract class httpInc extends core {
 		$http['header'] = 'Content-Type: application/json';
 		$http['content'] = json_encode($props);
 		
-		
 		$request = new httpRequest(
 				$url,
 				$method,
