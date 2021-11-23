@@ -5,7 +5,9 @@ route::get("/doc","main@doc")->name('doc');
 
 route::group(['prefix'=>'test'],function(){
 	route::get("/", function(){
-		dd(http::withBasicAuth('Администратор','')->asMultipart()->post('http://194.170.100.85/test/hs/site/GetItems',['code'=>'НФ-00004846','date'=>'2021-10-25'])->json());
+		//dd(http::withBasicAuth('Администратор','')->asMultipart()->post('http://194.170.100.85/test/hs/site/GetItems',['code'=>'НФ-00004846','date'=>'2021-10-25'])->json());
+		$var = [['123']];
+		dd($var);
 		dd(route('doc'));
 		return 123;
 	});

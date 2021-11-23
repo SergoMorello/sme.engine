@@ -7,6 +7,7 @@ if (app::isConsole()) {
 	mb_http_output('IBM866');
 	ob_start("mb_output_handler");
 }else{
+	session_save_path(STORAGE.'.tmp');
 	session_name('smeSession');
 	session_start();
 	header('Content-Type: text/html; charset=utf-8');
