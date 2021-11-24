@@ -1,12 +1,16 @@
 <?php
+
 class model extends core {
-	private $query;
+
+	protected $query;
+
 	//SELECT
 	public function select(...$data) {
 		foreach($data as $dt)
 			$this->query->select[] = preg_split("/ as /i",$dt);
 		return $this;
 	}
+
 	//WHERE
 	public function where(...$data) {
 		if (count($data)==2 && !is_array($data[0]) && !is_array($data[1])) {
@@ -21,6 +25,7 @@ class model extends core {
 			$this->query->where[] = $dt[0].$dt[1].'"'.$dt[2].'"';
 		return $this;
 	}
+
 	//WHERE IN
 	public function whereIn(...$data) {
 		$gen = function($data) {
@@ -33,11 +38,13 @@ class model extends core {
 				$gen($dt);
 		return $this;
 	}
+
 	//LIMIT
 	public function limit($limit) {
 		$this->query->limit[0] = $limit;
 		return $this;
 	}
+
 	//ORDER BY
 	public function orderBy(...$data) {
 		if (count($data)==1 && !is_array($data[0])) {
@@ -52,14 +59,38 @@ class model extends core {
 			$this->query->orderBy[] = "`".$dt[0]."` ".($dt[1] ? strtoupper($dt[1]) : "DESC");
 		return $this;
 	}
+
 	//GROUP BY
 	public function groupBy($group) {
 		$this->query->groupBy[0] = $group;
 		return $this;
 	}
-	private function getTableName() {
-		return isset($this->table) ? $this->table : get_called_class();
+
+	//LEFT JOIN
+	public function leftJoin($table, $callback) {
+		//$this->query->leftJoin[] = 'LEFT JOIN '.$table.' ON';
+		return $callback(new class($table) extends model{
+			private $table;
+
+			public function __construct($table) {
+				$this->table = $table;
+			}
+
+			public function on(...$props) {
+				$p1 = $props[0] ?? '';
+				$p2 = $props[1] ?? '';
+				$p3 = $props[2] ?? '';
+				$this->query->leftJoin[] = 'LEFT JOIN '.$this->table.' ON '.$p1.' '.$p2.' '.$p3;
+				return $this;
+			}
+		});
+		return $this;
 	}
+
+	private function getTableName() {
+		return $this->table ?? get_called_class();
+	}
+
 	private function srtSelect() {
 		$ret = "";
 		if (isset($this->query->select) && count($this->query->select))
@@ -72,26 +103,32 @@ class model extends core {
 			$ret .= "*";
 		return $ret;
 	}
+
 	private function srtWhere() {
 		if (isset($this->query->where) && count($this->query->where))
 			return implode(" AND ",$this->query->where);
 	}
+
 	private function srtWhereIn() {
 		if (isset($this->query->whereIn) && count($this->query->whereIn))
 			return implode(" AND ",$this->query->whereIn);
 	}
+
 	private function strLimit() {
 		if (isset($this->query->limit[0]) && $this->query->limit[0])
 			return " LIMIT ".$this->query->limit[0];
 	}
+
 	private function srtOrderBy() {
 		if (isset($this->query->orderBy) && count($this->query->orderBy))
 			return " ORDER BY ".implode(", ",$this->query->orderBy);
 	}
+
 	private function srtGroupBy() {
 		if (isset($this->query->groupBy) && count($this->query->groupBy))
 			return " GROUP BY ".$this->query->groupBy[0];
 	}
+
 	private function strQuerySelect() {
 		$ret = "SELECT ";
 		
@@ -114,28 +151,34 @@ class model extends core {
 		$ret .= $this->strLimit();
 		return $ret;
 	}
+
 	private function clearQuery() {
 		unset($this->query);
 	}
+
 	public function get() {
 		$ret = (object)self::$dblink->get_list($this->strQuerySelect());
 		$this->clearQuery();
 		return $ret;
 	}
+
 	public function first() {
 		$ret = (object)self::$dblink->get_row($this->strQuerySelect());
 		$this->clearQuery();
 		return $ret;
 	}
+
 	public function count() {
 		$ret = self::$dblink->get_num($this->strQuerySelect());
 		$this->clearQuery();
 		return $ret;
 	}
+
 	public function find($id) {
 		$this->query->where[] = 'id="'.$id.'"';
 		return $this;
 	}
+
 	public function save() {
 		
 		$vars = get_object_vars($this);
@@ -150,6 +193,18 @@ class model extends core {
 		$this->clearQuery();
 		return $this;
 	}
+
+	public function update($props) {
+		if (is_array($props) && count($props)) {
+			$arrQuery = array();
+			foreach($props as $key=>$value)
+				$arrQuery[] = $key."='".$value."'";
+
+			self::$dblink->query("UPDATE `".$this->getTableName()."` SET ".implode(",",$arrQuery)." WHERE ".$this->srtWhere());
+			return $this;
+		}
+	}
+
 	public function delete() {
 		if ($this->query) {
 			$ret = self::$dblink->query("DELETE FROM `".$this->getTableName()."`".(count($this->query->where) ? " WHERE " : NULL).$this->srtWhere());
