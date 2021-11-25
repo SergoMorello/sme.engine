@@ -12,9 +12,11 @@ class controller extends core {
 			
 			require_once(self::dirM.$model.'.php');
 			
-			if (class_exists($model))
-				return self::$model[$model] = new $model;
-			else
+			if (class_exists($model)) {
+				$newModel = new $model;
+				$newModel->__init();
+				return self::$model[$model] = $newModel;
+			}else
 				throw new Exception('Class "'.$model.'" not found',1);
 			
 		}else

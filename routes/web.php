@@ -6,9 +6,18 @@ route::get("/doc","main@doc")->name('doc');
 route::group(['prefix'=>'test'],function(){
 	route::get("/", function(){
 		$db = controller::model('test');
-		dd($db->leftJoin('userlist',function($join){
-			return $join->on('userlist.id','=','tasklist.id');
-		}));
+		//$obj = $db->select('id','email')->find(32)->first();
+		$db->find(34);
+		$db->uid = 1;
+		$db->login = 'test';
+		$db->email = '123@123.123';
+		$db->text = 'ttt';
+		$db->stat = 1;
+		$res = $db->save();
+		dd($res);
+		dd($db->select('userlist.id as ssdd','userlists as table')->leftJoin('userlist',function($join){
+			return $join->on(['userlist.id','tasklist.uid']);
+		})->groupBy('userlist.id')->__sql());
 		//dd(http::withBasicAuth('Администратор','')->asMultipart()->post('http://194.170.100.85/test/hs/site/GetItems',['code'=>'НФ-00004846','date'=>'2021-10-25'])->json());
 		$var = [['123']];
 		dd($var);
