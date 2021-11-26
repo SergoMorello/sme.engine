@@ -1,6 +1,7 @@
 <?php
 class compiler extends core {
 	static $_section;
+
 	protected static function genCache($view,$dirV) {
 		if (!file_exists(core::dirCache))
 					if (!mkdir(core::dirCache))
@@ -43,12 +44,15 @@ class compiler extends core {
 				return [['name'=>$cacheViewName,'hash'=>$md5Hash]];
 			});
 	}
+
 	public function setSection($name,$buffer) {
 		self::$_section[$name] = $buffer;
 	}
+
 	public function getSection($name) {
 		return self::$_section[$name] ?? NULL;
 	}
+
 	protected static function compile($buffer) {
 		$buffer .= "\r\n";
 		
@@ -121,7 +125,14 @@ class compiler extends core {
 		
 		return $buffer;
 	}
+
 	public static function declare($name,$return) {
 		self::$arrCompilerView[] = ['name'=>$name,'return'=>$return];
+	}
+
+	public static function flush() {
+		foreach(glob(core::dirCompiler.'*') as $file)
+			@unlink($file);
+		return file_put_contents(core::dirCompiler.'.index','[]');
 	}
 }

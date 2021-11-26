@@ -7,7 +7,7 @@ if (app::isConsole()) {
 	mb_http_output('IBM866');
 	ob_start("mb_output_handler");
 }else{
-	session_save_path(STORAGE.'.tmp');
+	session_save_path(TEMP);
 	session_name('smeSession');
 	session_start();
 	header('Content-Type: text/html; charset=utf-8');
@@ -282,4 +282,8 @@ if (app::isConsole()) {
 			log::info('Cache cleared');
 	});
 
+	console::command("view:clear",function() {
+		if (view::flush())
+			log::info('Views cleared');
+	});
 }

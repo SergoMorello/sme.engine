@@ -2,9 +2,9 @@
 
 return [
 	'CORE'=>[
-		'database',
 		'core',
 		'config',
+		'database',
 		'model/modelCore',
 		'model/modelObject',
 		'model/modelSql',
