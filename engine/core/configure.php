@@ -228,7 +228,7 @@ if (app::isConsole()) {
 	exceptions::declare('validate',function($errors){
 		$list = [];
 		foreach($errors as $error)
-			$list[] = 'field '.$error['name'].' must be '.$error['access'];
+			$list[$error['name']] = 'field '.$error['name'].' must be '.$error['access'];
 		die(redirect()->back()->withErrors($list));
 	});
 	

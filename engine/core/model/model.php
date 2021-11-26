@@ -23,7 +23,7 @@ class model extends modelSql {
 	}
 
 	public function save() {
-		
+		$modelObject = new modelObject($this);
 		$vars = get_object_vars($this);
 		unset($vars['table'],$vars['query']);
 		if (self::$__query) {
@@ -32,8 +32,9 @@ class model extends modelSql {
 				$arrQuery[] = $key."='".$value."'";
 			self::$dblink->query("UPDATE `".$this->getTableName()."` SET ".implode(",",$arrQuery)." WHERE ".$this->srtWhere());
 		}else
-			$this->id = self::$dblink->query("INSERT INTO `".$this->getTableName()."` (id,".implode(",",array_keys($vars)).") VALUES (NULL,'".implode("','",$vars)."')",true);
-		return new modelObject($this);
+			$modelObject->id = self::$dblink->query("INSERT INTO `".$this->getTableName()."` (id,".implode(",",array_keys($vars)).") VALUES (NULL,'".implode("','",$vars)."');",true);
+			
+		return $modelObject;
 	}
 
 	public function update($props) {

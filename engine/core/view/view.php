@@ -1,6 +1,13 @@
 <?php
 class view extends compiler {	
 
+	public function __destruct() {
+		session()->delete([
+			'__oldInputs',
+			'__withErrors'
+		]);
+	}
+
 	private function addView($view, $data=array(), $system=false) {
 		$view = str_replace(".","/",$view);
 		$pathV = $system ? self::dirVSys : self::dirV;
@@ -24,6 +31,10 @@ class view extends compiler {
 						$this->errors = session('__withErrors');
 					}
 					
+					public function has($name) {
+						return count($this->errors) ? array_key_exists($name, $this->errors) : false;
+					}
+
 					public function any() {
 						return count($this->errors) ? true : false;
 					}
@@ -43,11 +54,6 @@ class view extends compiler {
 				ob_start();
 				
 				require_once($__file);
-				
-				session()->delete([
-					'__oldInputs',
-					'__withErrors'
-				]);
 				
 				return ob_get_clean();
 			};

@@ -25,13 +25,23 @@ class storage extends core {
 		$arrFolders = explode('/',$path);
 		if (count($arrFolders)<=1)
 			return;
+			
 		array_pop($arrFolders);
+
 		$folders = implode('/',$arrFolders);
-		mkdir(STORAGE.self::getDisk()->path.'/'.$folders, 0777, true);
+		
+		$fullPath = STORAGE.self::getDisk()->path.'/'.$folders;
+
+		if (empty($folders) || file_exists($fullPath))
+			return;
+
+		mkdir($fullPath, 0777, true);
 	}
 	public static function put($name,$data) {
 		self::makeFolders($name);
-		return file_put_contents(STORAGE.self::getDisk()->path.'/'.$name,$data);
+		$fullPath = STORAGE.self::getDisk()->path.'/'.$name;
+		if (file_put_contents($fullPath, $data))
+			return $fullPath;
 	}
 	
 	public static function get($name) {

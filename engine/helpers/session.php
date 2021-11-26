@@ -8,13 +8,13 @@ class session {
 			unset($_SESSION[$data]);
 	}
 }
-function session($data=[]) {
-	if (is_array($data) && !count($data))
+function session($data=null) {
+	if (is_null($data))
 		return new session;
 	if (is_array($data)) {
-		foreach($data as $key=>$val) {
+		foreach($data as $key=>$val)
 			$_SESSION[$key] = $val;
-		}
-	}else
+	}
+	if (is_string($data))
 		return $_SESSION[$data] ?? NULL;
 }

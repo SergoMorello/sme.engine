@@ -2,14 +2,14 @@
 
 class modelCore extends core {
 
-    private static $table;
+    private $table;
 
     protected function getTableName() {
-		return self::$table;
+		return $this->table;
 	}
 
     protected function setTableName($name) {
-        self::$table = $name;
+        $this->table = $name;
     }
 
     protected function genParams($params, $callback, &$data, $default=[]) {

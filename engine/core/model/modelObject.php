@@ -1,7 +1,7 @@
 <?php
 
 class modelObject extends modelCore {
-    public function __construct($result) {
+    public function __construct($result=[]) {
         $this->setVars($result);
         modelSql::clearQuery();
     }
