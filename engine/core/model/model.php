@@ -26,7 +26,8 @@ class model extends modelSql {
 		$modelObject = new modelObject($this);
 		$vars = get_object_vars($this);
 		unset($vars['table'],$vars['query']);
-		if (self::$__query) {
+		
+		if (get_object_vars(self::$__query)) {
 			$arrQuery = array();
 			foreach($vars as $key=>$value)
 				$arrQuery[] = $key."='".$value."'";

@@ -5,7 +5,7 @@ class modelSql extends modelCore {
     protected static $__query;
 
     public static function clearQuery() {
-		self::$__query = [];
+		self::$__query = (object)[];
 	}
 
     //SELECT
@@ -53,17 +53,18 @@ class modelSql extends modelCore {
 
 	//LEFT JOIN
 	public function leftJoin($table, $callback) {
-		return $callback(new class($table) extends model{
+		return $callback(new class($table, $this->getTableName()) extends model{
 			private $table;
 
-			public function __construct($table) {
+			public function __construct($table, $curentTable) {
 				$this->table = $table;
+				$this->setTableName($curentTable);
 			}
 
 			public function on(...$props) {
                 $this->genParams($props, function($a, $b, $c){
                     return '`'.$this->table.'` ON '.$a.' '.$b.' '.$c;
-                }, self::$__query->leftJoin,['b'=>'=']);
+                }, self::$__query->leftJoin, ['b'=>'=']);
                 return $this;
 			}
 		});

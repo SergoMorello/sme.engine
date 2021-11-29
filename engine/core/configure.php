@@ -7,6 +7,8 @@ if (app::isConsole()) {
 	mb_http_output('IBM866');
 	ob_start("mb_output_handler");
 }else{
+	if (!file_exists(TEMP))
+		mkdir(TEMP);
 	session_save_path(TEMP);
 	session_name('smeSession');
 	session_start();
