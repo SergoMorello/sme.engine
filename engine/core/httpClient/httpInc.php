@@ -31,7 +31,16 @@ abstract class httpInc extends core {
 		$http['ignore_errors'] = true;
 		$http['method'] = $method;
 		$http['header'] = 'Content-Type: application/json';
+
 		$http['content'] = json_encode($props);
+
+		if (isset($props['headers']) && is_array($props['headers']) && isset($props['body'])) {
+			$http['header'] .= PHP_EOL;
+			foreach($props['headers'] as $key=>$value)
+				$http['header'] .= $key.': '.$value.PHP_EOL;
+			$props = $props['body'];
+			$http['content'] = $props;
+		}
 		
 		$request = new httpRequest(
 				$url,
