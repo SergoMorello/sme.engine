@@ -2,10 +2,6 @@
 
 if (app::isConsole()) {
 	ini_set('default_charset','IBM866');
-	mb_internal_encoding('UTF-8'); 
-
-	mb_http_output('IBM866');
-	ob_start("mb_output_handler");
 }else{
 	if (!file_exists(TEMP))
 		mkdir(TEMP);
@@ -266,6 +262,7 @@ if (app::isConsole()) {
 }
 
 if (app::isConsole()) {
+	
 	// Console
 	console::command("serve",function($port=8000, $ip='127.0.0.1') {
 		log::info('Start dev server on: http://'.$ip.':'.$port);

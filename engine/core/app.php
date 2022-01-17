@@ -20,7 +20,7 @@ class app extends core {
 		self::$run = true;
 		
 		self::$console = $console;
-		
+
 		$this->checkFolders();
 
 		self::include('engine.core.configure');
@@ -169,7 +169,7 @@ class app extends core {
 				$return->call = $route['callback'];
 			}else{
 				$return->call = [new $route['callback']->controller, $route['callback']->method];
-
+				
 				array_unshift($return->props, new request);
 			}
 

@@ -17,9 +17,9 @@
 		<link rel="apple-touch-icon" sizes="120x120" href="{{asset('ico/120x120.png')}}">
 		<link rel="apple-touch-icon" sizes="144x144" href="{{asset('ico/144x144.png')}}">
 		<link rel="apple-touch-icon" sizes="152x152" href="{{asset('ico/152x152.png')}}">
-		<link href="{{asset('css/bootstrap.min.css')}}" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
-		<script src="{{asset('js/bootstrap.bundle.min.js')}}" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
-		<style>@yield("style")</style>
+		<link href="{{asset('css/bootstrap.min.css')}}" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+		<script src="{{asset('js/bootstrap.bundle.min.js')}}" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+		<style>@yield('style')</style>
     </head>
     <body>
 		@yield('content')
