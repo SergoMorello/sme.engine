@@ -8,7 +8,7 @@ class request extends core {
 		self::$_get = core::guardData($_GET);
 		self::$_post = core::guardData($_POST);
 	}
-	
+
 	public static function route($var) {
 		if (is_string($var))
 			return route::getProps($var);
@@ -22,6 +22,10 @@ class request extends core {
 		return self::$_server[$var] ?? null;
 	}
 	
+	public static function all() {
+		return count(self::$_post)>0 ? self::$_post : (count(self::$_get)>0 ? self::$_get : (count($_FILES)>0 ? self::file : NULL));
+	}
+
 	public static function input($var) {
 		if (is_string($var)) {
 			$splitVars = explode('.',$var);
@@ -46,22 +50,51 @@ class request extends core {
 		if (!is_string($var))
 			return;
 		return (new class($_FILES[$var]) {
-			function __construct($file) {
-				foreach($file as $key=>$value)
-					$this->$key = $value;
+			public function __construct($file) {
+
+				foreach($file['name'] as $key=>$value) {
+					if (empty($value))
+						continue;
+					$this->$key = new class([
+						'name'=>$value,
+						'type'=>$file['type'][$key],
+						'tmp_name'=>$file['tmp_name'][$key],
+						'error'=>$file['error'][$key],
+						'size'=>$file['size'][$key]
+					]) {
+						public function __construct($props) {
+							foreach($props as $key=>$value)
+								$this->$key = $value;
+						}
+						public function getData() {
+							return file_get_contents($this->tmp_name);
+						}
+						public function getName() {
+							return $this->name;
+						}
+						public function getType() {
+							return $this->type;
+						}
+						public function getPath() {
+							return $this->tmp_name;
+						}
+						public function getError() {
+							return $this->error;
+						}
+						public function getSize() {
+							return $this->size;
+						}
+						public function store($path="",$disk="") {
+							return storage::disk($disk)->put($path.'/'.$this->name,$this->getData());
+						}
+						public function storeAs($path,$name,$disk="") {
+							return storage::disk($disk)->put($path.'/'.$name,$this->getData());
+						}
+					};
+				}
 			}
-			public function store($path="",$disk=""){
-				storage::disk($disk)->put($path.'/'.$this->name,$this->getData());
-			}
-			public function storeAs($path,$name,$disk=""){
-				storage::disk($disk)->put($path.'/'.$name,$this->getData());
-			}
-			public function getData() {
-				return file_get_contents($this->tmp_name);
-			}
-			public function getPath() {
-				return $this->tmp_name;
-			}
+			
+			
 		});
 		return (object)$file;
 	}

@@ -1,6 +1,10 @@
 <?php
 abstract class core {
-	static $dblink, $arrConfig=[], $arrError=[], $arrCompilerView=[], $arrStorages=[];
+	static $dblink,
+		$arrConfig=[],
+		$arrError=[],
+		$arrCompilerView=[],
+		$arrStorages=[];
 	
 	const dirM = APP.'model/';
 	const dirV = APP.'view/';
@@ -26,7 +30,7 @@ abstract class core {
 			self::$dblink->connect(true);
 		} catch (PDOException $e) {
 			if (config::get('APP_DEBUG'))
-				exceptions::throw('error',['message'=>@iconv('CP1251','UTF-8',$e->getMessage())]);
+				exceptions::throw('error',['message'=>$e->getMessage()]);
 			else
 				exceptions::throw('error',['message'=>'Connect DB']);
 		}

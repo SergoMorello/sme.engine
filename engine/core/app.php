@@ -20,7 +20,9 @@ class app extends core {
 		self::$run = true;
 		
 		self::$console = $console;
-		
+
+		$this->checkFolders();
+
 		self::include('engine.core.configure');
 		
 		self::$configure = true;
@@ -68,10 +70,17 @@ class app extends core {
 		return self::$configure;
 	}
 	
+	private function checkFolders() {
+		foreach(get_defined_constants(true)['user'] as $folder) {
+			if (!file_exists($folder))
+				mkdir($folder);
+		}
+	}
+
 	public static function isConsole() {
 		return self::$console;
 	}
-	
+
 	public static function singleton($name, $callback) {
 		self::$classes[] = [
 			'name'=>$name,
@@ -150,13 +159,29 @@ class app extends core {
 			echo (is_array($result) || is_object($result)) ? response::json($result) : $result;
 		};
 		
+		$routeCallback = function($route) {
+			$return = (object)[
+				'call'=>null,
+				'props'=>$route['props'] ?? []
+			];
+
+			if (is_callable($route['callback'])) {
+				$return->call = $route['callback'];
+			}else{
+				$return->call = [new $route['callback']->controller, $route['callback']->method];
+				
+				array_unshift($return->props, new request);
+			}
+
+			return $return;
+		};
+
 		try {
-			
-			$callback = is_callable($route['callback']) ? $route['callback'] : [new $route['callback']->controller,$route['callback']->method];
+			$callback = $routeCallback($route);
 			
 			$return(call_user_func_array(
-				$callback,
-				array_values($route['props'] ?? [])
+				$callback->call, 
+				array_values($callback->props)
 			));
 			
 		} catch (ParseError $e) {

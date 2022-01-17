@@ -10,6 +10,10 @@ class httpResponse {
 	
 	public function _setBody($body) {
 		$this->_body = $body;
+		
+		if ($jsonBody = json_decode($body))
+			foreach($jsonBody as $key=>$value)
+				$this->$key = $value;
 	}
 	
 	public function _setHeaders($headers) {

@@ -1,16 +1,15 @@
 <?php
 
-session_name('smeSession');
-session_start();
-
 if (app::isConsole()) {
 	ini_set('default_charset','IBM866');
-	mb_internal_encoding('UTF-8'); 
-
-	mb_http_output('IBM866');
-	ob_start("mb_output_handler");
-}else
+}else{
+	if (!file_exists(TEMP))
+		mkdir(TEMP);
+	session_save_path(TEMP);
+	session_name('smeSession');
+	session_start();
 	header('Content-Type: text/html; charset=utf-8');
+}
 
 set_error_handler(function($errno, $errstr, $errfile, $errline) {
 	if (0 === error_reporting())
@@ -227,7 +226,7 @@ if (app::isConsole()) {
 	exceptions::declare('validate',function($errors){
 		$list = [];
 		foreach($errors as $error)
-			$list[] = 'field '.$error['name'].' must be '.$error['access'];
+			$list[$error['name']] = 'field '.$error['name'].' must be '.$error['access'];
 		die(redirect()->back()->withErrors($list));
 	});
 	
@@ -263,6 +262,7 @@ if (app::isConsole()) {
 }
 
 if (app::isConsole()) {
+	
 	// Console
 	console::command("serve",function($port=8000, $ip='127.0.0.1') {
 		log::info('Start dev server on: http://'.$ip.':'.$port);
@@ -279,5 +279,10 @@ if (app::isConsole()) {
 	console::command("cache:clear",function() {
 		if (cache::flush())
 			log::info('Cache cleared');
+	});
+
+	console::command("view:clear",function() {
+		if (view::flush())
+			log::info('Views cleared');
 	});
 }

@@ -17,6 +17,6 @@ class redirect extends request {
 		session(['__withErrors'=>$data]);
 	}
 	private static function setOldInputs() {
-		session(['__oldInputs'=>request::POST()]);
+		session(['__oldInputs'=>request::all()]);
 	}
 }

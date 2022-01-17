@@ -108,7 +108,7 @@ abstract class routeInc extends core {
 				
 				if ($request->get==$route['url'])
 					return self::setCurrent($route);
-
+				
 				//Определяем нужный маршрут
 				if (preg_match('/\s'.$urlMatch($route['url']).'[\/|]{0,}\s/is', ' '.$request->get.' ', $matchUrl)) {
 					

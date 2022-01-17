@@ -2,10 +2,13 @@
 
 return [
 	'CORE'=>[
-		'database',
 		'core',
 		'config',
-		'model',
+		'database',
+		'model/modelCore',
+		'model/modelObject',
+		'model/modelSql',
+		'model/model',
 		'controller',
 		'view/compiler',
 		'view/view',
