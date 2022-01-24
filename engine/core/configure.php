@@ -1,7 +1,7 @@
 <?php
 
 if (app::isConsole()) {
-	ini_set('default_charset','IBM866');
+	ini_set('default_charset','UTF-8');
 }else{
 	if (!file_exists(TEMP))
 		mkdir(TEMP);
