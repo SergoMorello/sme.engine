@@ -84,12 +84,12 @@ class view extends compiler {
 	}
 	
 	public static function show($page, $data=[]) {
-		response::сode(200);
+		response::code(200);
 		return (new self)->addView($page,$data);
 	}
 	
 	public static function error($page,$props=[],$code=500) {
-		response::сode($code);
+		response::code($code);
 		while(ob_list_handlers())
 			ob_end_clean();
 		$props['code'] = $code;
