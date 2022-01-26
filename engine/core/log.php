@@ -15,18 +15,22 @@ class log extends core {
 		return $text;
 	}
 	
+	private static function inputOS($input) {
+		return PHP_OS=='WINNT' ? iconv('UTF-8','CP866',$input) : $input;
+	}
+
 	private static function cout($text) {
 		$input = self::input($text);
 		if (!app::isConsole())
 			return;
-		fwrite(STDOUT,iconv('UTF-8','IBM866',$input));
+		fwrite(STDOUT, self::inputOS($input));
 	}
 	
 	private static function cerr($text) {
 		$input = self::input($text);
 		if (!app::isConsole())
 			return;
-		fwrite(STDERR,iconv('UTF-8','IBM866',$input));
+		fwrite(STDERR, self::inputOS($input));
 	}
 	
 	private static function updateLog($text) {

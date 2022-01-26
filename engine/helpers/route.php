@@ -1,5 +1,6 @@
 <?php
-function route($name=NULL,$props=[]) {
+
+function route($name = NULL, $props = []) {
 	if (is_null($name))
 		return (new class{
 			public function current() {
@@ -31,8 +32,8 @@ function route($name=NULL,$props=[]) {
 	$searchRoute = function($name) {
 		foreach(route::getRoutes() as $page)
 			if (isset($page['name']) && $page['name']==$name)
-				return (object)$page;
+				return (object) $page;
 	};
 	if (!empty($searchRoute($name)))
-		return $replaceVars($searchRoute($name)->url,$props);
+		return asset($replaceVars($searchRoute($name)->url,$props));
 }

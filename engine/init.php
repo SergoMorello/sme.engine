@@ -12,6 +12,7 @@ define('CORE',ROOT.'/engine/core/');
 define('HELPERS',ROOT.'/engine/helpers/');
 define('INC',ROOT.'/engine/inc/');
 define('TEMP',ROOT.'/storage/.tmp/');
+define('PUBLIC_DIR',ROOT.'/public/');
 
 foreach(require_once(INC.'engine.php') as $path=>$files)
 	foreach($files as $file)

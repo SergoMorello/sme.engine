@@ -43,7 +43,7 @@ class httpResponse {
 	}
 	
 	public function error() {
-		return $this->_errors;
+		return (array) $this->_errors;
 	}
 	
 	public function json($array=true) {

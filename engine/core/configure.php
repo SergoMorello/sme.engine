@@ -1,7 +1,7 @@
 <?php
 
 if (app::isConsole()) {
-	ini_set('default_charset','IBM866');
+	ini_set('default_charset','UTF-8');
 }else{
 	if (!file_exists(TEMP))
 		mkdir(TEMP);
@@ -39,6 +39,10 @@ config::set('LOG_ENABLED',false);
 
 config::set('MAX_LOG_SIZE',2097152);
 
+config::set('MIX_ENABLE', true);
+
+config::set('MIX_NAME', 'mix');
+
 core::$arrStorages = [
 	[
 	'name'=>'local',
@@ -48,6 +52,9 @@ core::$arrStorages = [
 ];
 
 config::set();
+
+if (config("MIX_ENABLE"))
+	route::get('/'.config("MIX_NAME").'/{hash}/{name}', 'mix@get')->name('mix-get');
 
 // Compiler
 
@@ -266,7 +273,7 @@ if (app::isConsole()) {
 	// Console
 	console::command("serve",function($port=8000, $ip='127.0.0.1') {
 		log::info('Start dev server on: http://'.$ip.':'.$port);
-		exec('php -S '.$ip.':'.$port.' -t public/');
+		exec('php -S '.$ip.':'.$port.' -t public dev');
 	});
 	
 	console::command("route:list",function() {
