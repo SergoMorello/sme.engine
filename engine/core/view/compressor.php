@@ -1,14 +1,13 @@
 <?php
 
-class mix extends core {
-	private const nameCache = '_mixData';
+class compressor extends core {
+	const nameCache = '_compressorData';
 
 	public static function make($files, $name = 'scripts.js', $type = null) {
 		if (!is_array($files)) {
-			throw new Exception('mix make, files is not array!');
+			throw new Exception('compressor make, files is not array!');
 		}
 
-		$nameCache = '_mixData';
 		$cache = cache();
 		$hash = '';
 
@@ -19,11 +18,13 @@ class mix extends core {
 			$data = $cache->get(self::nameCache.$name);
 			$hash = $data['hash'];
 		}else{
-
+			$paths = [];
 			$str = '';
 			foreach($files as $file) {
-				if (file_exists(PUBLIC_DIR.$file) && !empty($file))
+				if (file_exists(PUBLIC_DIR.$file) && !empty($file)) {
 					$str .= file_get_contents(PUBLIC_DIR.$file);
+					$paths[] = pathinfo($file, PATHINFO_DIRNAME);
+				}
 			}
 
 			$str = self::compress($str);
@@ -31,6 +32,10 @@ class mix extends core {
 			$hash = md5($str);
 
 			$type = is_null($type) ? pathinfo($name, PATHINFO_EXTENSION)=='js' ? 'text/javascript' : 'text/css' : $type;
+
+			$cache->put(self::nameCache.$hash, [
+				'paths' => $paths
+			], 600);
 
 			$cache->put(self::nameCache.$name, [
 				'hash' => $hash,
@@ -40,7 +45,7 @@ class mix extends core {
 			], 600);
 		}
 
-		return route('mix-get', [$hash, $name]);
+		return route('compressor-get', [$hash, $name]);
 	}
 
 	private static function compress($str) {
@@ -55,18 +60,35 @@ class mix extends core {
 		return $str;
 	}
 
+	private function getAsset($hash, $name) {
+		$cache = cache();
+		if ($cache->has(self::nameCache.$hash)) {
+			$paths = $cache->get(self::nameCache.$hash);
+			foreach($paths['paths'] as $path) {
+				$fullPath = PUBLIC_DIR.$path.'/'.$name;
+				if (file_exists($fullPath)) {
+					return file_get_contents($fullPath);
+				}
+			}
+		}
+	}
+
 	public function get(request $req) {
 		$hash = $req->route('hash');
 		$name = $req->route('name');
 
 		$cache = cache();
 		
-		if (cache()->has(self::nameCache.$name)) {
+		if ($cache->has(self::nameCache.$name)) {
 			$cache = cache()->get(self::nameCache.$name);
 			return response::header('Content-type', $cache['type'] ?? 'text/javascript')
 			->header('Content-Length', $cache['size'] ?? 0)
 			->make($cache['str'] ?? '');
-		}else
-			abort(404);
+		}else{
+			if ($assetData = $this->getAsset($hash, $name)) {
+				return $assetData;
+			}else
+				abort(404);
+		}	
 	}
 }

@@ -39,9 +39,9 @@ config::set('LOG_ENABLED',false);
 
 config::set('MAX_LOG_SIZE',2097152);
 
-config::set('MIX_ENABLE', true);
+config::set('COMPRESSOR_ENABLE', true);
 
-config::set('MIX_NAME', 'mix');
+config::set('COMPRESSOR_NAME', 'com');
 
 core::$arrStorages = [
 	[
@@ -53,8 +53,8 @@ core::$arrStorages = [
 
 config::set();
 
-if (config("MIX_ENABLE"))
-	route::get('/'.config("MIX_NAME").'/{hash}/{name}', 'mix@get')->name('mix-get');
+if (config("COMPRESSOR_ENABLE"))
+	route::get('/'.config("COMPRESSOR_NAME").'/{hash}/{name}', 'compressor@get')->name('compressor-get');
 
 // Compiler
 
