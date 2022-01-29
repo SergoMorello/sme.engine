@@ -1,7 +1,7 @@
 <?php
 
 return [
-	'CORE'=>[
+	'CORE' => [
 		'core',
 		'env',
 		'config',
@@ -31,7 +31,7 @@ return [
 		'app',
 		'log',
 	],
-	'HELPERS'=>[
+	'HELPERS' => [
 		'app',
 		'env',
 		'config',
