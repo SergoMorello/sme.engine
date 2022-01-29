@@ -97,7 +97,7 @@ class app extends core {
 		$name = str_replace('.','/',$name);
 		try {
 			if (file_exists(ROOT.$name.'.php'))
-				require_once(ROOT.$name.'.php');
+				return require_once(ROOT.$name.'.php');
 			
 		} catch (ParseError $e) {
 			

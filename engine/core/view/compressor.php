@@ -11,7 +11,7 @@ class compressor extends core {
 		$cache = cache();
 		$hash = '';
 
-		if (config('APP_DEBUG'))
+		if (config('app.debug'))
 			$cache->forget(self::nameCache.$name);
 
 		if ($cache->has(self::nameCache.$name)) {

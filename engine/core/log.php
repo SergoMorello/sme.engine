@@ -34,13 +34,13 @@ class log extends core {
 	}
 	
 	private static function updateLog($text) {
-		if (!config('LOG_ENABLED'))
+		if (!config('app.logEnabled'))
 			return;
 		$file = 'system.log';
 		$fileExists = file_exists(LOGS.$file);
 		$date = date("Y-m-d H:i:s");
 		$log = $date."\tNew file".PHP_EOL;
-		if ($fileExists && filesize(LOGS.$file)>=config('MAX_LOG_SIZE')) {
+		if ($fileExists && filesize(LOGS.$file)>=config('app.maxLogSize')) {
 			rename(LOGS.$file, LOGS. str_replace([' ',':'],['_','-'],$date).'_'.$file);
 			$fileExists = false;
 			

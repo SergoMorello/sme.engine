@@ -1,10 +1,13 @@
 <?php
 
 class cache extends core {
-	public static function put($key,$value,$time=0) {
+	//const dirCache = config('app.');
+
+	public static function put($key, $value, $time = 0) {
 		$cache = self::index()->set($key, $value, $time);
-		return file_put_contents(self::dirCache.$cache->name,$cache->value);
+		return file_put_contents(self::dirCache.$cache->name, $cache->value);
 	}
+
 	private static function index() {
 		return (new class{
 			function __construct() {
@@ -15,40 +18,40 @@ class cache extends core {
 					$this->update();
 				
 				foreach($this->get() as $line)
-					if ($line->time>0 && time()>$line->time)
+					if ($line->time > 0 && time() > $line->time)
 						if ($obj = $this->delete($line->key))
-							unlink(core::dirCache.$obj->name);
+							@unlink(core::dirCache.$obj->name);
 			}
-			private function findKey($obj,$key) {
-				foreach($obj as $keyIt=>$line)
-					if ($line->key==$key)
+			private function findKey($obj, $key) {
+				foreach($obj as $keyIt => $line)
+					if ($line->key == $key)
 						return $keyIt;
 				return -1;
 			}
-			private function update($obj="") {
+			private function update($obj = "") {
 				file_put_contents(core::dirCache.'.index',(empty($obj) ? '[]' : json_encode($obj)));
 			}
 			private function remArrKey($arr,$key) {
 				$res = [];
-				foreach($arr as $keyIt=>$value) {
-					if ($key==$keyIt)
+				foreach($arr as $keyIt => $value) {
+					if ($key == $keyIt)
 						continue;
 					$res[] = $value;
 				}
 				return $res;
 			}
-			public function get($key="") {
+			public function get($key = "") {
 				$res = json_decode(file_get_contents(core::dirCache.'.index'));
 				if (empty($key))
 					return $res;
 				foreach($res as $line)
-					if ($line->key==$key)
+					if ($line->key == $key)
 						return $line;
 			}
 			private function dataType($value) {
 				$ret = (object)[
-							'type'=>'string',
-							'value'=>$value
+							'type' => 'string',
+							'value' => $value
 						];
 				if (is_callable($value)) {
 					$ret->type = 'callable';
@@ -69,23 +72,28 @@ class cache extends core {
 				$time = $time>0 ? time()+$time : 0;
 				$name = md5($key);
 				$valType = $this->dataType($value);
-				if (($keyIt = $this->findKey($obj,$key))>=0) {
+				if (($keyIt = $this->findKey($obj,$key)) >= 0) {
 					$objIt = $obj[$keyIt];
 					$objIt->time = $time;
 					$objIt->type = $valType->type;
 				}else
-					$obj[] = (object)['key'=>$key,'time'=>$time,'type'=>$valType->type,'name'=>$name];
+					$obj[] = (object)[
+						'key' => $key,
+						'time' => $time,
+						'type' => $valType->type,
+						'name' => $name
+					];
 				$this->update($obj);
 				return (object)[
-						'name'=>$name,
-						'value'=>$valType->value
+						'name' => $name,
+						'value' => $valType->value
 						];
 			}
 			public function delete($key) {
 				$obj = $this->get();
-				if (($keyIt = $this->findKey($obj,$key))>=0) {
+				if (($keyIt = $this->findKey($obj, $key)) >= 0) {
 					$deleteObj = $obj[$keyIt];
-					$obj = $this->remArrKey($obj,$keyIt);
+					$obj = $this->remArrKey($obj, $keyIt);
 					$this->update($obj);
 					return $deleteObj;
 				}
@@ -93,10 +101,10 @@ class cache extends core {
 		});
 	}
 	
-	public static function get($key,$default="") {
+	public static function get($key, $default = "") {
 		if ($cache = self::index()->get($key)) {
 			$return = file_get_contents(self::dirCache.$cache->name);
-			if ($cache->type=='array' || $cache->type=='object')
+			if ($cache->type == 'array' || $cache->type == 'object')
 				return unserialize($return);
 			return $return;
 		}else

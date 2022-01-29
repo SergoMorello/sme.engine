@@ -6,6 +6,8 @@ route::get("/doc","main@doc")->name('doc');
 route::group(['prefix'=>'test'],function(){
 	route::get("/", function(){
 		$db = controller::model('test');
+		//dd(env('APP_NAME', 'SME'));
+		//dd();
 		//$obj = $db->select('id','email')->find(32)->first();
 		// $db->find(34);
 		// $db->uid = 1;
@@ -18,7 +20,7 @@ route::group(['prefix'=>'test'],function(){
 		// dd($db->select('userlist.id as ssdd','userlists as table')->leftJoin('userlist',function($join){
 		// 	return $join->on(['userlist.id','tasklist.uid']);
 		// })->groupBy('userlist.id')->__sql());
-		dd(http::withBasicAuth('Администратор','')->asMultipart()->post('http://194.170.100.85/test/hs/site/GetItems',['code'=>'НФ-00004846','date'=>'2021-11-25']));
+		//dd(http::withBasicAuth('Администратор','')->asMultipart()->post('http://194.170.100.85/test/hs/site/GetItems',['code'=>'НФ-00004846','date'=>'2021-11-25']));
 		$var = [['123']];
 		dd($var);
 		dd(route('doc'));

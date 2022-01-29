@@ -3,6 +3,7 @@
 define('ROOT',realpath(__DIR__ .'/..').'/');
 define('ROUTES',ROOT.'/routes/');
 define('APP',ROOT.'/app/');
+define('CONFIG',ROOT.'/config/');
 define('EXCEPTIONS',ROOT.'/app/exceptions/');
 define('MIDDLEWARE',ROOT.'/app/middleware/');
 define('STORAGE',ROOT.'/storage/');

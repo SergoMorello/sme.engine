@@ -17,44 +17,17 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
 	throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
 });
 
+// Init
+env::init();
+
 // Config
 
-config::set('APP_NAME','SME Engine');
-		
-config::set('APP_DEBUG',true);
+config::set('app', app::include('config.app'));
 
-config::set('DB_ENABLED',false);
+config::set('storage', app::include('config.storage'));
 
-config::set('DB_TYPE','mysql');
-
-config::set('DB_HOST','127.0.0.1');
-
-config::set('DB_USER','');
-
-config::set('DB_PASS','');
-
-config::set('DB_NAME','');
-
-config::set('LOG_ENABLED',false);
-
-config::set('MAX_LOG_SIZE',2097152);
-
-config::set('COMPRESSOR_ENABLE', true);
-
-config::set('COMPRESSOR_NAME', 'com');
-
-core::$arrStorages = [
-	[
-	'name'=>'local',
-	'path'=>'.local',
-	'default'=>true
-	]
-];
-
-config::set();
-
-if (config("COMPRESSOR_ENABLE"))
-	route::get('/'.config("COMPRESSOR_NAME").'/{hash}/{name}', 'compressor@get')->name('compressor-get');
+if (config('app.compressorEnabled'))
+	route::get('/'.config("app.compressorName").'/{hash}/{name}', 'compressor@get')->name('compressor-get');
 
 // Compiler
 

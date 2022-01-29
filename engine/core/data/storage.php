@@ -13,7 +13,7 @@ class storage extends core {
 	private static function getDisk($name="") {
 		$name = empty($name) ? self::$props['disk'] ?? NULL : $name;
 		
-		foreach(core::$arrStorages as $disk) {
+		foreach(config::get('storage') as $disk) {
 			if (empty($name))
 				if (isset($disk['default']) && $disk['default'])
 					return (object)$disk;

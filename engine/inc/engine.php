@@ -3,6 +3,7 @@
 return [
 	'CORE'=>[
 		'core',
+		'env',
 		'config',
 		'database',
 		'model/modelCore',
@@ -32,6 +33,7 @@ return [
 	],
 	'HELPERS'=>[
 		'app',
+		'env',
 		'config',
 		'view',
 		'compressor',
