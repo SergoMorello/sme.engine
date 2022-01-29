@@ -25,7 +25,6 @@ class env extends core {
 						$value = $vall=='true' ? true : false;
 				}
 				self::$env[$key] = $value;
-				//core::$arrConfig[$key] = $value;
 			}
 		}
 	}

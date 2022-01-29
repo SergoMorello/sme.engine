@@ -8,8 +8,6 @@ abstract class core {
 	const dirV = APP.'view/';
 	const dirC = APP.'controller/';
 	const dirCache = STORAGE.'.cache/';
-	const dirCompiler = STORAGE.'.cache/compiler/';
-	const dirVSys = ENGINE.'view/';
 	
 	protected function connectDB() {
 		

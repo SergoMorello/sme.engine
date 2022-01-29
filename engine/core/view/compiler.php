@@ -1,20 +1,23 @@
 <?php
 class compiler extends core {
+
+	const dirCompiler = STORAGE.'.cache/compiler/';
+
 	static $_section;
 
 	protected static function genCache($view,$dirV) {
 		if (!file_exists(core::dirCache))
 					if (!mkdir(core::dirCache))
 						die('cache dir, error create');
-		if (!file_exists(core::dirCompiler))
-					if (!mkdir(core::dirCompiler))
+		if (!file_exists(self::dirCompiler))
+					if (!mkdir(self::dirCompiler))
 						die('cache dir, error create');
 		
 		if (config::get('app.debug'))
 			return 1;
 		
 		$cacheViewName = md5($dirV.$view);
-		$cacheViewIndex = core::dirCompiler.".index";
+		$cacheViewIndex = self::dirCompiler.".index";
 		$md5Hash = md5_file($dirV.$view.".php");
 		$createIndex = function($cacheViewIndex,$obj) {
 			if (file_put_contents($cacheViewIndex,json_encode((is_callable($obj) ? $obj() : $obj))))
@@ -131,8 +134,8 @@ class compiler extends core {
 	}
 
 	public static function flush() {
-		foreach(glob(core::dirCompiler.'*') as $file)
+		foreach(glob(self::dirCompiler.'*') as $file)
 			@unlink($file);
-		return file_put_contents(core::dirCompiler.'.index','[]');
+		return file_put_contents(self::dirCompiler.'.index','[]');
 	}
 }

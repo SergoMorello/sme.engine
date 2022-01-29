@@ -1,5 +1,7 @@
 <?php
 class view extends compiler {	
+	
+	const dirVSys = ENGINE.'view/';
 
 	public function __destruct() {
 		session()->delete([
@@ -14,7 +16,7 @@ class view extends compiler {
 		
 		if (file_exists($pathV.$view.".php")) {
 			
-			$cacheViewPath = core::dirCompiler.md5($pathV.$view);
+			$cacheViewPath = self::dirCompiler.md5($pathV.$view);
 			
 			if (compiler::genCache($view,$pathV))
 				file_put_contents(

@@ -12,15 +12,20 @@ class config extends core {
 		
 	}
 	
+
 	public static function get($params) {
 		if (empty($params)) {
 			return (object)self::$config;
 		}
 			
-		$p = explode('.', $params);
-		
-		return (count($p) > 1) ? self::$config[$p[0]][$p[1]] : self::$config[$p[0]];
-			
+		$tempGet = self::$config;
+		foreach(explode('.', $params) as $key) {
+			if (isset($tempGet[$key]))
+				$tempGet = $tempGet[$key];
+			else
+				return null;
+		}
+		return $tempGet;	
 	}
 }
 

@@ -7,7 +7,7 @@ route::group(['prefix'=>'test'],function(){
 	route::get("/", function(){
 		$db = controller::model('test');
 		//dd(env('APP_NAME', 'SME'));
-		//dd();
+		//dd(config::newGet('app.test'));
 		//$obj = $db->select('id','email')->find(32)->first();
 		// $db->find(34);
 		// $db->uid = 1;
