@@ -207,7 +207,7 @@ if (app::isConsole()) {
 		$list = [];
 		foreach($errors as $error)
 			$list[$error['name']] = 'field '.$error['name'].' must be '.$error['access'];
-		die(redirect()->back()->withErrors($list));
+		app::__return(redirect()->back()->withErrors($list));
 	});
 	
 	exceptions::declare('exception',function($error, $short=false){
@@ -217,17 +217,17 @@ if (app::isConsole()) {
 				return explode(PHP_EOL,file_get_contents($file));
 			};
 			
-			die(view::error('error',[
+			app::__return(view::error('error',[
 				'message'=>$error->getMessage().' on line: '.$error->getLine().' in '.$error->getFile(),
 				'errorLine'=>$error->getLine(),
 				'sourceLines'=>$sourceLines($error->getFile())
 			]));
 		}else
-			die(view::error('error',['message'=>$error->getMessage()]));
+			app::__return(view::error('error',['message'=>$error->getMessage()]));
 	});
 	
 	exceptions::declare('httpError',function($e){
-		die(view::error('error',[
+		app::__return(view::error('error',[
 			'message'=>$e['message'],
 			'errorLine'=>0,
 			'sourceLines'=>$e['lines']

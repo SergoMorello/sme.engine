@@ -14,6 +14,7 @@ return [
 		'view/compiler',
 		'view/view',
 		'view/compressor',
+		'responseObject',
 		'response',
 		'route/routeInc',
 		'route/route',

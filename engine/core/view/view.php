@@ -85,17 +85,15 @@ class view extends compiler {
 			throw new Exception('View \''.$view.'\' not found',1);
 	}
 	
-	public static function show($page, $data=[]) {
-		response::code(200);
-		return (new self)->addView($page,$data);
+	public static function show($page, $data = []) {
+		return response::make((new self)->addView($page, $data))->code(200);
 	}
 	
-	public static function error($page,$props=[],$code=500) {
-		response::code($code);
+	public static function error($page, $props = [], $code = 500) {
 		while(ob_list_handlers())
 			ob_end_clean();
 		$props['code'] = $code;
-		return (new self)->addView($page,$props,true);
+		return response::make((new self)->addView($page, $props, true))->code($code);
 	}
 }
 

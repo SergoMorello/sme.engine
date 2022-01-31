@@ -16,7 +16,7 @@ function dd($data) {
 	};
 	
 	if (app::isConsole())
-		die(var_dump($data));
+		app::__return(var_dump($data));
 	else
-		die(view::error('dd', ['data'=>$varDumpView($data)]));
+		app::__return(view::error('dd', ['data'=>$varDumpView($data)]));
 }

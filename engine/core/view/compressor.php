@@ -81,9 +81,9 @@ class compressor extends core {
 		
 		if ($cache->has(self::nameCache.$name)) {
 			$cache = cache()->get(self::nameCache.$name);
-			return response::header('Content-type', $cache['type'] ?? 'text/javascript')
-			->header('Content-Length', $cache['size'] ?? 0)
-			->make($cache['str'] ?? '');
+			return response($cache['str'] ?? '')
+			->header('Content-type', $cache['type'] ?? 'text/javascript')
+			->header('Content-Length', $cache['size'] ?? 0);
 		}else{
 			if ($assetData = $this->getAsset($hash, $name)) {
 				return $assetData;
