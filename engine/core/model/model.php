@@ -3,6 +3,7 @@
 class model extends modelSql {
 
 	public function __init() {
+		self::clearQuery();
 		$this->setTableName($this->table ?? get_called_class());
 	}
 
