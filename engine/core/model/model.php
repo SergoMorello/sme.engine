@@ -19,8 +19,26 @@ class model extends modelSql {
 		return new modelObject(self::$dblink->get_row($this->strQuerySelect()));
 	}
 
+	public function count() {
+		return self::$dblink->get_num($this->strQuerySelect());
+	}
+
 	public function find($id) {
 		return $this->where('id','=',$id);
+	}
+
+	private function getValues($values, $onlyValues = false) {
+		$return = [];
+		if (!is_array($values))
+			return $return;
+		foreach($values as $key => $value) {
+			$value = (is_object($value) && method_exists($value, 'getValue')) ? $value->getValue() : "'".$value."'";
+			if ($onlyValues) 
+				$return[] = $value;
+			else
+				$return[] = $key."=".$value;
+		}
+		return $return;
 	}
 
 	public function save() {
@@ -29,21 +47,19 @@ class model extends modelSql {
 		unset($vars['table'],$vars['query']);
 		
 		if (get_object_vars(self::$__query)) {
-			$arrQuery = array();
-			foreach($vars as $key=>$value)
-				$arrQuery[] = $key."='".$value."'";
+			$arrQuery = $this->getValues($vars);
 			self::$dblink->query("UPDATE `".$this->getTableName()."` SET ".implode(",",$arrQuery)." WHERE ".$this->srtWhere());
-		}else
-			$modelObject->id = self::$dblink->query("INSERT INTO `".$this->getTableName()."` (id,".implode(",",array_keys($vars)).") VALUES (NULL,'".implode("','",$vars)."');",true);
+		}else{
+			$arrQuery = $this->getValues($vars, true);
+			$modelObject->id = self::$dblink->query("INSERT INTO `".$this->getTableName()."` (id,".implode(",",array_keys($vars)).") VALUES (NULL,".implode(",",$arrQuery).");",true);
+		}
 			
 		return $modelObject;
 	}
 
 	public function update($props) {
 		if (is_array($props) && count($props)) {
-			$arrQuery = array();
-			foreach($props as $key=>$value)
-				$arrQuery[] = $key."='".$value."'";
+			$arrQuery = $this->getValues($props);
 
 			self::$dblink->query("UPDATE `".$this->getTableName()."` SET ".implode(",",$arrQuery)." WHERE ".$this->srtWhere());
 			return new modelObject($this);

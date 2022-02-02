@@ -10,6 +10,7 @@ return [
 		'model/modelObject',
 		'model/modelSql',
 		'model/model',
+		'model/DB',
 		'controller',
 		'view/compiler',
 		'view/view',

@@ -66,7 +66,11 @@ class compiler extends core {
 		};
 		
 		$splitArg = function($str) {
-			return explode(',',$str);
+			$return = [];
+			preg_replace_callback(['/\[(.*)\]/isU', '/[\'|\"](.*)[\'|\"]/isU'], function($var) use (&$return) {
+				$return[] = $var[0];
+			}, $str);
+			return count($return) ? array_reverse($return) : explode(',',$str);
 		};
 		
 		$convertSpec = [

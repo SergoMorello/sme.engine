@@ -22,6 +22,7 @@ abstract class core {
 			config::get('app.dbName'),
 			config::get('app.debug')
 		);
+		
 		try {
 			self::$dblink->connect(true);
 		} catch (PDOException $e) {

@@ -212,7 +212,7 @@ if (app::isConsole()) {
 	
 	exceptions::declare('exception',function($error, $short=false){
 		
-		if (config::get('APP_DEBUG') && $error->getCode()==0 && !$short) {
+		if (config::get('app.debug') && $error->getCode()==0 && !$short) {
 			$sourceLines = function($file) {
 				return explode(PHP_EOL,file_get_contents($file));
 			};
@@ -235,9 +235,9 @@ if (app::isConsole()) {
 	});
 	
 	exceptions::declare('error',function($e){
-		return view::error('error',[
+		app::__return(view::error('error',[
 			'message'=>$e['message']
-		]);
+		]));
 	});
 }
 
