@@ -52,7 +52,7 @@ class view extends compiler {
 				
 				if (count($__data)>0)
 					extract($__data);
-				
+						
 				ob_start();
 				
 				require_once($__file);

@@ -48,7 +48,7 @@ class compiler extends core {
 			});
 	}
 
-	public function setSection($name,$buffer) {
+	public function setSection($name, $buffer) {
 		self::$_section[$name] = $buffer;
 	}
 
@@ -67,10 +67,13 @@ class compiler extends core {
 		
 		$splitArg = function($str) {
 			$return = [];
+			
 			$f = function(...$arg) use (&$return) {
+				
 				$return = $arg;
 			};
-			eval("\$f(\$str);");
+			
+			@eval("\$f(\$str);");
 			
 			return $return;
 		};
@@ -135,8 +138,11 @@ class compiler extends core {
 		return $buffer;
 	}
 
-	public static function declare($name,$return) {
-		self::$arrCompilerView[] = ['name'=>$name,'return'=>$return];
+	public static function declare($name, $return) {
+		self::$arrCompilerView[] = [
+			'name' => $name,
+			'return' => $return
+		];
 	}
 
 	public static function flush() {
