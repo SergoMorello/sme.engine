@@ -83,12 +83,10 @@ compiler::declare('sectiond',function($arg) {
 
 // SECTION
 compiler::declare('section',function($arg1, $arg2, $append = null) {
-	print_r($arg2);
-	die();
 	if (is_null($append))
-		return "<?php ob_start(function(\$b){\$this->setSection('".$arg1."',\$b);}); ?>";	
+		return "<?php ob_start(function(\$b){\$this->setSection(".$arg1.",\$b);}); ?>";	
 	else{
-		return "<?php \$this->setSection('".$arg1."','".$arg2."'); ?>";
+		return "<?php \$this->setSection(".$arg1.",".$arg2."); ?>";
 	}
 		
 });
@@ -100,14 +98,14 @@ compiler::declare('endsection',function() {
 
 // YIELD
 compiler::declare('yield',function($arg) {
-	return "<?php echo \$this->getSection('".$arg."'); ?>";
+	return "<?php echo \$this->getSection(".$arg."); ?>";
 });
 
 // EXTENDS
 compiler::declare('extends',function($arg, $append) {
 	$varSection = str_replace(['\'','\"'],'',$arg);
 	
-	$append("<?php ob_end_clean(); echo \$this->addView('".$arg."', [], \$__system); echo \$this->getSection('__view.".$varSection."'); ?>");
+	$append("<?php ob_end_clean(); echo \$this->addView(".$arg.", [], \$__system); echo \$this->getSection('__view.".$varSection."'); ?>");
 	
 	return "<?php ob_start(function(\$b){self::\$_section['__view.".$varSection."']=\$b;}); ?>";
 });
@@ -116,7 +114,7 @@ compiler::declare('extends',function($arg, $append) {
 compiler::declare('include',function($arg1, $arg2) {
 	$arg2 = is_callable($arg2) ? '[]' : $arg2;
 	
-	return "<?php echo \$this->addView('".$arg1."', ".$arg2.", \$__system); ?>";
+	return "<?php echo \$this->addView(".$arg1.", ".$arg2.", \$__system); ?>";
 });
 
 

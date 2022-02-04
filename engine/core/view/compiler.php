@@ -67,21 +67,24 @@ class compiler extends core {
 		};
 		
 		$splitArg = function($str) {
-			return explode(',', $str);
-			$return = [];
+			$args = [];
 			
+			$str = preg_replace_callback(['/\[(.*)\]/isU', '/(\s)([^,]*)\((.*)\)(\s)/isU'], function($var) use (&$args) {
+				if (!empty($var[0])) {
+					$key = '__arg_'.count($args);
+					$args[$key] = $var[0];	
+					return $key;
+				}
+			}, $str);
 			
-			
-			$f = function(...$arg) use (&$return) {
-				print_r(func_get_args());
-				die();
-				$return = $arg;
-			};
-			
-			print_r(('test'));
+			$return = explode(',', $str);
 
-			//@eval("print_r(\$f = ".$str.");");
-			die();
+			foreach($return as $key => $arg) {
+				$arg = trim($arg);
+				if (isset($args[$arg]))
+					$return[$key] = $args[$arg];
+			}
+
 			return $return;
 		};
 		
@@ -118,36 +121,18 @@ class compiler extends core {
 			return "<?php echo ".$var[1]."; ?>";
 		}, $buffer);
 		
-		$buffer0 = preg_replace_callback(['/\@([a-z0-9]{1,})[\r\n|\n|\s]/isU','/\@([^()\n\@]{0,})(\(((?>[^()\n]|(?2))*)\))/isU'], function($var) use (&$append, &$splitArg) {
-			// $arg = (isset($var[3]) && $var[3]) ? $splitArg($var[3]) : [];
-			
-			// if (count(self::$arrCompilerView)) {
-			// 	$argCustom = (isset($var[3]) && $var[3]) ? $splitArg($var[3]) : [];
-			// 	foreach(self::$arrCompilerView as $rule) {
-			// 		if ((isset($var[1]) && $var[1]==$rule['name'])) {
-
-			// 			if (count($argCustom)<=(new ReflectionFunction($rule['return']))->getNumberOfParameters()) {
-			// 				$argCustom[count($arg)] = &$append;		
-			// 				return $rule['return'](...$argCustom);
-			// 			}
-			// 		}
-			// 	}
-			// }
-			
-			return $var[0];
-		}, $buffer);
 
 		$buffer = preg_replace_callback(['/\@(.*)(\(((?>[^()\n]|(?2))*)\))/isU', '/\@([^()]*)\s/isU'], function($var) use (&$append, &$splitArg) {
 			
 			if (count(self::$arrCompilerView)) {
-				$name = $var[1];
-				$args = $var[3] ?? null;
-	
+				$name = $var[1] ?? '';
+				$args = (isset($var[3]) && $var[3]) ? $splitArg($var[3]) : [];
 				foreach(self::$arrCompilerView as $rule) {
 					if ($name == $rule['name']) {
-						$return = null;
-						@eval("\$return = \$rule['return'](".$args.", \$append);");
-						return $return;
+						if (count($args) <= (new ReflectionFunction($rule['return']))->getNumberOfParameters()) {
+							$args[] = &$append;		
+							return $rule['return'](...$args);
+						}
 					}
 				}
 			}
