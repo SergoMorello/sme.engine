@@ -5,7 +5,8 @@ class compiler extends core {
 
 	static $_section;
 
-	protected static function genCache($view,$dirV) {
+	protected static function genCache($view, $dirV) {
+		
 		if (!file_exists(core::dirCache))
 					if (!mkdir(core::dirCache))
 						die('cache dir, error create');
@@ -66,15 +67,21 @@ class compiler extends core {
 		};
 		
 		$splitArg = function($str) {
+			return explode(',', $str);
 			$return = [];
 			
+			
+			
 			$f = function(...$arg) use (&$return) {
-				
+				print_r(func_get_args());
+				die();
 				$return = $arg;
 			};
 			
-			@eval("\$f(\$str);");
-			
+			print_r(('test'));
+
+			//@eval("print_r(\$f = ".$str.");");
+			die();
 			return $return;
 		};
 		
@@ -111,17 +118,36 @@ class compiler extends core {
 			return "<?php echo ".$var[1]."; ?>";
 		}, $buffer);
 		
-		$buffer = preg_replace_callback(['/\@([a-z0-9]{1,})[\r\n|\n|\s]/isU','/\@([^()\n\@]{0,})(\(((?>[^()\n]|(?2))*)\))/isU'], function($var) use (&$append,&$splitArg) {
-			$arg = (isset($var[3]) && $var[3]) ? $splitArg($var[3]) : [];
+		$buffer0 = preg_replace_callback(['/\@([a-z0-9]{1,})[\r\n|\n|\s]/isU','/\@([^()\n\@]{0,})(\(((?>[^()\n]|(?2))*)\))/isU'], function($var) use (&$append, &$splitArg) {
+			// $arg = (isset($var[3]) && $var[3]) ? $splitArg($var[3]) : [];
+			
+			// if (count(self::$arrCompilerView)) {
+			// 	$argCustom = (isset($var[3]) && $var[3]) ? $splitArg($var[3]) : [];
+			// 	foreach(self::$arrCompilerView as $rule) {
+			// 		if ((isset($var[1]) && $var[1]==$rule['name'])) {
+
+			// 			if (count($argCustom)<=(new ReflectionFunction($rule['return']))->getNumberOfParameters()) {
+			// 				$argCustom[count($arg)] = &$append;		
+			// 				return $rule['return'](...$argCustom);
+			// 			}
+			// 		}
+			// 	}
+			// }
+			
+			return $var[0];
+		}, $buffer);
+
+		$buffer = preg_replace_callback(['/\@(.*)(\(((?>[^()\n]|(?2))*)\))/isU', '/\@([^()]*)\s/isU'], function($var) use (&$append, &$splitArg) {
 			
 			if (count(self::$arrCompilerView)) {
-				$argCustom = (isset($var[3]) && $var[3]) ? $splitArg($var[3]) : [];
+				$name = $var[1];
+				$args = $var[3] ?? null;
+	
 				foreach(self::$arrCompilerView as $rule) {
-					if ((isset($var[1]) && $var[1]==$rule['name'])) {
-						if (count($argCustom)<=(new ReflectionFunction($rule['return']))->getNumberOfParameters()) {
-							$argCustom[count($arg)] = &$append;
-							return $rule['return'](...$argCustom);
-						}
+					if ($name == $rule['name']) {
+						$return = null;
+						@eval("\$return = \$rule['return'](".$args.", \$append);");
+						return $return;
 					}
 				}
 			}

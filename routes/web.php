@@ -5,6 +5,7 @@ route::get("/doc","main@doc")->name('doc');
 
 route::group(['prefix'=>'test'],function(){
 	route::get("/", function(){
+		return view('test');
 		$db = controller::model('test');
 		//return response::make('test')->code(202);
 		//dd(response('test')->code(200)->header('Conten-Type', 'text/javascript'));
