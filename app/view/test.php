@@ -1,2 +1,5 @@
+@extends('lay.html')
 
-@if(isset($sourceLines) && count($sourceLines))
+@section('content')
+<div>123</div>
+@endsection

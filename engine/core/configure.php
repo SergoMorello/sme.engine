@@ -33,12 +33,12 @@ if (config('app.compressorEnabled'))
 
 // PHP
 compiler::declare('php',function() {
-	return "<?php ";
+	return "<?php";
 });
 
 // END PHP
 compiler::declare('endphp',function() {
-	return " ?>";
+	return "?>";
 });
 
 // IF

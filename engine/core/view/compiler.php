@@ -58,6 +58,7 @@ class compiler extends core {
 	}
 
 	protected static function compile($buffer) {
+		
 		$buffer .= "\r\n";
 		
 		$appendBuffer = "";
@@ -67,24 +68,25 @@ class compiler extends core {
 		};
 		
 		$splitArg = function($str) {
+			$return = [];
 			$args = [];
 			
-			$str = preg_replace_callback(['/\[(.*)\]/isU', '/(\s)([^,]*)\((.*)\)(\s)/isU'], function($var) use (&$args) {
+			$str = preg_replace_callback(['/\[(.*)\]/isU', '/([^,\s]*)(\(([^()]|(?2))*\))([\s]*)\{(.*)\}/isU', '/([^,\s]*)\((.*)\)/isU'], function($var) use (&$args) {
 				if (!empty($var[0])) {
 					$key = '__arg_'.count($args);
 					$args[$key] = $var[0];	
 					return $key;
 				}
 			}, $str);
-			
-			$return = explode(',', $str);
 
-			foreach($return as $key => $arg) {
-				$arg = trim($arg);
-				if (isset($args[$arg]))
-					$return[$key] = $args[$arg];
-			}
-
+				$return = explode(',', $str);
+				foreach($return as $key => $arg) {
+					$arg = trim($arg);
+					foreach($args as $keyArg => $valueArg) {	
+						$return[$key] = str_replace($keyArg, $valueArg, $return[$key]);
+					}
+				}
+				
 			return $return;
 		};
 		
@@ -122,7 +124,7 @@ class compiler extends core {
 		}, $buffer);
 		
 
-		$buffer = preg_replace_callback(['/\@(.*)(\(((?>[^()\n]|(?2))*)\))/isU', '/\@([^()]*)\s/isU'], function($var) use (&$append, &$splitArg) {
+		$buffer = preg_replace_callback(['/\@([a-z0-9]{1,})[\r\n|\n|\s]/isU','/\@([^()\n\@]{0,})(\(((?>[^()\n]|(?2))*)\))/isU'], function($var) use (&$append, &$splitArg) {
 			
 			if (count(self::$arrCompilerView)) {
 				$name = $var[1] ?? '';
