@@ -97,7 +97,7 @@ class app extends core {
 		$name = str_replace('.','/',$name);
 		try {
 			if (file_exists(ROOT.$name.'.php'))
-				require_once(ROOT.$name.'.php');
+				return require_once(ROOT.$name.'.php');
 			
 		} catch (ParseError $e) {
 			
@@ -143,6 +143,13 @@ class app extends core {
 		}
 	}
 
+	public static function __return($result) {
+		$result = (is_object($result) && method_exists($result, 'getContent')) ? $result->getContent() : $result;
+		$result = (is_array($result) || is_object($result)) ? response::json($result)->getContent() : $result;
+
+		die($result);
+	}
+
 	private function run() {
 		$route = route::getRoute();
 		
@@ -154,10 +161,6 @@ class app extends core {
 		
 		if (middleware::check($route['middleware'] ?? null))
 			return;
-		
-		$return = function($result) {
-			echo (is_array($result) || is_object($result)) ? response::json($result) : $result;
-		};
 		
 		$routeCallback = function($route) {
 			$return = (object)[
@@ -179,7 +182,7 @@ class app extends core {
 		try {
 			$callback = $routeCallback($route);
 			
-			$return(call_user_func_array(
+			self::__return(call_user_func_array(
 				$callback->call, 
 				array_values($callback->props)
 			));

@@ -135,7 +135,7 @@ class modelSql extends modelCore {
 		$ret .= $this->srtOrderBy();
 		
 		$ret .= $this->strLimit();
-
+		
 		return trim($ret);
 	}
 }

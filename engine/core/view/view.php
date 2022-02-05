@@ -1,5 +1,7 @@
 <?php
 class view extends compiler {	
+	
+	const dirVSys = ENGINE.'view/';
 
 	public function __destruct() {
 		session()->delete([
@@ -14,7 +16,7 @@ class view extends compiler {
 		
 		if (file_exists($pathV.$view.".php")) {
 			
-			$cacheViewPath = core::dirCompiler.md5($pathV.$view);
+			$cacheViewPath = self::dirCompiler.md5($pathV.$view);
 			
 			if (compiler::genCache($view,$pathV))
 				file_put_contents(
@@ -50,7 +52,7 @@ class view extends compiler {
 				
 				if (count($__data)>0)
 					extract($__data);
-				
+						
 				ob_start();
 				
 				require_once($__file);
@@ -83,17 +85,15 @@ class view extends compiler {
 			throw new Exception('View \''.$view.'\' not found',1);
 	}
 	
-	public static function show($page, $data=[]) {
-		response::code(200);
-		return (new self)->addView($page,$data);
+	public static function show($page, $data = []) {
+		return response::make((new self)->addView($page, $data))->code(200);
 	}
 	
-	public static function error($page,$props=[],$code=500) {
-		response::code($code);
+	public static function error($page, $props = [], $code = 500) {
 		while(ob_list_handlers())
 			ob_end_clean();
 		$props['code'] = $code;
-		return (new self)->addView($page,$props,true);
+		return response::make((new self)->addView($page, $props, true))->code($code);
 	}
 }
 

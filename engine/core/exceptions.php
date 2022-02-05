@@ -8,11 +8,11 @@ class exceptions extends core {
 		foreach($arrCheck as $exc) {
 			foreach(self::$exceptions as $ex) {
 				if ($exc==$ex['name']) {
-					if (is_callable($ex['obj']) && $ex['obj'] instanceof Closure)
-						die($ex['obj'](...$arg));
-					else{
+					if (is_callable($ex['obj']) && $ex['obj'] instanceof Closure) {
+						app::__return($ex['obj'](...$arg));
+					}else{
 						require_once(EXCEPTIONS.$ex['name'].'.php');
-						die((new $ex['name'])->handle(...$arg));
+						app::__return((new $ex['name'])->handle(...$arg));
 					}
 				}
 			}

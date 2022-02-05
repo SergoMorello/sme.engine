@@ -17,48 +17,28 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
 	throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
 });
 
+// Init
+env::init();
+
 // Config
 
-config::set('APP_NAME','SME Engine');
-		
-config::set('APP_DEBUG',true);
+config::set('app', app::include('config.app'));
 
-config::set('DB_ENABLED',false);
+config::set('storage', app::include('config.storage'));
 
-config::set('DB_TYPE','mysql');
-
-config::set('DB_HOST','127.0.0.1');
-
-config::set('DB_USER','');
-
-config::set('DB_PASS','');
-
-config::set('DB_NAME','');
-
-config::set('LOG_ENABLED',false);
-
-config::set('MAX_LOG_SIZE',2097152);
-
-core::$arrStorages = [
-	[
-	'name'=>'local',
-	'path'=>'.local',
-	'default'=>true
-	]
-];
-
-config::set();
+if (config('app.compressorEnabled'))
+	route::get('/'.config("app.compressorName").'/{hash}/{name}', 'compressor@get')->name('compressor-get');
 
 // Compiler
 
 // PHP
 compiler::declare('php',function() {
-	return "<?php ";
+	return "<?php";
 });
 
 // END PHP
 compiler::declare('endphp',function() {
-	return " ?>";
+	return "?>";
 });
 
 // IF
@@ -97,13 +77,18 @@ compiler::declare('else',function() {
 });
 
 // SECTION SINGLE
-compiler::declare('section',function($arg) {
+compiler::declare('sectiond',function($arg) {
 	return "<?php ob_start(function(\$b){\$this->setSection(".$arg.",\$b);}); ?>";
 });
 
 // SECTION
-compiler::declare('section',function($arg1, $arg2) {
-	return "<?php \$this->setSection(".$arg1.",".$arg2."); ?>";
+compiler::declare('section',function($arg1, $arg2, $append = null) {
+	if (is_null($append))
+		return "<?php ob_start(function(\$b){\$this->setSection(".$arg1.",\$b);}); ?>";	
+	else{
+		return "<?php \$this->setSection(".$arg1.",".$arg2."); ?>";
+	}
+		
 });
 
 // END SECTION
@@ -227,27 +212,27 @@ if (app::isConsole()) {
 		$list = [];
 		foreach($errors as $error)
 			$list[$error['name']] = 'field '.$error['name'].' must be '.$error['access'];
-		die(redirect()->back()->withErrors($list));
+		app::__return(redirect()->back()->withErrors($list));
 	});
 	
 	exceptions::declare('exception',function($error, $short=false){
 		
-		if (config::get('APP_DEBUG') && $error->getCode()==0 && !$short) {
+		if (config::get('app.debug') && $error->getCode()==0 && !$short) {
 			$sourceLines = function($file) {
 				return explode(PHP_EOL,file_get_contents($file));
 			};
 			
-			die(view::error('error',[
+			app::__return(view::error('error',[
 				'message'=>$error->getMessage().' on line: '.$error->getLine().' in '.$error->getFile(),
 				'errorLine'=>$error->getLine(),
 				'sourceLines'=>$sourceLines($error->getFile())
 			]));
 		}else
-			die(view::error('error',['message'=>$error->getMessage()]));
+			app::__return(view::error('error',['message'=>$error->getMessage()]));
 	});
 	
 	exceptions::declare('httpError',function($e){
-		die(view::error('error',[
+		app::__return(view::error('error',[
 			'message'=>$e['message'],
 			'errorLine'=>0,
 			'sourceLines'=>$e['lines']
@@ -255,9 +240,9 @@ if (app::isConsole()) {
 	});
 	
 	exceptions::declare('error',function($e){
-		return view::error('error',[
+		app::__return(view::error('error',[
 			'message'=>$e['message']
-		]);
+		]));
 	});
 }
 
@@ -266,7 +251,7 @@ if (app::isConsole()) {
 	// Console
 	console::command("serve",function($port=8000, $ip='127.0.0.1') {
 		log::info('Start dev server on: http://'.$ip.':'.$port);
-		exec('php -S '.$ip.':'.$port.' -t public/');
+		exec('php -S '.$ip.':'.$port.' -t public dev');
 	});
 	
 	console::command("route:list",function() {

@@ -1,35 +1,32 @@
 <?php
 abstract class core {
 	static $dblink,
-		$arrConfig=[],
 		$arrError=[],
-		$arrCompilerView=[],
-		$arrStorages=[];
+		$arrCompilerView=[];
 	
 	const dirM = APP.'model/';
 	const dirV = APP.'view/';
 	const dirC = APP.'controller/';
 	const dirCache = STORAGE.'.cache/';
-	const dirCompiler = STORAGE.'.cache/compiler/';
-	const dirVSys = ENGINE.'view/';
 	
 	protected function connectDB() {
 		
-		if (!config::get('DB_ENABLED'))
+		if (!config::get('app.dbEnabled'))
 			return;
 		
 		self::$dblink = new database(
-			config::get('DB_TYPE'),
-			config::get('DB_HOST'),
-			config::get('DB_USER'),
-			config::get('DB_PASS'),
-			config::get('DB_NAME'),
-			config::get('APP_DEBUG')
+			config::get('app.dbType'),
+			config::get('app.dbHost'),
+			config::get('app.dbUser'),
+			config::get('app.dbPassword'),
+			config::get('app.dbName'),
+			config::get('app.debug')
 		);
+		
 		try {
 			self::$dblink->connect(true);
 		} catch (PDOException $e) {
-			if (config::get('APP_DEBUG'))
+			if (config::get('app.debug'))
 				exceptions::throw('error',['message'=>$e->getMessage()]);
 			else
 				exceptions::throw('error',['message'=>'Connect DB']);
@@ -37,7 +34,7 @@ abstract class core {
 	}
 	
 	protected function disconnectDB() {
-		if (config::get('DB_ENABLED') && !is_null(core::$dblink))
+		if (config::get('app.dbEnabled') && !is_null(core::$dblink))
 			core::$dblink->disconnect();
 	}
 	

@@ -12,7 +12,7 @@ class modelObject extends modelCore {
     }
 
     public function count() {
-        return count($this->toArray());
+        return count($this->toArray()) - 1;
     }
 
     public function toArray() {

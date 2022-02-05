@@ -1,20 +1,24 @@
 <?php
 class compiler extends core {
+
+	const dirCompiler = STORAGE.'.cache/compiler/';
+
 	static $_section;
 
-	protected static function genCache($view,$dirV) {
+	protected static function genCache($view, $dirV) {
+		
 		if (!file_exists(core::dirCache))
 					if (!mkdir(core::dirCache))
 						die('cache dir, error create');
-		if (!file_exists(core::dirCompiler))
-					if (!mkdir(core::dirCompiler))
+		if (!file_exists(self::dirCompiler))
+					if (!mkdir(self::dirCompiler))
 						die('cache dir, error create');
 		
-		if (config::get('APP_DEBUG'))
+		if (config::get('app.debug'))
 			return 1;
 		
 		$cacheViewName = md5($dirV.$view);
-		$cacheViewIndex = core::dirCompiler.".index";
+		$cacheViewIndex = self::dirCompiler.".index";
 		$md5Hash = md5_file($dirV.$view.".php");
 		$createIndex = function($cacheViewIndex,$obj) {
 			if (file_put_contents($cacheViewIndex,json_encode((is_callable($obj) ? $obj() : $obj))))
@@ -45,7 +49,7 @@ class compiler extends core {
 			});
 	}
 
-	public function setSection($name,$buffer) {
+	public function setSection($name, $buffer) {
 		self::$_section[$name] = $buffer;
 	}
 
@@ -54,6 +58,7 @@ class compiler extends core {
 	}
 
 	protected static function compile($buffer) {
+		
 		$buffer .= "\r\n";
 		
 		$appendBuffer = "";
@@ -63,7 +68,26 @@ class compiler extends core {
 		};
 		
 		$splitArg = function($str) {
-			return explode(',',$str);
+			$return = [];
+			$args = [];
+			
+			$str = preg_replace_callback(['/\[(.*)\]/isU', '/([^,\s]*)(\(([^()]|(?2))*\))([\s]*)\{(.*)\}/isU', '/([^,\s]*)\((.*)\)/isU'], function($var) use (&$args) {
+				if (!empty($var[0])) {
+					$key = '__arg_'.count($args);
+					$args[$key] = $var[0];	
+					return $key;
+				}
+			}, $str);
+
+				$return = explode(',', $str);
+				foreach($return as $key => $arg) {
+					$arg = trim($arg);
+					foreach($args as $keyArg => $valueArg) {	
+						$return[$key] = str_replace($keyArg, $valueArg, $return[$key]);
+					}
+				}
+				
+			return $return;
 		};
 		
 		$convertSpec = [
@@ -99,16 +123,17 @@ class compiler extends core {
 			return "<?php echo ".$var[1]."; ?>";
 		}, $buffer);
 		
-		$buffer = preg_replace_callback(['/\@([a-z0-9]{1,})[\r\n|\n|\s]/isU','/\@([^()\n\@]{0,})(\(((?>[^()\n]|(?2))*)\))/isU'], function($var) use (&$append,&$splitArg) {
-			$arg = (isset($var[3]) && $var[3]) ? $splitArg($var[3]) : [];
+
+		$buffer = preg_replace_callback(['/\@([a-z0-9]{1,})[\r\n|\n|\s]/isU','/\@([^()\n\@]{0,})(\(((?>[^()\n]|(?2))*)\))/isU'], function($var) use (&$append, &$splitArg) {
 			
 			if (count(self::$arrCompilerView)) {
-				$argCustom = (isset($var[3]) && $var[3]) ? $splitArg($var[3]) : [];
+				$name = $var[1] ?? '';
+				$args = (isset($var[3]) && $var[3]) ? $splitArg($var[3]) : [];
 				foreach(self::$arrCompilerView as $rule) {
-					if ((isset($var[1]) && $var[1]==$rule['name'])) {
-						if (count($argCustom)<=(new ReflectionFunction($rule['return']))->getNumberOfParameters()) {
-							$argCustom[count($arg)] = &$append;
-							return $rule['return'](...$argCustom);
+					if ($name == $rule['name']) {
+						if (count($args) <= (new ReflectionFunction($rule['return']))->getNumberOfParameters()) {
+							$args[] = &$append;		
+							return $rule['return'](...$args);
 						}
 					}
 				}
@@ -126,13 +151,16 @@ class compiler extends core {
 		return $buffer;
 	}
 
-	public static function declare($name,$return) {
-		self::$arrCompilerView[] = ['name'=>$name,'return'=>$return];
+	public static function declare($name, $return) {
+		self::$arrCompilerView[] = [
+			'name' => $name,
+			'return' => $return
+		];
 	}
 
 	public static function flush() {
-		foreach(glob(core::dirCompiler.'*') as $file)
+		foreach(glob(self::dirCompiler.'*') as $file)
 			@unlink($file);
-		return file_put_contents(core::dirCompiler.'.index','[]');
+		return file_put_contents(self::dirCompiler.'.index','[]');
 	}
 }

@@ -2,7 +2,7 @@
 
 class modelCore extends core {
 
-    private $table;
+    protected $table;
 
     protected function getTableName() {
 		return $this->table;

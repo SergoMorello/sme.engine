@@ -17,7 +17,7 @@
 		<link rel="apple-touch-icon" sizes="120x120" href="{{asset('ico/120x120.png')}}">
 		<link rel="apple-touch-icon" sizes="144x144" href="{{asset('ico/144x144.png')}}">
 		<link rel="apple-touch-icon" sizes="152x152" href="{{asset('ico/152x152.png')}}">
-		<link href="{{asset('css/bootstrap.min.css')}}" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+		<link href="{{asset('css/bootstrap.min.css')}}" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3">
 		<script src="{{asset('js/bootstrap.bundle.min.js')}}" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 		<style>@yield('style')</style>
     </head>
