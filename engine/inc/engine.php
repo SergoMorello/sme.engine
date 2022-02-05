@@ -14,39 +14,56 @@ return [
 		'controller',
 		'view/compiler',
 		'view/view',
-		'view/compressor',
 		'response/responseObject',
 		'response/response',
 		'route/routeInc',
 		'route/route',
 		'route/console',
+		'exceptions',
+		'middleware',
+		'request',
+		'app',
+		'log',
+	],
+	'MODULES' => [
+		//Http client
 		'httpClient/httpInc',
 		'httpClient/http',
 		'httpClient/httpResponse',
 		'httpClient/httpRequest',
-		'exceptions',
-		'middleware',
-		'request',
-		'redirect',
-		'data/cache',
-		'data/storage',
-		'app',
-		'log',
+
+		//Cacher
+		'cache/cache',
+		'cache/helper',
+
+		//Storage
+		'storage/storage',
+
+		//Cookie
+		'cookie/cookie',
+		'cookie/helper',
+
+		//Session
+		'session/session',
+		'session/helper',
+
+		//Redirect
+		'redirect/redirect',
+		'redirect/helper',
+
+		//Compressor
+		'compressor/compressor',
+		'compressor/helper'
 	],
 	'HELPERS' => [
 		'app',
 		'env',
 		'config',
 		'view',
-		'compressor',
 		'response',
 		'dd',
-		'cookie',
-		'cache',
-		'session',
 		'route',
 		'request',
-		'redirect',
 		'abort',
 		'asset',
 		'old',

@@ -10,6 +10,7 @@ define('STORAGE',ROOT.'/storage/');
 define('LOGS',ROOT.'/storage/.logs/');
 define('ENGINE',ROOT.'/engine/');
 define('CORE',ROOT.'/engine/core/');
+define('MODULES',ROOT.'/engine/modules/');
 define('HELPERS',ROOT.'/engine/helpers/');
 define('INC',ROOT.'/engine/inc/');
 define('TEMP',ROOT.'/storage/.tmp/');
