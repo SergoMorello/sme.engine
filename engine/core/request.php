@@ -7,7 +7,7 @@ class request extends core {
 		self::$_server = $_SERVER;
 		self::$_get = core::guardData($_GET);
 		self::$_post = core::guardData($_POST);
-		self::$_headers = getallheaders();
+		self::$_headers = $this->getallheaders();
 	}
 
 	public static function route($var) {
@@ -25,6 +25,16 @@ class request extends core {
 	
 	public static function all() {
 		return count(self::$_post)>0 ? self::$_post : (count(self::$_get)>0 ? self::$_get : (count($_FILES)>0 ? self::file : NULL));
+	}
+
+	private function getallheaders() {
+		$headers = [];
+		foreach (self::$_server as $name => $value) {
+			if (substr($name, 0, 5) == 'HTTP_') {
+				$headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+			}
+		}
+		return $headers;
 	}
 
 	public static function header($name = null) {
