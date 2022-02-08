@@ -1,12 +1,13 @@
 <?php
 class request extends core {
 	
-	private static $_server, $_get, $_post;
+	private static $_server, $_get, $_post, $_headers;
 	
 	public function __construct() {
 		self::$_server = $_SERVER;
 		self::$_get = core::guardData($_GET);
 		self::$_post = core::guardData($_POST);
+		self::$_headers = getallheaders();
 	}
 
 	public static function route($var) {
@@ -24,6 +25,15 @@ class request extends core {
 	
 	public static function all() {
 		return count(self::$_post)>0 ? self::$_post : (count(self::$_get)>0 ? self::$_get : (count($_FILES)>0 ? self::file : NULL));
+	}
+
+	public static function header($name = null) {
+		if (is_null($name)) {
+			return (object)self::$_headers;
+		}else{
+			if (isset(self::$_headers[$name]))
+				return self::$_headers[$name];
+		}
 	}
 
 	public static function input($var) {
