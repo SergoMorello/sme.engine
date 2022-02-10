@@ -1,8 +1,15 @@
 <?php
 class database {
-	private $type,$host,$user,$pass,$name,$debug;
+	private $type, $host, $user, $pass, $name, $debug;
 	
-    function __construct($db_type='mysql',$db_host='127.0.0.1',$db_user='root',$db_pass=NULL,$db_name=NULL,$db_debug=false) {
+    function __construct(
+			$db_type = 'mysql',
+			$db_host = '127.0.0.1',
+			$db_user = 'root',
+			$db_pass = NULL,
+			$db_name = NULL,
+			$db_debug = false
+		) {
 		$this->type = $db_type;
 		$this->host = $db_host;
 		$this->user = $db_user;

@@ -5,7 +5,7 @@ class modelCore extends core {
     protected $table;
 
     protected function getTableName() {
-		return $this->table;
+		return config::get('app.dbPrefix').$this->table;
 	}
 
     protected function setTableName($name) {
