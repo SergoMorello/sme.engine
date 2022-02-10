@@ -1,7 +1,7 @@
 <?php
 class test extends middleware {
 	public function handle($request, $next) {
-		//dd($request);
+		return response('21132')->json();
 		return $next($request);
 	}
 }
