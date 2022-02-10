@@ -7,7 +7,8 @@ class middleware extends core {
 		$arrCheck = is_array($arrCheck) ? $arrCheck : [$arrCheck];
 		
 		$nextClosure = function($request) use (&$controllerReturn){
-			array_unshift($controllerReturn->props, $request);
+			if (!app::isConsole())
+				array_unshift($controllerReturn->props, $request);
 			return (object)[
 				'call' => $controllerReturn->call,
 				'props' => $controllerReturn->props

@@ -26,6 +26,15 @@ config::set('app', app::include('config.app'));
 
 config::set('storage', app::include('config.storage'));
 
+route::group(['prefix' => 'api', 'middleware' => 'api'], function() {
+	app::include('routes.api');
+});
+
+middleware::declare('api', function($request, $next){
+	
+	return $next($request);
+});
+
 if (config('app.compressorEnabled'))
 	route::get('/'.config("app.compressorName").'/{hash}/{name}', 'compressor@get')->name('compressor-get');
 

@@ -39,7 +39,7 @@ class app extends core {
 		
 		if ($console)
 			self::include('routes.console');
-		
+
 		self::include('routes.web');
 		
 		core::connectDB();
@@ -147,7 +147,7 @@ class app extends core {
 		$result = (is_object($result) && method_exists($result, 'getContent')) ? $result->getContent() : $result;
 		$result = (is_array($result) || is_object($result)) ? response::json($result)->getContent() : $result;
 
-		die($result);
+		die((string)$result);
 	}
 
 	private function run() {
