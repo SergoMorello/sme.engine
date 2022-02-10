@@ -12,6 +12,10 @@ class modelCore extends core {
         $this->table = $name;
     }
 
+	protected function value($value) {
+		$value = (is_object($value) && method_exists($value, 'getValue')) ? $value->getValue() : "'".$value."'";
+	}
+
     protected function genParams($params, $callback, &$data, $default=[]) {
         if (!is_array($params))
             return;
