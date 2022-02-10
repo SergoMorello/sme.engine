@@ -5,6 +5,9 @@ class appService extends core {
 	}
 	
 	public function register() {
+
+		middleware::declare('test');
+
 		app::singleton('testClass', function(){
 			return new class{
 				public function test() {

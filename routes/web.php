@@ -3,6 +3,13 @@ route::get("/","main@index")->name('home');
 
 route::get("/doc","main@doc")->name('doc');
 
+route::group(['middleware' => 'test'],function(){
+	route::get('/test2', function() {
+		return ['ok'];
+	});
+});
+
+
 route::group(['prefix'=>'test'],function(){
 	route::get("/", function(){
 		
