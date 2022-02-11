@@ -146,7 +146,7 @@ class app extends core {
 	public static function __return($result) {
 		$result = (is_object($result) && method_exists($result, 'getContent')) ? $result->getContent() : $result;
 		$result = (is_array($result) || is_object($result)) ? response::json($result)->getContent() : $result;
-
+		
 		die((string)$result);
 	}
 
