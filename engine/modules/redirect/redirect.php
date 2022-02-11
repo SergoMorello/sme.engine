@@ -8,7 +8,7 @@ class redirect extends request {
 	}
 	public static function back() {
 		self::setOldInputs();
-		self::rdr($_SERVER['HTTP_REFERER']);
+		self::rdr(request::server('HTTP_REFERER'));
 		return new self;
 	}
 	public static function withErrors($data) {

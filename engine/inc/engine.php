@@ -21,7 +21,9 @@ return [
 		'route/console',
 		'exceptions',
 		'middleware',
-		'request',
+		'request/validateIs',
+		'request/validate',
+		'request/request',
 		'app',
 		'log',
 	],
@@ -68,5 +70,6 @@ return [
 		'asset',
 		'old',
 		'log',
+		'is'
 	]
 ];

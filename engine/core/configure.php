@@ -279,4 +279,34 @@ if (app::isConsole()) {
 		if (view::flush())
 			log::info('Views cleared');
 	});
+
+	console::command("make:{func} {name?}",function($func, $name) {
+
+		request::validate([
+			'name' => 'required|regex:/([a-zA-Z]{1,}[0-9]{0,})/i'
+		]);
+		
+		switch($func) {
+			case 'controller':
+				$path = CONTROLLER.$name.'.php';
+				$file = file_get_contents(ENGINE.'/make/controller.php');
+				$file = str_replace('__NAME__', $name, $file);
+				if (file_exists($path))
+					return log::info('Controller exists');
+				if (file_put_contents($path, $file))
+					log::info('Controller created');
+			break;
+			case 'model':
+				$path = MODEL.$name.'.php';
+				$file = file_get_contents(ENGINE.'/make/model.php');
+				$file = str_replace('__NAME__', $name, $file);
+				if (file_exists($path))
+					return log::info('Model exists');
+				if (file_put_contents($path, $file))
+					log::info('Model created');
+			break;
+			default:
+				log::info('Example make:controller MainController');
+		}
+	});
 }

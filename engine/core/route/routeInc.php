@@ -104,7 +104,7 @@ abstract class routeInc extends core {
 				$request = core::request();
 				
 				//Получаем переменные после знака ?
-				if ($request->props)
+				if ($request->props && !app::isConsole())
 					$route['props'] = $request->props;
 				
 				if ($request->get==$route['url'])
@@ -116,15 +116,18 @@ abstract class routeInc extends core {
 					//Получаем названия переменных из маршрута
 					if (preg_match_all("/\{(.*)\}/isU", $route['url'], $matchVars)) {
 						
-						foreach($matchVars[1] as $key=>$varName) {
+						foreach($matchVars[1] as $key => $varName) {
 							
 							$varName = str_replace('?','',$varName);
 							$varValue = $matchUrl[$key+1] ?? null;
 							
 							//Проверяем регуляркой что внутри переменных
-							if (isset($route['where'][$varName]) && !empty($varValue) && !preg_match('/'.$route['where'][$varName].'/',$varValue))
-								return [];
-							
+							if (isset($route['where'])) {
+								$where = (isset($route['where'][0]) && is_array($route['where'][0])) ? $route['where'][0] : $route['where'];
+								if (isset($where[$varName]) && !empty($varValue) && !preg_match('/^'.$where[$varName].'$/isU', $varValue))
+									return [];
+							}
+
 							$route['props'][$varName] = $varValue;
 						}
 					}

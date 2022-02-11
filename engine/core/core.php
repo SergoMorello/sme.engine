@@ -85,20 +85,6 @@ abstract class core {
 		return htmlspecialchars(addslashes($data));
 	}
 	
-	protected static function isBase64($data) {
-		if (base64_encode(base64_decode($data, true))==$data)
-			return true;
-		return false;
-	}
-	
-	protected static function isJson($string) {
-		if (is_string($string)) {
-            @json_decode($string);
-            return (json_last_error() === 0);
-        }
-        return false;
-	}
-	
 	protected function addControllers() {
 		foreach(route::getRoutes() as $page)
 			if (!is_callable($page['callback']))
