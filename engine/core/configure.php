@@ -305,6 +305,15 @@ if (app::isConsole()) {
 				if (file_put_contents($path, $file))
 					log::info('Model created');
 			break;
+			case 'middleware':
+				$path = MIDDLEWARE.$name.'.php';
+				$file = file_get_contents(ENGINE.'/make/middleware.php');
+				$file = str_replace('__NAME__', $name, $file);
+				if (file_exists($path))
+					return log::info('Middleware exists');
+				if (file_put_contents($path, $file))
+					log::info('Middleware created');
+			break;
 			default:
 				log::info('Example make:controller MainController');
 		}
