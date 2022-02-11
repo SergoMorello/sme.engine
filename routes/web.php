@@ -5,7 +5,7 @@ route::get("/doc","main@doc")->name('doc');
 
 route::group(['prefix' => 'test2'], function(){
 	route::get('/', function(){
-		return 123;
+		return 12;
 	});
 	route::group(['prefix' => 'test3', 'middleware' => 'test'], function(){
 		route::get('/', function(){

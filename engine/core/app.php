@@ -156,10 +156,9 @@ class app extends core {
 		if (!$route)
 			abort(404);
 		
-		if (!$this->checkMethod($route['method']))
+		if (!$this->checkMethod($route['method'] ?? ''))
 			abort(405);
 
-		
 		$routeCallback = function($route) {
 			$return = (object)[
 				'call' => null,

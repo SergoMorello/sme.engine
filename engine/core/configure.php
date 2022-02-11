@@ -191,7 +191,7 @@ if (app::isConsole()) {
 	});
 	
 	// 404
-	exceptions::declare(404,function(){
+	exceptions::declare(404,function($e){
 		return view::error(
 			'error',
 			['message'=>'Not found'],
