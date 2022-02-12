@@ -49,10 +49,11 @@ class compressor extends core {
 	}
 
 	private static function compress($str) {
+		$str = preg_replace("/([;\s^])\/\/(.{0,150})\n/i", " ", $str);
 		$str = preg_replace("/\t\/\/(.*)/i", " ", $str);
 		$str = preg_replace("/\n\/\/(.*)/i", " ", $str);
 		$str = preg_replace("/\r\n\/\/(.*)/i", " ", $str);
-		$str = preg_replace("/ \/\/(.*)\n/i", " ", $str);
+		
 		$str = str_replace("\r\n"," ",$str);
 		$str = str_replace("\n"," ",$str);
 		$str = str_replace("\t"," ",$str);
