@@ -83,7 +83,7 @@ abstract class routeInc extends core {
 	public static function getRoute() {
 		$routes = self::$routes;
 		
-		$allowChars = '0-9A-Za-z.';
+		$allowChars = '0-9A-Za-z.-';
 		$urlMatch = function($url) use (&$allowChars) {
 			return preg_replace([
 				'`/`is',

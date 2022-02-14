@@ -10,8 +10,10 @@ class modelSql extends modelCore {
 
     //SELECT
 	public function select(...$data) {
-		foreach($data as $dt)
+		$data = (is_array($data) && count($data) == 1) ? $data[0] : $data;
+		foreach($data as $dt) {
 			self::$__query->select[] = preg_split("/ as /i",$dt);
+		}
 		return $this;
 	}
 
