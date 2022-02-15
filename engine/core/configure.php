@@ -260,9 +260,11 @@ if (app::isConsole()) {
 if (app::isConsole()) {
 	
 	// Console
-	console::command("serve",function($port=8000, $ip='127.0.0.1') {
-		log::info('Start dev server on: http://'.$ip.':'.$port);
-		exec('php -S '.$ip.':'.$port.' -t public dev');
+	console::command("serve",function() {
+		$port = request::route('port') ?? '8000';
+		$host = request::route('host') ?? '127.0.0.1';
+		log::info('Start dev server on: http://'.$host.':'.$port);
+		exec('php -S '.$host.':'.$port.' -t public dev');
 	});
 	
 	console::command("route:list",function() {

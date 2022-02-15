@@ -84,6 +84,19 @@ abstract class routeInc extends core {
 		self::$routes[] = $this->route;
 	}
 	
+	private static function parseConsoleProps($requestProps, &$routeProps) {
+		if (count($requestProps)<=0 || !app::isConsole())
+			return;
+		foreach($requestProps as $prop) {
+			if (($index = strrpos($prop, '--')) === false)
+				continue;
+				$var = explode('=', substr($prop, $index + 2));
+				$name = $var[0] ?? '';
+				$value = $var[1] ?? '';
+				$routeProps[$name] = $value;
+		}
+	} 
+
 	public static function getRoute() {
 		$routes = self::$routes;
 		
@@ -105,6 +118,9 @@ abstract class routeInc extends core {
 		if ($routes)
 			foreach($routes as $route) {
 				$request = core::request();
+
+				//Получаем переменные в консоли
+				self::parseConsoleProps($request->props, $route['props']);
 				
 				//Получаем переменные после знака ?
 				if ($request->props && !app::isConsole())
