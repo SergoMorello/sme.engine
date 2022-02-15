@@ -20,6 +20,8 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
 // Init
 env::init();
 
+middleware::init();
+
 // Config
 
 config::set('app', app::include('config.app'));

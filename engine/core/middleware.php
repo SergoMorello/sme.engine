@@ -2,6 +2,28 @@
 class middleware extends core {
 	static $addMiddleware = [];
 
+	public static function init() {
+		$initFnc = function($init) {
+			foreach($init as $name => $path) {
+				$nameClass = $path;
+				if (($index = strrpos($path, '/')) || ($index = strrpos($path, '.'))) 
+					$nameClass = substr($path, $index + 1);
+				
+				app::include($path);
+				self::declare($name, $nameClass);
+			}
+		};
+		if ($init = app::include('app.appMiddleware')) {
+			if (app::isConsole()) {
+				if (isset($init['console']))
+					$initFnc($init['console']);
+			}else{
+				if (isset($init['http']))
+					$initFnc($init['http']);
+			}	
+		}
+	}
+
 	private static function checkResponse($obj) {
 		if (is_object($obj) && property_exists($obj, 'call') && property_exists($obj, 'props'))
 			return $obj;
@@ -27,8 +49,7 @@ class middleware extends core {
 					if (is_callable($mw['obj']) && $mw['obj'] instanceof Closure)
 						return self::checkResponse($mw['obj']($request, $nextClosure));
 					else{
-						app::include('app.middleware.'.$mw['name']);
-						return self::checkResponse((new $mw['name'])->handle($request, $nextClosure));
+						return self::checkResponse((new $mw['obj'])->handle($request, $nextClosure));
 					}
 				}
 			}
@@ -38,6 +59,6 @@ class middleware extends core {
 	}
 	
 	public static function declare($name, $obj = NULL) {
-		self::$addMiddleware[] = ['name'=>$name,'obj'=>$obj];
+		self::$addMiddleware[] = ['name' => $name, 'obj' => $obj];
 	}
 }

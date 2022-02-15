@@ -57,8 +57,12 @@ abstract class routeInc extends core {
 			foreach(array_reverse(self::$groupProps) as $gp) {
 				if (isset($gp['prefix']))
 					$params['url'] = '/'.$gp['prefix'].(substr($params['url'],-1)=='/' ? substr_replace($params['url'],'',strlen($params['url'])-1) : $params['url']);
-				if (isset($gp['middleware']))
-					$params['middleware'][] = $gp['middleware'];
+				if (isset($gp['middleware'])) {
+					$middlewares = is_array($gp['middleware']) ? $gp['middleware'] : [$gp['middleware']];
+					foreach($middlewares as $middleware) {
+						$params['middleware'][] = $middleware;
+					}
+				}
 			}
 		}
 		
