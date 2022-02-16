@@ -72,4 +72,45 @@ class log extends core {
 		self::cerr($text);
 		self::$props = [];
 	}
+
+	public static function table($heads, $rows) {
+
+		$addNp = function($str, $num) {
+			$np = ' ';
+			for($i = 0; $i <= $num / 2; $i++)
+				$np .= ' ';
+			return $np.$str.$np;
+		};
+
+		$maxWidth = [];
+		$textHead = '';
+		
+		foreach($rows as $row) {
+			foreach($heads as $key => $head) {
+				$rowLen = strlen($row[$key]);
+				if ($rowLen >= ($maxWidth[$key] ?? 0))
+					$maxWidth[$key] = $rowLen;
+			}
+		}
+
+		foreach($heads as $key => $head) {
+			$headLen = strlen($head);
+			$headLenDelta = ($maxWidth[$key] > $headLen) ? $maxWidth[$key] - $headLen : 1;
+				
+			$textHead .= $addNp($head, $headLenDelta);
+			if ($headLen > ($maxWidth[$key] ?? 0))
+				$maxWidth[$key] = $headLen;
+		}
+		self::info($textHead);
+
+		foreach($rows as $row) {
+			$textRows = '';
+			foreach($heads as $key => $head) {
+				$rowLen = strlen($row[$key]);
+				$rowLenDelta = ($maxWidth[$key] > $rowLen) ? $maxWidth[$key] - $rowLen : 1;
+				$textRows .= $addNp($row[$key], $rowLenDelta);
+			}
+			self::info($textRows);
+		}
+	}
 }

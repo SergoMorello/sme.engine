@@ -269,9 +269,18 @@ if (app::isConsole()) {
 	
 	console::command("route:list",function() {
 		log::info('Route list:');
-		log::info("URL\tController\tMethod");
-		foreach(route::list() as $list)
-			log::info($list['url']."\t".(is_callable($list['callback']) ? 'fn' : $list['callback']->controller.'@'.$list['callback']->method)."\t".$list['method']);
+		$list = [];
+		foreach(route::list() as $el)
+			$list[] = [
+				$el['url'],
+				(is_callable($el['callback']) ? 'fn' : $el['callback']->controller.'@'.$el['callback']->method),
+				$el['method']
+			];
+		log::table([
+			'URL',
+			'Controller',
+			'Method'
+		], $list);
 	});
 	
 	console::command("cache:clear",function() {
