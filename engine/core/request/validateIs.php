@@ -37,4 +37,19 @@ class validateIs {
 	public function not_regex($var, $pattern) {
 		return (!$this->regex($var, $pattern)) ? true : false;
 	}
+
+	public function max($var, $value) {
+		return $var <= $value ? true : false;
+	}
+
+	public function min($var, $value) {
+		return $var >= $value ? true : false;
+	}
+
+	public function size($var, $value) {
+		if (is_string($var))
+			return strlen($var) == $value ? true : false;
+		if (is_array($var))
+			return count($var) == $value ? true : false;
+	}
 }

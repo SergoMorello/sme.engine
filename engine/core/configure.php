@@ -220,10 +220,11 @@ if (app::isConsole()) {
 	});
 	
 	exceptions::declare('validate',function($errors){
+
 		$list = [];
 		foreach($errors as $error)
 			$list[$error['name']] = 'field '.$error['name'].' must be '.$error['access'];
-		app::__return(redirect()->back()->withErrors($list));
+		return redirect()->back()->withErrors($list);
 	});
 	
 	exceptions::declare('exception',function($error, $short=false){
@@ -233,27 +234,27 @@ if (app::isConsole()) {
 				return explode(PHP_EOL,file_get_contents($file));
 			};
 			
-			app::__return(view::error('error',[
+			return view::error('error',[
 				'message'=>$error->getMessage().' on line: '.$error->getLine().' in '.$error->getFile(),
 				'errorLine'=>$error->getLine(),
 				'sourceLines'=>$sourceLines($error->getFile())
-			]));
+			]);
 		}else
-			app::__return(view::error('error',['message'=>$error->getMessage()]));
+			return view::error('error',['message'=>$error->getMessage()]);
 	});
 	
 	exceptions::declare('httpError',function($e){
-		app::__return(view::error('error',[
+		return view::error('error',[
 			'message'=>$e['message'],
 			'errorLine'=>0,
 			'sourceLines'=>$e['lines']
-		]));
+		]);
 	});
 	
 	exceptions::declare('error',function($e){
-		app::__return(view::error('error',[
+		return view::error('error',[
 			'message'=>$e['message']
-		]));
+		]);
 	});
 }
 

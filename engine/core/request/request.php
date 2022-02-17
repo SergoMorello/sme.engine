@@ -158,7 +158,7 @@ class request extends core {
 			if ($return)
 				return true;
 			else
-				exceptions::throw('validate',$arrErr);
+				exceptions::throw('validate', $arrErr);
 		}
 	}
 }
