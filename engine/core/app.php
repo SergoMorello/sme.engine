@@ -166,6 +166,8 @@ class app extends core {
 			if (is_callable($route['callback'])) {
 				$return->call = $route['callback'];
 			}else{
+				if (!class_exists($route['callback']->controller))
+					throw new Exception('Controller "'.$route['callback']->controller.'" not found',1);
 				$return->call = [new $route['callback']->controller, $route['callback']->method];
 			}
 			
