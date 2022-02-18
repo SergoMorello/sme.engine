@@ -37,20 +37,18 @@ class app extends core {
 		
 		new request;
 		
-		if ($console)
-			self::include('routes.console');
-
-		self::include('routes.web');
+		route::__init();
 		
 		core::connectDB();
 		
-		core::addControllers();
+		controller::__init();
 		
 		$this->defaultService('boot');
 		
 		$this->run();
 		
 	}
+
 	public function __destruct() {
 		if (self::$run)
 			return;

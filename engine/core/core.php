@@ -45,7 +45,7 @@ abstract class core {
 			if (!isset($argvConsole[1]))
 				return exceptions::throw('consoleError',[
 						'message'=>'Comand list:',
-						'routes'=>route::list('command')
+						'routes'=>route::__list('command')
 					]);
 			unset($argvConsole[0]);
 			$get = implode(' ', $argvConsole);
@@ -83,34 +83,6 @@ abstract class core {
 			return $isObj ? (object)$ret : $ret;
 		}
 		return htmlspecialchars(addslashes($data));
-	}
-	
-	protected function addControllers() {
-		foreach(route::getRoutes() as $page)
-			if (!is_callable($page['callback']))
-				if (file_exists(self::dirC.$page['callback']->controller.".php")) {
-					try {
-						
-						require_once(self::dirC.$page['callback']->controller.'.php');
-						
-					} catch (ParseError $e) {
-			
-						exceptions::throw('viewError',$e);
-					
-					} catch (Error $e) {
-						
-						exceptions::throw('viewError',$e);
-						
-					} catch (Exception $e) {
-						
-						exceptions::throw('viewError',$e);
-						
-					} catch (ErrorException $e) {
-						
-						exceptions::throw('viewError',$e);
-						
-					}
-				}
 	}
 	
 	protected function checkMethod($method) {

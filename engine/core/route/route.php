@@ -9,6 +9,13 @@ class route extends routeInc {
 	public function __destruct() {
 		$this->saveRoute();
 	}
+
+	public static function __init() {
+		if (app::isConsole())
+			self::__instConsole();
+		else
+			self::__instHttp();
+	}
 	
 	public static function get($url, $callback) {
 		return new self([

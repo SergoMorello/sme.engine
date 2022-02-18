@@ -1,8 +1,17 @@
 <?php
+
 class controller extends core {
 	
 	private static $model;
 	
+	public static function __init() {
+		foreach(route::getRoutes() as $page)
+			if (!is_callable($page['callback'])) {
+				$controller = preg_match('/[.\/]+/',$page['callback']->controller) ? $page['callback']->controller : 'app.controller.'.$page['callback']->controller;
+				app::include($controller);
+			}
+	}
+
 	public static function model($model=null) {
 		
 		if (empty($model))

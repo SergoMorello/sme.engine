@@ -28,9 +28,7 @@ config::set('app', app::include('config.app'));
 
 config::set('storage', app::include('config.storage'));
 
-route::group(['prefix' => 'api', 'middleware' => 'api'], function() {
-	app::include('routes.api');
-});
+
 
 middleware::declare('api', function($request, $next){
 	
@@ -271,7 +269,7 @@ if (app::isConsole()) {
 	console::command("route:list",function() {
 		log::info('Route list:');
 		$list = [];
-		foreach(route::list() as $el)
+		foreach(route::__list() as $el)
 			$list[] = [
 				$el['url'],
 				(is_callable($el['callback']) ? 'fn' : $el['callback']->controller.'@'.$el['callback']->method),

@@ -2,9 +2,28 @@
 
 abstract class routeInc extends core {
 	
-	protected static $routes=[], $props=[], $groupProps=[], $current=[];
+	protected static $routes = [], $props = [], $groupProps = [], $current = [];
 	
 	protected $route;
+
+	protected static function __instHttp() {
+		app::include('routes.web');
+
+		self::group(['prefix' => 'api', 'middleware' => 'api'], function() {
+			app::include('routes.api');
+		});
+		return (object)[
+			'routes' => self::$routes,
+			'props' => self::$props,
+			'groupProps' => self::$groupProps,
+			'current' => self::$current
+		];
+	}
+
+	protected static function __instConsole() {
+		app::include('routes.console');
+	}
+
 	
 	public function name($name) {
 		$this->route['name'] = $name;
@@ -27,10 +46,11 @@ abstract class routeInc extends core {
 		self::$groupProps = [];
 	}
 	
-	public static function list($method='') {
+	public static function __list($method = '') {
+		self::__instHttp();
 		$ret = [];
 		foreach(self::$routes as $route)
-			if ($route['method']==$method || empty($method))
+			if ($route['method'] == $method || empty($method))
 				$ret[] = $route;
 		return $ret;
 	}
