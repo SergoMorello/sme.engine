@@ -292,6 +292,21 @@ if (app::isConsole()) {
 			log::info('Views cleared');
 	});
 
+	console::command("config:{func}",function($func) {
+		switch($func) {
+			case 'cache':
+				if (env::__cache())
+					log::info('Config cached');
+			break;
+			case 'clear':
+				if (env::__cacheClear())
+					log::info('Config clear');
+			break;
+			default:
+				log::info('Example - config:cache');
+		}
+	});
+
 	console::command("make:{func} {name?}",function($func, $name) {
 
 		request::validate([
@@ -327,7 +342,7 @@ if (app::isConsole()) {
 					log::info('Middleware created');
 			break;
 			default:
-				log::info('Example make:controller MainController');
+				log::info('Example - make:controller MainController');
 		}
 	});
 }

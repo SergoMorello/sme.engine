@@ -1,1 +1,0 @@
-a:12:{s:8:"APP_NAME";s:10:"SME Engine";s:9:"APP_DEBUG";b:1;s:11:"LOG_ENABLED";b:0;s:12:"MAX_LOG_SIZE";s:7:"2097152";s:10:"DB_ENABLED";b:0;s:7:"DB_TYPE";s:5:"mysql";s:7:"DB_HOST";s:9:"127.0.0.1";s:7:"DB_USER";s:4:"root";s:7:"DB_PASS";s:0:"";s:7:"DB_NAME";s:8:"test_app";s:18:"COMPRESSOR_ENABLED";b:1;s:15:"COMPRESSOR_NAME";s:3:"com";}
