@@ -2,9 +2,28 @@
 
 abstract class routeInc extends core {
 	
-	protected static $routes=[], $props=[], $groupProps=[], $current=[];
+	protected static $routes = [], $props = [], $groupProps = [], $current = [];
 	
 	protected $route;
+
+	protected static function __instHttp() {
+		app::include('routes.web');
+
+		self::group(['prefix' => 'api', 'middleware' => 'api'], function() {
+			app::include('routes.api');
+		});
+		return (object)[
+			'routes' => self::$routes,
+			'props' => self::$props,
+			'groupProps' => self::$groupProps,
+			'current' => self::$current
+		];
+	}
+
+	protected static function __instConsole() {
+		app::include('routes.console');
+	}
+
 	
 	public function name($name) {
 		$this->route['name'] = $name;
@@ -22,15 +41,16 @@ abstract class routeInc extends core {
 	}
 	
 	public static function group($params, $callback) {
-		self::$groupProps = $params;
+		self::$groupProps[] = $params;
 		$callback();
 		self::$groupProps = [];
 	}
 	
-	public static function list($method='') {
+	public static function __list($method = '') {
+		self::__instHttp();
 		$ret = [];
 		foreach(self::$routes as $route)
-			if ($route['method']==$method || empty($method))
+			if ($route['method'] == $method || empty($method))
 				$ret[] = $route;
 		return $ret;
 	}
@@ -54,12 +74,16 @@ abstract class routeInc extends core {
 	
 	protected function setRoute($params) {
 		if (count(self::$groupProps)) {
-			
-			$gp = self::$groupProps;
-			if (isset($gp['prefix']))
-				$params['url'] = '/'.$gp['prefix'].(substr($params['url'],-1)=='/' ? substr_replace($params['url'],'',strlen($params['url'])-1) : $params['url']);
-			if (isset($gp['middleware']))
-				$params['middleware'] = $gp['middleware'];
+			foreach(array_reverse(self::$groupProps) as $gp) {
+				if (isset($gp['prefix']))
+					$params['url'] = '/'.$gp['prefix'].(substr($params['url'],-1)=='/' ? substr_replace($params['url'],'',strlen($params['url'])-1) : $params['url']);
+				if (isset($gp['middleware'])) {
+					$middlewares = is_array($gp['middleware']) ? $gp['middleware'] : [$gp['middleware']];
+					foreach($middlewares as $middleware) {
+						$params['middleware'][] = $middleware;
+					}
+				}
+			}
 		}
 		
 		$params['callback'] = is_string($params['callback']) ? (function($callback) {
@@ -80,10 +104,23 @@ abstract class routeInc extends core {
 		self::$routes[] = $this->route;
 	}
 	
+	private static function parseConsoleProps($requestProps, &$routeProps) {
+		if (count($requestProps)<=0 || !app::isConsole())
+			return;
+		foreach($requestProps as $prop) {
+			if (($index = strrpos($prop, '--')) === false)
+				continue;
+				$var = explode('=', substr($prop, $index + 2));
+				$name = $var[0] ?? '';
+				$value = $var[1] ?? '';
+				$routeProps[$name] = $value;
+		}
+	} 
+
 	public static function getRoute() {
 		$routes = self::$routes;
 		
-		$allowChars = '0-9A-Za-z.';
+		$allowChars = '0-9A-Za-z.-';
 		$urlMatch = function($url) use (&$allowChars) {
 			return preg_replace([
 				'`/`is',
@@ -101,9 +138,12 @@ abstract class routeInc extends core {
 		if ($routes)
 			foreach($routes as $route) {
 				$request = core::request();
+
+				//Получаем переменные в консоли
+				self::parseConsoleProps($request->props, $route['props']);
 				
 				//Получаем переменные после знака ?
-				if ($request->props)
+				if ($request->props && !app::isConsole())
 					$route['props'] = $request->props;
 				
 				if ($request->get==$route['url'])
@@ -115,15 +155,18 @@ abstract class routeInc extends core {
 					//Получаем названия переменных из маршрута
 					if (preg_match_all("/\{(.*)\}/isU", $route['url'], $matchVars)) {
 						
-						foreach($matchVars[1] as $key=>$varName) {
+						foreach($matchVars[1] as $key => $varName) {
 							
 							$varName = str_replace('?','',$varName);
 							$varValue = $matchUrl[$key+1] ?? null;
 							
 							//Проверяем регуляркой что внутри переменных
-							if (isset($route['where'][$varName]) && !empty($varValue) && !preg_match('/'.$route['where'][$varName].'/',$varValue))
-								return [];
-							
+							if (isset($route['where'])) {
+								$where = (isset($route['where'][0]) && is_array($route['where'][0])) ? $route['where'][0] : $route['where'];
+								if (isset($where[$varName]) && !empty($varValue) && !preg_match('/^'.$where[$varName].'$/isU', $varValue))
+									return [];
+							}
+
 							$route['props'][$varName] = $varValue;
 						}
 					}

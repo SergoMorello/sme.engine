@@ -5,12 +5,16 @@ class modelCore extends core {
     protected $table;
 
     protected function getTableName() {
-		return $this->table;
+		return config::get('app.dbPrefix').$this->table;
 	}
 
     protected function setTableName($name) {
         $this->table = $name;
     }
+
+	protected function value($value) {
+		$value = (is_object($value) && method_exists($value, 'getValue')) ? $value->getValue() : "'".$value."'";
+	}
 
     protected function genParams($params, $callback, &$data, $default=[]) {
         if (!is_array($params))

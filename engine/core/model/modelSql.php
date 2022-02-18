@@ -10,8 +10,10 @@ class modelSql extends modelCore {
 
     //SELECT
 	public function select(...$data) {
-		foreach($data as $dt)
+		$data = (is_array($data) && count($data) == 1) ? $data[0] : $data;
+		foreach($data as $dt) {
 			self::$__query->select[] = preg_split("/ as /i",$dt);
+		}
 		return $this;
 	}
 
@@ -54,16 +56,16 @@ class modelSql extends modelCore {
 	//LEFT JOIN
 	public function leftJoin($table, $callback) {
 		return $callback(new class($table, $this->getTableName()) extends model{
-			private $table;
+			private $joinTable;
 
 			public function __construct($table, $curentTable) {
-				$this->table = $table;
+				$this->joinTable = $table;
 				$this->setTableName($curentTable);
 			}
 
 			public function on(...$props) {
                 $this->genParams($props, function($a, $b, $c){
-                    return '`'.$this->table.'` ON '.$a.' '.$b.' '.$c;
+                    return '`'.$this->joinTable.'` ON '.$a.' '.$b.' '.$c;
                 }, self::$__query->leftJoin, ['b'=>'=']);
                 return $this;
 			}

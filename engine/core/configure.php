@@ -20,11 +20,20 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
 // Init
 env::init();
 
+middleware::init();
+
 // Config
 
 config::set('app', app::include('config.app'));
 
 config::set('storage', app::include('config.storage'));
+
+
+
+middleware::declare('api', function($request, $next){
+	
+	return $next($request);
+});
 
 if (config('app.compressorEnabled'))
 	route::get('/'.config("app.compressorName").'/{hash}/{name}', 'compressor@get')->name('compressor-get');
@@ -182,7 +191,7 @@ if (app::isConsole()) {
 	});
 	
 	// 404
-	exceptions::declare(404,function(){
+	exceptions::declare(404,function($e){
 		return view::error(
 			'error',
 			['message'=>'Not found'],
@@ -209,10 +218,11 @@ if (app::isConsole()) {
 	});
 	
 	exceptions::declare('validate',function($errors){
+
 		$list = [];
 		foreach($errors as $error)
 			$list[$error['name']] = 'field '.$error['name'].' must be '.$error['access'];
-		app::__return(redirect()->back()->withErrors($list));
+		return redirect()->back()->withErrors($list);
 	});
 	
 	exceptions::declare('exception',function($error, $short=false){
@@ -222,43 +232,54 @@ if (app::isConsole()) {
 				return explode(PHP_EOL,file_get_contents($file));
 			};
 			
-			app::__return(view::error('error',[
+			return view::error('error',[
 				'message'=>$error->getMessage().' on line: '.$error->getLine().' in '.$error->getFile(),
 				'errorLine'=>$error->getLine(),
 				'sourceLines'=>$sourceLines($error->getFile())
-			]));
+			]);
 		}else
-			app::__return(view::error('error',['message'=>$error->getMessage()]));
+			return view::error('error',['message'=>$error->getMessage()]);
 	});
 	
 	exceptions::declare('httpError',function($e){
-		app::__return(view::error('error',[
+		return view::error('error',[
 			'message'=>$e['message'],
 			'errorLine'=>0,
 			'sourceLines'=>$e['lines']
-		]));
+		]);
 	});
 	
 	exceptions::declare('error',function($e){
-		app::__return(view::error('error',[
+		return view::error('error',[
 			'message'=>$e['message']
-		]));
+		]);
 	});
 }
 
 if (app::isConsole()) {
 	
 	// Console
-	console::command("serve",function($port=8000, $ip='127.0.0.1') {
-		log::info('Start dev server on: http://'.$ip.':'.$port);
-		exec('php -S '.$ip.':'.$port.' -t public dev');
+	console::command("serve",function() {
+		$port = request::route('port') ?? '8000';
+		$host = request::route('host') ?? '127.0.0.1';
+		log::info('Start dev server on: http://'.$host.':'.$port);
+		exec('php -S '.$host.':'.$port.' -t public dev');
 	});
 	
 	console::command("route:list",function() {
 		log::info('Route list:');
-		log::info("URL\tController\tMethod");
-		foreach(route::list() as $list)
-			log::info($list['url']."\t".(is_callable($list['callback']) ? 'fn' : $list['callback']->controller.'@'.$list['callback']->method)."\t".$list['method']);
+		$list = [];
+		foreach(route::__list() as $el)
+			$list[] = [
+				$el['url'],
+				(is_callable($el['callback']) ? 'fn' : $el['callback']->controller.'@'.$el['callback']->method),
+				$el['method']
+			];
+		log::table([
+			'URL',
+			'Controller',
+			'Method'
+		], $list);
 	});
 	
 	console::command("cache:clear",function() {
@@ -269,5 +290,44 @@ if (app::isConsole()) {
 	console::command("view:clear",function() {
 		if (view::flush())
 			log::info('Views cleared');
+	});
+
+	console::command("make:{func} {name?}",function($func, $name) {
+
+		request::validate([
+			'name' => 'required|regex:/([a-zA-Z]{1,}[0-9]{0,})/i'
+		]);
+		
+		switch($func) {
+			case 'controller':
+				$path = CONTROLLER.$name.'.php';
+				$file = file_get_contents(ENGINE.'/make/controller.php');
+				$file = str_replace('__NAME__', $name, $file);
+				if (file_exists($path))
+					return log::info('Controller exists');
+				if (file_put_contents($path, $file))
+					log::info('Controller created');
+			break;
+			case 'model':
+				$path = MODEL.$name.'.php';
+				$file = file_get_contents(ENGINE.'/make/model.php');
+				$file = str_replace('__NAME__', $name, $file);
+				if (file_exists($path))
+					return log::info('Model exists');
+				if (file_put_contents($path, $file))
+					log::info('Model created');
+			break;
+			case 'middleware':
+				$path = MIDDLEWARE.$name.'.php';
+				$file = file_get_contents(ENGINE.'/make/middleware.php');
+				$file = str_replace('__NAME__', $name, $file);
+				if (file_exists($path))
+					return log::info('Middleware exists');
+				if (file_put_contents($path, $file))
+					log::info('Middleware created');
+			break;
+			default:
+				log::info('Example make:controller MainController');
+		}
 	});
 }

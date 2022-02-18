@@ -23,9 +23,5 @@ return [
 
 	'compressorEnabled' => env('COMPRESSOR_ENABLED', true),
 
-	'compressorName' => env('COMPRESSOR_NAME', 'com'),
-
-	'test' => [
-		'test1' => 321
-	]
+	'compressorName' => env('COMPRESSOR_NAME', 'com')
 ];

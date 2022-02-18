@@ -37,20 +37,18 @@ class app extends core {
 		
 		new request;
 		
-		if ($console)
-			self::include('routes.console');
-		
-		self::include('routes.web');
+		route::__init();
 		
 		core::connectDB();
 		
-		core::addControllers();
+		controller::__init();
 		
 		$this->defaultService('boot');
 		
 		$this->run();
 		
 	}
+
 	public function __destruct() {
 		if (self::$run)
 			return;
@@ -146,8 +144,8 @@ class app extends core {
 	public static function __return($result) {
 		$result = (is_object($result) && method_exists($result, 'getContent')) ? $result->getContent() : $result;
 		$result = (is_array($result) || is_object($result)) ? response::json($result)->getContent() : $result;
-
-		die($result);
+		
+		die((string)$result);
 	}
 
 	private function run() {
@@ -156,32 +154,28 @@ class app extends core {
 		if (!$route)
 			abort(404);
 		
-		if (!$this->checkMethod($route['method']))
+		if (!$this->checkMethod($route['method'] ?? ''))
 			abort(405);
-		
-		if (middleware::check($route['middleware'] ?? null))
-			return;
-		
+
 		$routeCallback = function($route) {
 			$return = (object)[
-				'call'=>null,
-				'props'=>$route['props'] ?? []
+				'call' => null,
+				'props' => $route['props'] ?? []
 			];
 
 			if (is_callable($route['callback'])) {
 				$return->call = $route['callback'];
 			}else{
+				if (!class_exists($route['callback']->controller))
+					throw new Exception('Controller "'.$route['callback']->controller.'" not found',1);
 				$return->call = [new $route['callback']->controller, $route['callback']->method];
-				
-				array_unshift($return->props, new request);
 			}
-
-			return $return;
+			
+			return middleware::check($route['middleware'] ?? null, $return, new request);
 		};
 
 		try {
 			$callback = $routeCallback($route);
-			
 			self::__return(call_user_func_array(
 				$callback->call, 
 				array_values($callback->props)

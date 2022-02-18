@@ -1,13 +1,11 @@
 <?php
 
-function cookie($data=[],$time=0) {
-	if (!count($data))
+function cookie($data = null, $time = 0) {
+	if (is_null($data))
 		return new cookie;
 	if (is_array($data)) {
-		foreach($data as $key=>$val) {
-			$arrData = is_array($val) ? $val : array("value"=>$val,"date"=>($time ? time()+$time : time()+(3600*24*30)));
-			return setcookie($key, $arrData['value'], $arrData['date'], "/");
-		}
-	}else
-		return $_COOKIE[$data] ?? NULL;
+		return cookie::make($data, $time);
+	}elseif(is_string($data)){
+		return cookie::get($data);
+	}
 }

@@ -1,16 +1,27 @@
 <?php
+
 class controller extends core {
 	
 	private static $model;
 	
-	public static function model($model=null) {
+	private static function getPath($file, $default) {
+		return preg_match('/[.\/]+/', $file) ? $file : $default.'.'.$file;
+	}
+
+	public static function __init() {
+		foreach(route::getRoutes() as $page)
+			if (!is_callable($page['callback'])) {
+				app::include(self::getPath($page['callback']->controller, 'app.controller'));
+			}
+	}
+
+	public static function model($model = null) {
 		
 		if (empty($model))
 			return (object)self::$model;
 		
-		if (file_exists(self::dirM.$model.".php")) {
-			
-			require_once(self::dirM.$model.'.php');
+		if (app::include(self::getPath($model, 'app.model'))) {
+			//app::include(self::getPath($model, 'app.model'));
 			
 			if (class_exists($model)) {
 				$newModel = new $model;
