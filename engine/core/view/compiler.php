@@ -59,7 +59,7 @@ class compiler extends core {
 
 	protected static function compile($buffer) {
 		
-		$buffer .= "\r\n";
+		$buffer .= PHP_EOL;
 		
 		$appendBuffer = "";
 		
@@ -90,29 +90,8 @@ class compiler extends core {
 			return $return;
 		};
 		
-		$convertSpec = [
-			[
-				'{',
-				'}',
-				'@',
-				':',
-				'$',
-				'<?',
-				'?>'
-			],
-			[
-				'&lcub;',
-				'&rcub;',
-				'&commat;',
-				'&colon;',
-				'&dollar;',
-				'&lt;&quest;',
-				'&quest;&rt;'
-			]
-		];
-		
-		$buffer = preg_replace_callback('/\@nc(.*)@endnc/isU', function($var) use (&$convertSpec){
-			return str_replace($convertSpec[0],$convertSpec[1],$var[1]);
+		$buffer = preg_replace_callback('/\@html(.*)@endhtml/isU', function($var) use (&$convertSpec){
+			return self::convertSpec($var[1])->encode();
 		}, $buffer);
 		
 		$buffer = preg_replace_callback('/\{\{(.*)\}\}/isU', function($var){
@@ -143,12 +122,50 @@ class compiler extends core {
 		}, $buffer);
 		
 		$buffer .= $appendBuffer ?? NULL;
-		
-		unset($convertSpec[0][5],$convertSpec[0][6],$convertSpec[1][5],$convertSpec[1][6]);
-		
-		$buffer = str_replace($convertSpec[1],$convertSpec[0],$buffer);
+
+		$buffer = self::convertSpec($buffer)->decode();
 		
 		return $buffer;
+	}
+
+	private static function convertSpec($buffer) {
+		return new class($buffer){
+			private $buffer, $spec;
+
+			public function __construct($buffer) {
+				$this->buffer = $buffer;
+				$this->spec = [
+					[
+						'{',
+						'}',
+						'@',
+						':',
+						'$',
+						'<?',
+						'?>'
+					],
+					[
+						'&lcub;',
+						'&rcub;',
+						'&commat;',
+						'&colon;',
+						'&dollar;',
+						'&lt;?',
+						'?&gt;'
+					]
+				];
+			}
+
+			public function encode() {
+				return str_replace($this->spec[0], $this->spec[1], $this->buffer);
+			}
+
+			public function decode() {
+				unset($this->spec[0][5],$this->spec[0][6],$this->spec[1][5],$this->spec[1][6]);
+		
+				return str_replace($this->spec[1], $this->spec[0], $this->buffer);
+			}
+		};
 	}
 
 	public static function declare($name, $return) {
