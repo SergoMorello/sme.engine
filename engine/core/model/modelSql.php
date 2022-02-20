@@ -11,6 +11,7 @@ class modelSql extends modelCore {
     //SELECT
 	public function select(...$data) {
 		$data = (is_array($data) && count($data) == 1) ? $data[0] : $data;
+		$data = is_array($data) ? $data : [$data];
 		foreach($data as $dt) {
 			self::$__query->select[] = preg_split("/ as /i",$dt);
 		}
@@ -56,17 +57,33 @@ class modelSql extends modelCore {
 	//LEFT JOIN
 	public function leftJoin($table, $callback) {
 		return $callback(new class($table, $this->getTableName()) extends model{
-			private $joinTable;
+			private $query, $joinTable, $count, $index;
 
 			public function __construct($table, $curentTable) {
 				$this->joinTable = $table;
 				$this->setTableName($curentTable);
+				$this->count = 0;
+				$this->query = [];
+				$this->index = isset(self::$__query->leftJoin) ? array_key_last(self::$__query->leftJoin) + 1 : 0;
+			}
+
+			private function split() {
+				return $this->count > 0 ? 'AND ' :'`'.$this->joinTable.'` ON ';
+			}
+
+			public function save() {
+				self::$__query->leftJoin[$this->index] = implode(' ',$this->query);
 			}
 
 			public function on(...$props) {
                 $this->genParams($props, function($a, $b, $c){
-                    return '`'.$this->joinTable.'` ON '.$a.' '.$b.' '.$c;
-                }, self::$__query->leftJoin, ['b'=>'=']);
+                    return $this->split().$a.' '.$b.' '.self::value($c);
+                }, $this->query, ['b' => '=']);
+
+				$this->save();
+				
+				++$this->count;
+
                 return $this;
 			}
 		});

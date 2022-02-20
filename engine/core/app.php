@@ -39,21 +39,12 @@ class app extends core {
 		
 		route::__init();
 		
-		core::connectDB();
-		
 		controller::__init();
 		
 		$this->defaultService('boot');
 		
 		$this->run();
 		
-	}
-
-	public function __destruct() {
-		if (self::$run)
-			return;
-		
-		core::disconnectDB();
 	}
 	
 	public static function getObj() {

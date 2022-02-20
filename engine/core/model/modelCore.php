@@ -1,8 +1,37 @@
 <?php
 
 class modelCore extends core {
-
+	private static $dblink;
     protected $table;
+
+	public function __construct() {
+		self::$dblink = new database(
+			config::get('database.dbType'),
+			config::get('database.dbHost'),
+			config::get('database.dbUser'),
+			config::get('database.dbPassword'),
+			config::get('database.dbName'),
+			config::get('app.debug')
+		);
+		
+		try {
+			self::$dblink->connect(true);
+		} catch (PDOException $e) {
+			if (config::get('app.debug'))
+				exceptions::throw('error',['message' => $e->getMessage()]);
+			else
+				exceptions::throw('error',['message' => 'Connect DB']);
+		}
+	}
+
+	public function __destruct() {
+		if (!is_null(self::$dblink))
+			self::$dblink->disconnect();
+	}
+
+	protected static function dblink() {
+		return self::$dblink;
+	}
 
     protected function getTableName() {
 		return config::get('app.dbPrefix').$this->table;
@@ -13,7 +42,7 @@ class modelCore extends core {
     }
 
 	protected function value($value) {
-		$value = (is_object($value) && method_exists($value, 'getValue')) ? $value->getValue() : "'".$value."'";
+		return (is_object($value) && method_exists($value, 'getValue')) ? $value->getValue() : "'".$value."'";
 	}
 
     protected function genParams($params, $callback, &$data, $default=[]) {

@@ -21,7 +21,6 @@ class controller extends core {
 			return (object)self::$model;
 		
 		if (app::include(self::getPath($model, 'app.model'))) {
-			//app::include(self::getPath($model, 'app.model'));
 			
 			if (class_exists($model)) {
 				$newModel = new $model;

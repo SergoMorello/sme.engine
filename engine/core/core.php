@@ -1,42 +1,12 @@
 <?php
 abstract class core {
-	static $dblink,
-		$arrError=[],
-		$arrCompilerView=[];
+	static $arrError=[],
+			$arrCompilerView=[];
 	
 	const dirM = APP.'model/';
 	const dirV = APP.'view/';
 	const dirC = APP.'controller/';
 	const dirCache = STORAGE.'.cache/';
-	
-	protected function connectDB() {
-		
-		if (!config::get('app.dbEnabled'))
-			return;
-		
-		self::$dblink = new database(
-			config::get('app.dbType'),
-			config::get('app.dbHost'),
-			config::get('app.dbUser'),
-			config::get('app.dbPassword'),
-			config::get('app.dbName'),
-			config::get('app.debug')
-		);
-		
-		try {
-			self::$dblink->connect(true);
-		} catch (PDOException $e) {
-			if (config::get('app.debug'))
-				exceptions::throw('error',['message'=>$e->getMessage()]);
-			else
-				exceptions::throw('error',['message'=>'Connect DB']);
-		}
-	}
-	
-	protected function disconnectDB() {
-		if (config::get('app.dbEnabled') && !is_null(core::$dblink))
-			core::$dblink->disconnect();
-	}
 	
 	protected static function request() {
 		if (app::isConsole()) {

@@ -5,7 +5,7 @@ return [
 		'core',
 		'env',
 		'config',
-		'database',
+		'model/database',
 		'model/modelCore',
 		'model/modelObject',
 		'model/modelSql',

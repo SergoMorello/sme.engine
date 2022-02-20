@@ -26,8 +26,9 @@ middleware::init();
 
 config::set('app', app::include('config.app'));
 
-config::set('storage', app::include('config.storage'));
+config::set('database', app::include('config.database'));
 
+config::set('storage', app::include('config.storage'));
 
 
 middleware::declare('api', function($request, $next){
