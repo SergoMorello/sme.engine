@@ -14,8 +14,10 @@ class view extends compiler {
 		$view = str_replace(".","/",$view);
 		$pathV = $system ? self::dirVSys : self::dirV;
 		
-		if (file_exists($pathV.$view.".php")) {
-			
+		if ($isPHP = file_exists($pathV.$view.".php") || $isHTML = file_exists($pathV.$view.".html")) {
+			if (isset($isHTML))
+				return file_get_contents($pathV.$view.'.html');
+
 			$cacheViewPath = self::dirCompiler.md5($pathV.$view);
 			
 			if (compiler::genCache($view,$pathV))
