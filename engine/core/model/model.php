@@ -21,7 +21,7 @@ class model extends modelSql {
 	}
 
 	public function count() {
-		return self::dblink()->get_num($this->strQuerySelect());
+		return intval(self::dblink()->get_num($this->strQuerySelect()));
 	}
 
 	public function find($id) {
@@ -33,7 +33,7 @@ class model extends modelSql {
 		if (!is_array($values))
 			return $return;
 		foreach($values as $key => $value) {
-			$value = (is_object($value) && method_exists($value, 'getValue')) ? $value->getValue() : "'".$value."'";
+			$value = self::value($value);
 			if ($onlyValues) 
 				$return[] = $value;
 			else

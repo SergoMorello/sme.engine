@@ -21,7 +21,7 @@ class modelSql extends modelCore {
 	//WHERE
 	public function where(...$data) {
         $this->genParams($data, function($a, $b, $c){
-            return $a.$b.'"'.$c.'"';
+            return $a.$b.self::value($c);
         }, self::$__query->where, ['b'=>'=']);
         return $this;
 	}
@@ -29,7 +29,7 @@ class modelSql extends modelCore {
 	//WHERE IN
 	public function whereIn(...$data) {
         $this->genParams($data, function($a, $b, $c){
-            return "`".$a."` IN (\"".implode("\",\"",$c)."\")";
+            return "`".$a."` IN (".self::values(',', $c).")";
         }, self::$__query->whereIn);
         return $this;
 	}
@@ -68,11 +68,11 @@ class modelSql extends modelCore {
 			}
 
 			private function split() {
-				return $this->count > 0 ? 'AND ' :'`'.$this->joinTable.'` ON ';
+				return count($this->query) > 0 ? ' AND ' :'`'.$this->joinTable.'` ON ';
 			}
 
 			public function save() {
-				self::$__query->leftJoin[$this->index] = implode(' ',$this->query);
+				self::$__query->leftJoin[$this->index] = implode('',$this->query);
 			}
 
 			public function on(...$props) {
@@ -81,8 +81,6 @@ class modelSql extends modelCore {
                 }, $this->query, ['b' => '=']);
 
 				$this->save();
-				
-				++$this->count;
 
                 return $this;
 			}

@@ -45,6 +45,13 @@ class modelCore extends core {
 		return (is_object($value) && method_exists($value, 'getValue')) ? $value->getValue() : "'".$value."'";
 	}
 
+	protected function values($split, $values) {
+		$return = [];
+		foreach($values as $value)
+			$return[]= self::value($value);
+		return implode($split, $return);
+	}
+
     protected function genParams($params, $callback, &$data, $default=[]) {
         if (!is_array($params))
             return;
