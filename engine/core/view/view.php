@@ -28,23 +28,36 @@ class view extends compiler {
 			
 			$errors = function() {
 				return (new class{
-					
-					private $errors;
-					
+
 					public function __construct() {
-						$this->errors = session('__withErrors');
+						if ($errors = session('__withErrors')) {
+							foreach($errors as $error => $access)
+								$this->{$error} = $access;
+						}
+					}
+
+					private function errors() {
+						return get_object_vars($this);
 					}
 					
 					public function has($name) {
-						return count($this->errors) ? array_key_exists($name, $this->errors) : false;
+						return count($this->errors()) ? array_key_exists($name, $this->errors()) : false;
+					}
+
+					public function count() {
+						return count($this->errors());
+					}
+
+					public function first($name) {
+						return $this->errors()[$name] ?? '';
 					}
 
 					public function any() {
-						return count($this->errors) ? true : false;
+						return count($this->errors()) ? true : false;
 					}
-					
+
 					public function all() {
-						return $this->errors;
+						return $this->errors();
 					}
 				});
 			};

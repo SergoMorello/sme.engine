@@ -35,7 +35,7 @@ class app extends core {
 		
 		$this->singletonInit();
 		
-		new request;
+		request::__init();
 		
 		route::__init();
 		

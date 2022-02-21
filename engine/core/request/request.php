@@ -3,11 +3,11 @@ class request extends core {
 	
 	private static $_server, $_get, $_post, $_headers;
 	
-	public function __construct() {
+	public static function __init() {
 		self::$_server = $_SERVER;
 		self::$_get = core::guardData($_GET);
 		self::$_post = core::guardData($_POST);
-		self::$_headers = $this->getallheaders();
+		self::$_headers = self::getallheaders();
 	}
 
 	public static function route($var) {
@@ -27,7 +27,7 @@ class request extends core {
 		return count(self::$_post)>0 ? self::$_post : (count(self::$_get)>0 ? self::$_get : (count($_FILES)>0 ? self::file : NULL));
 	}
 
-	private function getallheaders() {
+	private static function getallheaders() {
 		$headers = [];
 		foreach (self::$_server as $name => $value) {
 			if (substr($name, 0, 5) == 'HTTP_') {

@@ -155,7 +155,7 @@ if (app::isConsole()) {
 	exceptions::declare('validate',function($errors){
 		$list = [];
 		foreach($errors as $error)
-			$list[] = 'field '.$error['name'].' must be '.$error['access'];
+			$list[] = 'field '.$error['name'].' must be '.implode(' | ', $error['access']);
 		return response(implode("\r\n",$list));
 	});
 	
@@ -219,10 +219,9 @@ if (app::isConsole()) {
 	});
 	
 	exceptions::declare('validate',function($errors){
-
 		$list = [];
 		foreach($errors as $error)
-			$list[$error['name']] = 'field '.$error['name'].' must be '.$error['access'];
+			$list[$error['name']] = 'field '.$error['name'].' must be '.implode(' | ', $error['access']);
 		return redirect()->back()->withErrors($list);
 	});
 	
