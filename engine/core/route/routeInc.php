@@ -43,7 +43,7 @@ abstract class routeInc extends core {
 	public static function group($params, $callback) {
 		self::$groupProps[] = $params;
 		$callback();
-		self::$groupProps = [];
+		unset(self::$groupProps[array_key_last(self::$groupProps)]);
 	}
 	
 	public static function __list($method = '') {

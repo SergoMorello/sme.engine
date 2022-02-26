@@ -5,6 +5,8 @@ class modelCore extends core {
     protected $table;
 
 	public function __construct() {
+		if (!is_null(self::$dblink))
+			return;
 		self::$dblink = new database(
 			config::get('database.dbType'),
 			config::get('database.dbHost'),
@@ -24,7 +26,7 @@ class modelCore extends core {
 		}
 	}
 
-	public function __destruct() {
+	public static function __close() {
 		if (!is_null(self::$dblink))
 			self::$dblink->disconnect();
 	}

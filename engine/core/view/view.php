@@ -3,6 +3,8 @@ class view extends compiler {
 	
 	const dirVSys = ENGINE.'view/';
 
+	private static $shareVars = [];
+
 	public function __destruct() {
 		session()->delete([
 			'__oldInputs',
@@ -10,13 +12,21 @@ class view extends compiler {
 		]);
 	}
 
-	private function addView($view, $data=array(), $system=false) {
+	public static function share($name, $value) {
+		self::$shareVars[$name] = $value;
+	}
+
+	private function addView($view, $data = array(), $system = false) {
+
 		$view = str_replace(".","/",$view);
 		$pathV = $system ? self::dirVSys : self::dirV;
 		
 		if ($isPHP = file_exists($pathV.$view.".php") || $isHTML = file_exists($pathV.$view.".html")) {
 			if (isset($isHTML))
 				return file_get_contents($pathV.$view.'.html');
+
+			foreach(self::$shareVars as $nameVar => $valueVar)
+				$data[$nameVar] = $valueVar;
 
 			$cacheViewPath = self::dirCompiler.md5($pathV.$view);
 			

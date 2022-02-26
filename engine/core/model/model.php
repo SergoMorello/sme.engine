@@ -62,7 +62,7 @@ class model extends modelSql {
 		if (is_array($props) && count($props)) {
 			$arrQuery = $this->getValues($props);
 
-			self::dblink()->query("UPDATE `".$this->getTableName()."` SET ".implode(",",$arrQuery)." WHERE ".$this->srtWhere());
+			$this->isUpdate = self::dblink()->query("UPDATE `".$this->getTableName()."` SET ".implode(",",$arrQuery)." WHERE ".$this->srtWhere());
 			return new modelObject($this);
 		}
 	}

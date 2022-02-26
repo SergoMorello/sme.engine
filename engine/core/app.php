@@ -46,6 +46,10 @@ class app extends core {
 		$this->run();
 		
 	}
+
+	public function __destruct() {
+		modelCore::__close();
+	}
 	
 	public static function getObj() {
 		return self::$objApp;

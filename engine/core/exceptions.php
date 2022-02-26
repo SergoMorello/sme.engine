@@ -12,7 +12,7 @@ class exceptions extends core {
 
 			$handler = new handlerException;
 
-			return $handler->render(request(), $arg);
+			app::__return($handler->render(request(), $arg));
 		}
 	}
 	

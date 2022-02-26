@@ -47,9 +47,9 @@ class middleware extends core {
 			foreach(self::$addMiddleware as $mw) {
 				if ($mdw == $mw['name']) {
 					if (is_callable($mw['obj']) && $mw['obj'] instanceof Closure)
-						return self::checkResponse($mw['obj']($request, $nextClosure));
+						self::checkResponse($mw['obj']($request, $nextClosure));
 					else{
-						return self::checkResponse((new $mw['obj'])->handle($request, $nextClosure));
+						self::checkResponse((new $mw['obj'])->handle($request, $nextClosure));
 					}
 				}
 			}
