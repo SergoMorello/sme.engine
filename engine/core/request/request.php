@@ -145,7 +145,7 @@ class request extends core {
 
 		$arrErr = [];
 		foreach($data as $var=>$access)
-			if ($accessErr = validate::checkVar(
+			if ($accessErr = validate::checkVar($var,
 								self::input($var) ?? self::route($var)
 									//isset(self::$_post[$var]) ? stripslashes(htmlspecialchars_decode(self::$_post[$var])) : (isset($_FILES[$var]) ? self::file($var) : NULL)
 								,$access))
