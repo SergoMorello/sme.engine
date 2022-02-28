@@ -2,6 +2,7 @@
 namespace SME\Core\Request;
 
 use SME\Core\core;
+use SME\Modules\storage;
 
 class request extends core {
 	
@@ -9,8 +10,8 @@ class request extends core {
 	
 	public static function __init() {
 		self::$_server = $_SERVER;
-		self::$_get = core::guardData($_GET);
-		self::$_post = core::guardData($_POST);
+		self::$_get = Core::guardData($_GET);
+		self::$_post = Core::guardData($_POST);
 		self::$_headers = self::getallheaders();
 	}
 

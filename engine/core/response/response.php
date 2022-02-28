@@ -1,4 +1,5 @@
 <?php
+namespace SME\Core\Response;
 
 class response {
 	public static function make($content, $code = 200) {

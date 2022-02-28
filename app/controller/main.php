@@ -1,9 +1,7 @@
 <?php
 namespace App\Controller;
 
-use SME\Core\controller;
-
-class main extends controller {
+class main extends Controller {
 	
 	public function index() {
 		$links = [

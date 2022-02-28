@@ -14,7 +14,7 @@ class route extends routeInc {
 	}
 
 	public static function __init() {
-		if (app::isConsole())
+		if (App::isConsole())
 			self::__instConsole();
 		else
 			self::__instHttp();

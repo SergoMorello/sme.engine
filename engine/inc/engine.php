@@ -11,7 +11,7 @@ return [
 		'model/modelSql',
 		'model/model',
 		'model/DB',
-		'controller',
+		'controllerCore',
 		'view/compiler',
 		'view/view',
 		'response/responseObject',

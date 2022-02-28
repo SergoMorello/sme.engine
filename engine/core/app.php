@@ -2,6 +2,7 @@
 namespace SME\Core;
 
 use SME\Core\Request\request;
+use SME\Core\Response\response;
 use SME\Core\Model\modelCore;
 
 class app extends core {
@@ -43,7 +44,7 @@ class app extends core {
 		
 		\route::__init();
 		
-		controller::__init();
+		ControllerCore::__init();
 		
 		$this->defaultService('boot');
 		
@@ -96,19 +97,19 @@ class app extends core {
 			if (file_exists(ROOT.$name.'.php'))
 				return require_once(ROOT.$name.'.php');
 			
-		} catch (ParseError $e) {
+		} catch (\ParseError $e) {
 			
 			exceptions::throw('exception',$e);
 			
-		} catch (Error $e) {
+		} catch (\Error $e) {
 			
 			exceptions::throw('exception',$e);
 			
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
 			
 			exceptions::throw('exception',$e);
 			
-		} catch (ErrorException $e) {
+		} catch (\ErrorException $e) {
 			
 			exceptions::throw('exception',$e);
 			
@@ -121,19 +122,19 @@ class app extends core {
 			if (method_exists($this->appService, $method))
 				$this->appService->$method();
 			
-		} catch (ParseError $e) {
+		} catch (\ParseError $e) {
 			
 			exceptions::throw('exception',$e);
 			
-		} catch (Error $e) {
+		} catch (\Error $e) {
 			
 			exceptions::throw('exception',$e);
 			
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
 			
 			exceptions::throw('exception',$e);
 			
-		} catch (ErrorException $e) {
+		} catch (\ErrorException $e) {
 			
 			exceptions::throw('exception',$e);
 			
@@ -165,9 +166,10 @@ class app extends core {
 			if (is_callable($route['callback'])) {
 				$return->call = $route['callback'];
 			}else{
-				if (!class_exists('App\\Controller\\'.$route['callback']->controller))
-					throw new \Exception('Controller "'.$route['callback']->controller.'" not found',1);
-				$return->call = [new $route['callback']->controller, $route['callback']->method];
+				$controller = strpos($route['callback']->controller, '\\') ? $route['callback']->controller : 'App\\controller\\'.$route['callback']->controller;
+				if (!class_exists($controller))
+					throw new \Exception('Controller "'.$controller.'" not found',1);
+				$return->call = [new $controller, $route['callback']->method];
 			}
 			
 			return middleware::check($route['middleware'] ?? null, $return, new request);
@@ -180,19 +182,19 @@ class app extends core {
 				array_values($callback->props)
 			));
 			
-		} catch (ParseError $e) {
+		} catch (\ParseError $e) {
 			
 			exceptions::throw('exception',$e);
 		
-		} catch (Error $e) {
+		} catch (\Error $e) {
 			
 			exceptions::throw('exception',$e);
 			
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
 			
 			exceptions::throw('exception',$e);
 			
-		} catch (ErrorException $e) {
+		} catch (\ErrorException $e) {
 			
 			exceptions::throw('exception',$e);
 			

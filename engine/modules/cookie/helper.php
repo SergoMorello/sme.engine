@@ -1,5 +1,7 @@
 <?php
 
+use SME\Modules\cookie;
+
 function cookie($data = null, $time = 0) {
 	if (is_null($data))
 		return new cookie;

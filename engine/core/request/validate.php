@@ -1,4 +1,5 @@
 <?php
+namespace SME\Core\Request;
 
 class validate {
 

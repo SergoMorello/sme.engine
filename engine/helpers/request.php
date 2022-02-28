@@ -1,5 +1,5 @@
 <?php
 
 function request() {
-	return new request;
+	return new SME\Core\Request\request;
 }

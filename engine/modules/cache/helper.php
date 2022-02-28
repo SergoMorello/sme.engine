@@ -1,5 +1,5 @@
 <?php
 
 function cache() {
-	return new cache;
+	return new SME\Modules\cache;
 }

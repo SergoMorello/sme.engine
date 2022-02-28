@@ -11,10 +11,10 @@ abstract class routeInc extends core {
 	protected $route;
 
 	protected static function __instHttp() {
-		app::include('routes.web');
+		App::include('routes.web');
 
 		self::group(['prefix' => 'api', 'middleware' => 'api'], function() {
-			app::include('routes.api');
+			App::include('routes.api');
 		});
 		return (object)[
 			'routes' => self::$routes,
@@ -25,7 +25,7 @@ abstract class routeInc extends core {
 	}
 
 	protected static function __instConsole() {
-		app::include('routes.console');
+		App::include('routes.console');
 	}
 
 	
@@ -98,7 +98,7 @@ abstract class routeInc extends core {
 			];
 		})($params['callback'])	: $params['callback'];
 		
-		if (!app::isConfigure())
+		if (!App::isConfigure())
 			$params['system'] = true;
 		
 		$this->route = $params;
@@ -109,7 +109,7 @@ abstract class routeInc extends core {
 	}
 	
 	private static function parseConsoleProps($requestProps, &$routeProps) {
-		if (count($requestProps)<=0 || !app::isConsole())
+		if (count($requestProps)<=0 || !App::isConsole())
 			return;
 		foreach($requestProps as $prop) {
 			if (($index = strrpos($prop, '--')) === false)
@@ -141,13 +141,13 @@ abstract class routeInc extends core {
 		};
 		if ($routes)
 			foreach($routes as $route) {
-				$request = core::request();
+				$request = Core::request();
 
 				//Получаем переменные в консоли
 				self::parseConsoleProps($request->props, $route['props']);
 				
 				//Получаем переменные после знака ?
-				if ($request->props && !app::isConsole())
+				if ($request->props && !App::isConsole())
 					$route['props'] = $request->props;
 				
 				if ($request->get==$route['url'])

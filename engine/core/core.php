@@ -1,7 +1,7 @@
 <?php
 namespace SME\Core;
 
-abstract class core {
+abstract class Core {
 	static $arrError=[],
 			$arrCompilerView=[];
 	
@@ -11,7 +11,7 @@ abstract class core {
 	const dirCache = STORAGE.'.cache/';
 	
 	protected static function request() {
-		if (app::isConsole()) {
+		if (App::isConsole()) {
 			
 			$argvConsole = $_SERVER['argv'];
 			if (!isset($argvConsole[1]))
@@ -22,7 +22,7 @@ abstract class core {
 			unset($argvConsole[0]);
 			$get = implode(' ', $argvConsole);
 			unset($argvConsole[1]);
-			return (object)['get'=>core::guardData($get),'props'=>$argvConsole];
+			return (object)['get'=>Core::guardData($get),'props'=>$argvConsole];
 			
 		}else{
 			
@@ -32,11 +32,11 @@ abstract class core {
 				$split = explode('&',$props);
 				foreach($split as $sp) {
 					$splitVar = explode('=',$sp);
-					$ret[$splitVar[0]] = core::guardData($splitVar[1] ?? null);
+					$ret[$splitVar[0]] = Core::guardData($splitVar[1] ?? null);
 				}
 				return $ret;
 			};
-			return (object)['get'=>core::guardData($splitUrl[0]).'/','props'=>(isset($splitUrl[1]) ? $splitProps($splitUrl[1]) : [])];
+			return (object)['get'=>Core::guardData($splitUrl[0]).'/','props'=>(isset($splitUrl[1]) ? $splitProps($splitUrl[1]) : [])];
 		}
 	}
 	
@@ -58,7 +58,7 @@ abstract class core {
 	}
 	
 	protected function checkMethod($method) {
-		if (app::isConsole())
+		if (App::isConsole())
 			return strtolower($method)=='command' ? true : false;
 		else
 			return strtolower($method)==strtolower($_SERVER['REQUEST_METHOD']) ? true : false;

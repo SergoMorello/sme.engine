@@ -2,13 +2,14 @@
 namespace SME\Modules;
 
 use SME\Core\core;
+use SME\Core\Request\request;
 
 class compressor extends core {
 	const nameCache = '_compressorData';
 
 	public static function make($files, $name = 'scripts.js', $type = null) {
 		if (!is_array($files)) {
-			throw new Exception('compressor make, files is not array!');
+			throw new \Exception('compressor make, files is not array!');
 		}
 
 		$cache = cache();

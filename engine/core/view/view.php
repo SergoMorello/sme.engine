@@ -1,6 +1,9 @@
 <?php
 namespace SME\Core\View;
 
+use SME\Core\Response\response;
+use SME\Core\exceptions;
+
 class view extends compiler {	
 	
 	const dirVSys = ENGINE.'view/';
@@ -109,7 +112,7 @@ class view extends compiler {
 				
 			}
 		}else
-			throw new Exception('View \''.$view.'\' not found',1);
+			throw new \Exception('View \''.$view.'\' not found',1);
 	}
 	
 	public static function show($page, $data = []) {

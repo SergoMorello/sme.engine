@@ -1,5 +1,5 @@
 <?php
 
 function response($data = NULL, $code = 200) {
-	return response::make($data, $code);
+	return SME\Core\Response\response::make($data, $code);
 }

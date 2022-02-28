@@ -1,4 +1,5 @@
 <?php
+namespace SME\Core\Response;
 
 class responseObject {
 

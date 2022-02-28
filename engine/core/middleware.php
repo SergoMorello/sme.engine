@@ -11,12 +11,12 @@ class middleware extends core {
 				if (($index = strrpos($path, '/')) || ($index = strrpos($path, '.'))) 
 					$nameClass = substr($path, $index + 1);
 				
-				app::include($path);
+				App::include($path);
 				self::declare($name, $nameClass);
 			}
 		};
-		if ($init = app::include('app.appMiddleware')) {
-			if (app::isConsole()) {
+		if ($init = App::include('app.appMiddleware')) {
+			if (App::isConsole()) {
 				if (isset($init['console']))
 					$initFnc($init['console']);
 			}else{
@@ -30,14 +30,14 @@ class middleware extends core {
 		if (is_object($obj) && property_exists($obj, 'call') && property_exists($obj, 'props'))
 			return $obj;
 		else
-			return app::__return($obj);
+			return App::__return($obj);
 	}
 	
 	public static function check($arrCheck, $controllerReturn, $request) {
 		$arrCheck = is_array($arrCheck) ? $arrCheck : [$arrCheck];
 		
 		$nextClosure = function($request) use (&$controllerReturn){
-			if (!app::isConsole())
+			if (!App::isConsole())
 				array_unshift($controllerReturn->props, $request);
 			return (object)[
 				'call' => $controllerReturn->call,

@@ -3,9 +3,10 @@ namespace SME\Core;
 
 use SME\Core\Route\console;
 use SME\Core\View\compiler;
+use SME\Core\View\view;
 use SME\Core\Request\request;
 
-if (app::isConsole()) {
+if (App::isConsole()) {
 	ini_set('default_charset','UTF-8');
 }else{
 	if (!file_exists(TEMP))
@@ -19,7 +20,7 @@ if (app::isConsole()) {
 set_error_handler(function($errno, $errstr, $errfile, $errline) {
 	if (0 === error_reporting())
 		return false;
-	throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+	throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
 });
 
 // Init
@@ -29,11 +30,11 @@ middleware::init();
 
 // Config
 
-config::set('app', app::include('config.app'));
+config::set('app', App::include('config.app'));
 
-config::set('database', app::include('config.database'));
+config::set('database', App::include('config.database'));
 
-config::set('storage', app::include('config.storage'));
+config::set('storage', App::include('config.storage'));
 
 
 middleware::declare('api', function($request, $next){
@@ -42,7 +43,7 @@ middleware::declare('api', function($request, $next){
 });
 
 if (config('app.compressorEnabled'))
-	\route::get('/'.config("app.compressorName").'/{hash}/{name}', 'compressor@get')->name('compressor-get');
+	\route::get('/'.config("app.compressorName").'/{hash}/{name}', 'SME\\Modules\\compressor@get')->name('compressor-get');
 
 // Compiler
 
@@ -135,7 +136,7 @@ compiler::declare('include',function($arg1, $arg2) {
 
 // Exceptions
 
-if (app::isConsole()) {
+if (App::isConsole()) {
 			
 	// 401
 	exceptions::declare(401,function(){
@@ -261,7 +262,7 @@ if (app::isConsole()) {
 	});
 }
 
-if (app::isConsole()) {
+if (App::isConsole()) {
 	
 	// Console
 	\console::command("serve",function() {

@@ -2,6 +2,7 @@
 namespace SME\Core\View;
 
 use SME\Core\core;
+use SME\Core\config;
 
 class compiler extends core {
 
@@ -11,8 +12,8 @@ class compiler extends core {
 
 	protected static function genCache($view, $dirV) {
 		
-		if (!file_exists(core::dirCache))
-					if (!mkdir(core::dirCache))
+		if (!file_exists(Core::dirCache))
+					if (!mkdir(Core::dirCache))
 						die('cache dir, error create');
 		if (!file_exists(self::dirCompiler))
 					if (!mkdir(self::dirCompiler))
@@ -114,7 +115,7 @@ class compiler extends core {
 				$args = (isset($var[3]) && $var[3]) ? $splitArg($var[3]) : [];
 				foreach(self::$arrCompilerView as $rule) {
 					if ($name == $rule['name']) {
-						if (count($args) <= (new ReflectionFunction($rule['return']))->getNumberOfParameters()) {
+						if (count($args) <= (new \ReflectionFunction($rule['return']))->getNumberOfParameters()) {
 							$args[] = &$append;		
 							return $rule['return'](...$args);
 						}

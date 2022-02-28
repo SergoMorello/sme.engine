@@ -9,11 +9,11 @@ class exceptions extends core {
 	public static function throw($exceptionName, $arg) {
 		self::$exceptionName = $exceptionName;
 
-		if (app::include('app.exceptions.handlerException')) {
+		if (App::include('app.exceptions.handlerException')) {
 
-			$handler = new handlerException;
+			$handler = new \App\Exceptions\handlerException;
 
-			app::__return($handler->render(request(), $arg));
+			App::__return($handler->render(request(), $arg));
 		}
 	}
 	
@@ -33,15 +33,14 @@ class exceptions extends core {
 	}
 
 	protected function render($request, $exception) {
-
 		foreach(self::$exceptions as $ex) {
 			if (self::$exceptionName == $ex['name']) {
-				if (is_callable($ex['obj']) && $ex['obj'] instanceof Closure) {
-					return app::__return($ex['obj']($exception));
+				if (is_callable($ex['obj']) && $ex['obj'] instanceof \Closure) {
+					return App::__return($ex['obj']($exception));
 				}
 			}
 		}
 
-		app::__return($exception);
+		App::__return($exception);
 	}
 }

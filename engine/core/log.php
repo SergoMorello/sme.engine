@@ -22,14 +22,14 @@ class log extends core {
 
 	private static function cout($text) {
 		$input = self::input($text);
-		if (!app::isConsole())
+		if (!App::isConsole())
 			return;
 		fwrite(STDOUT, self::inputOS($input));
 	}
 	
 	private static function cerr($text) {
 		$input = self::input($text);
-		if (!app::isConsole())
+		if (!App::isConsole())
 			return;
 		fwrite(STDERR, self::inputOS($input));
 	}
