@@ -2,4 +2,4 @@
 
 require_once('../engine/init.php');
 
-new app;
+new SME\Core\app;

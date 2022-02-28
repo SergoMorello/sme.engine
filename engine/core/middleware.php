@@ -1,4 +1,6 @@
 <?php
+namespace SME\Core;
+
 class middleware extends core {
 	static $addMiddleware = [];
 

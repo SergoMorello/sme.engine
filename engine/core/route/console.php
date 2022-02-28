@@ -1,4 +1,5 @@
 <?php
+use SME\Core\Route\routeInc;
 
 class console extends routeInc {
 	

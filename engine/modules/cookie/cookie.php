@@ -1,4 +1,5 @@
 <?php
+namespace SME\Modules;
 
 class cookie {
 

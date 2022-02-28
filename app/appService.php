@@ -1,4 +1,10 @@
 <?php
+namespace App;
+
+use SME\Core\app;
+use SME\Core\core;
+use SME\Core\middleware;
+
 class appService extends core {
 	public function boot() {
 		//

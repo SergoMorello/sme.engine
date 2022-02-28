@@ -3,4 +3,4 @@
 
 require_once(__DIR__ .'/engine/init.php');
 
-new app(true);
+new SME\Core\app(true);

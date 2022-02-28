@@ -1,4 +1,8 @@
 <?php
+namespace SME\Core;
+
+use SME\Core\Request\request;
+use SME\Core\Model\modelCore;
 
 class app extends core {
 	
@@ -29,7 +33,7 @@ class app extends core {
 		
 		self::include('app.appService');
 		
-		$this->appService = new appService;
+		$this->appService = new \App\appService;
 		
 		$this->defaultService('register');
 		
@@ -37,7 +41,7 @@ class app extends core {
 		
 		request::__init();
 		
-		route::__init();
+		\route::__init();
 		
 		controller::__init();
 		
@@ -144,7 +148,7 @@ class app extends core {
 	}
 
 	private function run() {
-		$route = route::getRoute();
+		$route = \route::getRoute();
 		
 		if (!$route)
 			abort(404);
@@ -161,8 +165,8 @@ class app extends core {
 			if (is_callable($route['callback'])) {
 				$return->call = $route['callback'];
 			}else{
-				if (!class_exists($route['callback']->controller))
-					throw new Exception('Controller "'.$route['callback']->controller.'" not found',1);
+				if (!class_exists('App\\Controller\\'.$route['callback']->controller))
+					throw new \Exception('Controller "'.$route['callback']->controller.'" not found',1);
 				$return->call = [new $route['callback']->controller, $route['callback']->method];
 			}
 			

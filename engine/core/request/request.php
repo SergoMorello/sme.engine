@@ -1,4 +1,8 @@
 <?php
+namespace SME\Core\Request;
+
+use SME\Core\core;
+
 class request extends core {
 	
 	private static $_server, $_get, $_post, $_headers;
@@ -12,7 +16,7 @@ class request extends core {
 
 	public static function route($var) {
 		if (is_string($var))
-			return route::getProps($var);
+			return \route::getProps($var);
 	}
 	
 	public static function server($var='') {
@@ -128,7 +132,7 @@ class request extends core {
 	public static function has($var) {
 		if (isset(self::$_post[$var]))
 			return true;
-		if (route::getProps($var))
+		if (\route::getProps($var))
 			return true;
 		if (isset(self::$_get[$var]))
 			return true;

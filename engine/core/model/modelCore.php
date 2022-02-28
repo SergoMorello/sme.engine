@@ -1,4 +1,7 @@
 <?php
+namespace SME\Core\Model;
+
+use SME\Core\core;
 
 class modelCore extends core {
 	private static $dblink;

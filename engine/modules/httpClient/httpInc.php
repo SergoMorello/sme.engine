@@ -1,4 +1,7 @@
 <?php
+namespace SME\Modules\HttpClient;
+
+use SME\Core\core;
 
 abstract class httpInc extends core {
 	protected static $props=[], $response, $static=[];

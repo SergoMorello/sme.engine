@@ -1,6 +1,7 @@
 <?php
+namespace SME\Core;
 
-class HttpException extends Exception {}
+class HttpException extends \Exception {}
 
 class exceptions extends core {
 	private static $exceptions = [], $exceptionName = '';

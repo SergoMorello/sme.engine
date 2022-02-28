@@ -1,4 +1,6 @@
 <?php
+namespace SME\Core\View;
+
 class view extends compiler {	
 	
 	const dirVSys = ENGINE.'view/';

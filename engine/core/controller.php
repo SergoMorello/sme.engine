@@ -1,4 +1,5 @@
 <?php
+namespace SME\Core;
 
 class controller extends core {
 	
@@ -9,7 +10,7 @@ class controller extends core {
 	}
 
 	public static function __init() {
-		foreach(route::getRoutes() as $page)
+		foreach(\route::getRoutes() as $page)
 			if (!is_callable($page['callback'])) {
 				app::include(self::getPath($page['callback']->controller, 'app.controller'));
 			}

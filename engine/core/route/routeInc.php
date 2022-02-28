@@ -1,4 +1,8 @@
 <?php
+namespace SME\Core\Route;
+
+use SME\Core\app;
+use SME\Core\core;
 
 abstract class routeInc extends core {
 	
@@ -43,7 +47,7 @@ abstract class routeInc extends core {
 	public static function group($params, $callback) {
 		self::$groupProps[] = $params;
 		$callback();
-		unset(self::$groupProps[array_key_last(self::$groupProps)]);
+		unset(self::$groupProps[count(self::$groupProps) - 1]);
 	}
 	
 	public static function __list($method = '') {

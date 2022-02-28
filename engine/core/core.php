@@ -1,4 +1,6 @@
 <?php
+namespace SME\Core;
+
 abstract class core {
 	static $arrError=[],
 			$arrCompilerView=[];

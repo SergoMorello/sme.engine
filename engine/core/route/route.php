@@ -1,5 +1,8 @@
 <?php
 
+use SME\Core\Route\routeInc;
+use SME\Core\app;
+
 class route extends routeInc {
 	
 	private function __construct($params) {

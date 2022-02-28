@@ -1,4 +1,8 @@
 <?php
+namespace SME\Modules;
+
+use SME\Core\Request\request;
+
 class redirect extends request {
 	public static function route($name,$props=[]) {
 		return self::rdr(route($name,$props));

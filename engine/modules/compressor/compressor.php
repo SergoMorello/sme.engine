@@ -1,4 +1,7 @@
 <?php
+namespace SME\Modules;
+
+use SME\Core\core;
 
 class compressor extends core {
 	const nameCache = '_compressorData';

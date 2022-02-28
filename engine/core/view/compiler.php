@@ -1,4 +1,8 @@
 <?php
+namespace SME\Core\View;
+
+use SME\Core\core;
+
 class compiler extends core {
 
 	const dirCompiler = STORAGE.'.cache/compiler/';

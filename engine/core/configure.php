@@ -1,4 +1,9 @@
 <?php
+namespace SME\Core;
+
+use SME\Core\Route\console;
+use SME\Core\View\compiler;
+use SME\Core\Request\request;
 
 if (app::isConsole()) {
 	ini_set('default_charset','UTF-8');
@@ -37,7 +42,7 @@ middleware::declare('api', function($request, $next){
 });
 
 if (config('app.compressorEnabled'))
-	route::get('/'.config("app.compressorName").'/{hash}/{name}', 'compressor@get')->name('compressor-get');
+	\route::get('/'.config("app.compressorName").'/{hash}/{name}', 'compressor@get')->name('compressor-get');
 
 // Compiler
 
@@ -259,17 +264,17 @@ if (app::isConsole()) {
 if (app::isConsole()) {
 	
 	// Console
-	console::command("serve",function() {
+	\console::command("serve",function() {
 		$port = request::route('port') ?? '8000';
 		$host = request::route('host') ?? '127.0.0.1';
 		log::info('Start dev server on: http://'.$host.':'.$port);
 		exec('php -S '.$host.':'.$port.' -t public dev');
 	});
 	
-	console::command("route:list",function() {
+	\console::command("route:list",function() {
 		log::info('Route list:');
 		$list = [];
-		foreach(route::__list() as $el)
+		foreach(\route::__list() as $el)
 			$list[] = [
 				$el['url'],
 				(is_callable($el['callback']) ? 'fn' : $el['callback']->controller.'@'.$el['callback']->method),
@@ -282,17 +287,17 @@ if (app::isConsole()) {
 		], $list);
 	});
 	
-	console::command("cache:clear",function() {
+	\console::command("cache:clear",function() {
 		if (cache::flush())
 			log::info('Cache cleared');
 	});
 
-	console::command("view:clear",function() {
+	\console::command("view:clear",function() {
 		if (view::flush())
 			log::info('Views cleared');
 	});
 
-	console::command("config:{func}",function($func) {
+	\console::command("config:{func}",function($func) {
 		switch($func) {
 			case 'cache':
 				if (env::__cache())
@@ -307,7 +312,7 @@ if (app::isConsole()) {
 		}
 	});
 
-	console::command("make:{func} {name?}",function($func, $name) {
+	\console::command("make:{func} {name?}",function($func, $name) {
 
 		request::validate([
 			'name' => 'required|regex:/([a-zA-Z]{1,}[0-9]{0,})/i'

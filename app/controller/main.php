@@ -1,4 +1,8 @@
 <?php
+namespace App\Controller;
+
+use SME\Core\controller;
+
 class main extends controller {
 	
 	public function index() {

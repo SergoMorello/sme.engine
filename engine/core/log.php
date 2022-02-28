@@ -1,4 +1,5 @@
 <?php
+namespace SME\Core;
 
 class log extends core {
 	private static $props=[];

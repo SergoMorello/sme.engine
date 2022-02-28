@@ -1,5 +1,5 @@
 <?php
 
 function env($name, $default = '') {
-	return env::get($name, $default);
+	return SME\Core\env::get($name, $default);
 }

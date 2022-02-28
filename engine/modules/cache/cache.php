@@ -1,4 +1,7 @@
 <?php
+namespace SME\Modules;
+
+use SME\Core\core;
 
 class cache extends core {
 	//const dirCache = config('app.');

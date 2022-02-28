@@ -1,4 +1,5 @@
 <?php
+namespace SME\Modules;
 
 class session {
 	public function delete($data) {
