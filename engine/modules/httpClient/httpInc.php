@@ -1,9 +1,9 @@
 <?php
 namespace SME\Modules\HttpClient;
 
-use SME\Core\core;
+use SME\Core\Core;
 
-abstract class httpInc extends core {
+abstract class httpInc extends Core {
 	protected static $props=[], $response, $static=[];
 	
 	private static function parseHeaders($headers) {

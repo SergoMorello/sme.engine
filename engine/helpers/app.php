@@ -1,5 +1,5 @@
 <?php
-use SME\Core\app;
+use SME\Core\App;
 
 function app($class='') {
 	$helper = new class {

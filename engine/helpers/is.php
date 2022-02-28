@@ -1,5 +1,5 @@
 <?php
 
 function is() {
-	return new SME\Core\Request\validateIs;
+	return new SME\Core\Request\ValidateIs;
 }

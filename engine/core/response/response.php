@@ -1,9 +1,9 @@
 <?php
 namespace SME\Core\Response;
 
-class response {
+class Response {
 	public static function make($content, $code = 200) {
-		$response = new responseObject([
+		$response = new ResponseObject([
 			'content' => $content,
 			'code' => $code
 		]);

@@ -1,5 +1,5 @@
 <?php
 
-require_once('../engine/init.php');
+require_once(__DIR__.'/../engine/init.php');
 
-new SME\Core\app;
+new SME\Core\App;

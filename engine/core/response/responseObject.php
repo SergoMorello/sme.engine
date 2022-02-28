@@ -1,7 +1,7 @@
 <?php
 namespace SME\Core\Response;
 
-class responseObject {
+class ResponseObject {
 
 	private $headers, $content, $code;
 

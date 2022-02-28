@@ -1,10 +1,11 @@
 <?php
 namespace SME\Core\Request;
 
-use SME\Core\core;
+use SME\Core\Core;
+use SME\Core\Exception;
 use SME\Modules\storage;
 
-class request extends core {
+class Request extends Core {
 	
 	private static $_server, $_get, $_post, $_headers;
 	
@@ -14,10 +15,10 @@ class request extends core {
 		self::$_post = Core::guardData($_POST);
 		self::$_headers = self::getallheaders();
 	}
-
+	
 	public static function route($var) {
 		if (is_string($var))
-			return \route::getProps($var);
+			return \Route::getProps($var);
 	}
 	
 	public static function server($var='') {
@@ -110,10 +111,10 @@ class request extends core {
 							return $this->size;
 						}
 						public function store($path="",$disk="") {
-							return storage::disk($disk)->put($path.'/'.$this->name,$this->getData());
+							return Storage::disk($disk)->put($path.'/'.$this->name,$this->getData());
 						}
 						public function storeAs($path,$name,$disk="") {
-							return storage::disk($disk)->put($path.'/'.$name,$this->getData());
+							return Storage::disk($disk)->put($path.'/'.$name,$this->getData());
 						}
 					};
 				}
@@ -133,7 +134,7 @@ class request extends core {
 	public static function has($var) {
 		if (isset(self::$_post[$var]))
 			return true;
-		if (\route::getProps($var))
+		if (\Route::getProps($var))
 			return true;
 		if (isset(self::$_get[$var]))
 			return true;
@@ -150,7 +151,7 @@ class request extends core {
 
 		$arrErr = [];
 		foreach($data as $var=>$access)
-			if ($accessErr = validate::checkVar($var,
+			if ($accessErr = Validate::checkVar($var,
 								self::input($var) ?? self::route($var)
 									//isset(self::$_post[$var]) ? stripslashes(htmlspecialchars_decode(self::$_post[$var])) : (isset($_FILES[$var]) ? self::file($var) : NULL)
 								,$access))
@@ -163,7 +164,7 @@ class request extends core {
 			if ($return)
 				return true;
 			else
-				exceptions::throw('validate', $arrErr);
+				Exception::throw('validate', $arrErr);
 		}
 	}
 }

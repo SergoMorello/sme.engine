@@ -1,5 +1,5 @@
 <?php
-use SME\Core\app;
+use SME\Core\App;
 use SME\Core\View\view;
 function dd($data) {
 
@@ -20,5 +20,5 @@ function dd($data) {
 	if (App::isConsole())
 		App::__return(var_dump($data));
 	else
-		App::__return(view::error('dd', ['data'=>$varDumpView($data)]));
+		App::__return(View::error('dd', ['data'=>$varDumpView($data)]));
 }

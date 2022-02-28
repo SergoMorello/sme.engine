@@ -1,9 +1,9 @@
 <?php
 namespace SME\Modules;
 
-use SME\Core\core;
+use SME\Core\Core;
 
-class cache extends core {
+class Cache extends Core {
 	//const dirCache = config('app.');
 
 	public static function put($key, $value, $time = 0) {

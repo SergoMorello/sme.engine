@@ -3,7 +3,7 @@ namespace SME\Core;
 
 use SME\Modules\cache;
 
-class env extends core {
+class Env extends Core {
 
 	const cacheName = '__env';
 
@@ -13,8 +13,8 @@ class env extends core {
 		if (!file_exists(ROOT.'.env'))
 			die('.env not found');
 
-		if (cache::has(self::cacheName)) 
-			return self::$env = cache::get(self::cacheName);
+		if (Cache::has(self::cacheName)) 
+			return self::$env = Cache::get(self::cacheName);
 		
 		if ($file = file_get_contents(ROOT.'.env')) {
 			$list = explode(PHP_EOL,$file);
@@ -39,11 +39,11 @@ class env extends core {
 	}
 
 	public static function __cache() {
-		return cache::put(self::cacheName, self::$env);
+		return Cache::put(self::cacheName, self::$env);
 	}
 
 	public static function __cacheClear() {
-		return cache::forget(self::cacheName);
+		return Cache::forget(self::cacheName);
 	}
 
 	public static function get($name, $default = '') {

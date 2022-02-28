@@ -1,9 +1,9 @@
 <?php
 
-use SME\Core\Route\routeInc;
-use SME\Core\app;
+use SME\Core\Route\RouteCore;
+use SME\Core\App;
 
-class route extends routeInc {
+class Route extends RouteCore {
 	
 	private function __construct($params) {
 		$this->setRoute($params);

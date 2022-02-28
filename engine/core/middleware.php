@@ -1,7 +1,7 @@
 <?php
 namespace SME\Core;
 
-class middleware extends core {
+class middleware extends Core {
 	static $addMiddleware = [];
 
 	public static function init() {

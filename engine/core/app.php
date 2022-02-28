@@ -2,10 +2,10 @@
 namespace SME\Core;
 
 use SME\Core\Request\request;
-use SME\Core\Response\response;
+use SME\Core\Response\Response;
 use SME\Core\Model\modelCore;
 
-class app extends core {
+class App extends Core {
 	
 	private $appService;
 	
@@ -20,7 +20,7 @@ class app extends core {
 		if (self::$run)
 			return;
 		
-		self::$objApp = new class extends core{};
+		self::$objApp = new class extends Core{};
 		
 		self::$run = true;
 		
@@ -40,9 +40,9 @@ class app extends core {
 		
 		$this->singletonInit();
 		
-		request::__init();
+		Request::__init();
 		
-		\route::__init();
+		\Route::__init();
 		
 		ControllerCore::__init();
 		
@@ -99,19 +99,19 @@ class app extends core {
 			
 		} catch (\ParseError $e) {
 			
-			exceptions::throw('exception',$e);
+			Exception::throw('exception',$e);
 			
 		} catch (\Error $e) {
 			
-			exceptions::throw('exception',$e);
+			Exception::throw('exception',$e);
 			
 		} catch (\Exception $e) {
 			
-			exceptions::throw('exception',$e);
+			Exception::throw('exception',$e);
 			
 		} catch (\ErrorException $e) {
 			
-			exceptions::throw('exception',$e);
+			Exception::throw('exception',$e);
 			
 		}
 	}
@@ -124,32 +124,32 @@ class app extends core {
 			
 		} catch (\ParseError $e) {
 			
-			exceptions::throw('exception',$e);
+			Exception::throw('exception',$e);
 			
 		} catch (\Error $e) {
 			
-			exceptions::throw('exception',$e);
+			Exception::throw('exception',$e);
 			
 		} catch (\Exception $e) {
 			
-			exceptions::throw('exception',$e);
+			Exception::throw('exception',$e);
 			
 		} catch (\ErrorException $e) {
 			
-			exceptions::throw('exception',$e);
+			Exception::throw('exception',$e);
 			
 		}
 	}
 
 	public static function __return($result) {
 		$result = (is_object($result) && method_exists($result, 'getContent')) ? $result->getContent() : $result;
-		$result = (is_array($result) || is_object($result)) ? response::json($result)->getContent() : $result;
+		$result = (is_array($result) || is_object($result)) ? Response::json($result)->getContent() : $result;
 		
 		die((string)$result);
 	}
 
 	private function run() {
-		$route = \route::getRoute();
+		$route = \Route::getRoute();
 		
 		if (!$route)
 			abort(404);
@@ -166,7 +166,7 @@ class app extends core {
 			if (is_callable($route['callback'])) {
 				$return->call = $route['callback'];
 			}else{
-				$controller = strpos($route['callback']->controller, '\\') ? $route['callback']->controller : 'App\\controller\\'.$route['callback']->controller;
+				$controller = strpos($route['callback']->controller, '\\') ? $route['callback']->controller : 'App\\Controllers\\'.$route['callback']->controller;
 				if (!class_exists($controller))
 					throw new \Exception('Controller "'.$controller.'" not found',1);
 				$return->call = [new $controller, $route['callback']->method];
@@ -184,19 +184,19 @@ class app extends core {
 			
 		} catch (\ParseError $e) {
 			
-			exceptions::throw('exception',$e);
+			Exception::throw('exception',$e);
 		
 		} catch (\Error $e) {
 			
-			exceptions::throw('exception',$e);
+			Exception::throw('exception',$e);
 			
 		} catch (\Exception $e) {
 			
-			exceptions::throw('exception',$e);
+			Exception::throw('exception',$e);
 			
 		} catch (\ErrorException $e) {
 			
-			exceptions::throw('exception',$e);
+			Exception::throw('exception',$e);
 			
 		}
 	}

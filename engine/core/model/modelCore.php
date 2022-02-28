@@ -1,9 +1,9 @@
 <?php
 namespace SME\Core\Model;
 
-use SME\Core\core;
+use SME\Core\Core;
 
-class modelCore extends core {
+class modelCore extends Core {
 	private static $dblink;
     protected $table;
 
@@ -11,21 +11,21 @@ class modelCore extends core {
 		if (!is_null(self::$dblink))
 			return;
 		self::$dblink = new database(
-			config::get('database.dbType'),
-			config::get('database.dbHost'),
-			config::get('database.dbUser'),
-			config::get('database.dbPassword'),
-			config::get('database.dbName'),
-			config::get('app.debug')
+			Config::get('database.dbType'),
+			Config::get('database.dbHost'),
+			Config::get('database.dbUser'),
+			Config::get('database.dbPassword'),
+			Config::get('database.dbName'),
+			Config::get('app.debug')
 		);
 		
 		try {
 			self::$dblink->connect(true);
 		} catch (PDOException $e) {
-			if (config::get('app.debug'))
-				exceptions::throw('error',['message' => $e->getMessage()]);
+			if (Config::get('app.debug'))
+				Exception::throw('error',['message' => $e->getMessage()]);
 			else
-				exceptions::throw('error',['message' => 'Connect DB']);
+				Exception::throw('error',['message' => 'Connect DB']);
 		}
 	}
 
@@ -39,7 +39,7 @@ class modelCore extends core {
 	}
 
     protected function getTableName() {
-		return config::get('app.dbPrefix').$this->table;
+		return Config::get('app.dbPrefix').$this->table;
 	}
 
     protected function setTableName($name) {

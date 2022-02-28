@@ -3,7 +3,7 @@ namespace SME\Modules;
 
 use SME\Core\Request\request;
 
-class redirect extends request {
+class redirect extends Request {
 	public static function route($name,$props=[]) {
 		return self::rdr(route($name,$props));
 	}
@@ -12,7 +12,7 @@ class redirect extends request {
 	}
 	public static function back() {
 		self::setOldInputs();
-		self::rdr(request::server('HTTP_REFERER'));
+		self::rdr(Request::server('HTTP_REFERER'));
 		return new self;
 	}
 	public static function withErrors($data) {
@@ -21,6 +21,6 @@ class redirect extends request {
 		session(['__withErrors'=>$data]);
 	}
 	private static function setOldInputs() {
-		session(['__oldInputs'=>request::all()]);
+		session(['__oldInputs'=>Request::all()]);
 	}
 }

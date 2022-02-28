@@ -1,25 +1,26 @@
 <?php
-route::get("/","main@index")->name('home');
+Route::get("/","main@index")->name('home');
 
-route::get("/doc","main@doc")->name('doc');
+Route::get("/doc","main@doc")->name('doc');
 
-route::group(['prefix' => 'test'], function(){
+Route::group(['prefix' => 'test'], function(){
 	
-	route::get('/', function(){
+	Route::get('/', function(){
+		
 		return View('test');
 	});
-	route::post('/submit', function(){
-		request::validate([
+	Route::post('/submit', function(){
+		SME\Core\Request\Request::validate([
 			'tt' => 'min:11|required',
 			'dd' => 'min:0'
 		]);
 		dd(request()->input('tt'));
 	})->name('submit');
-	// route::get('/post', function(){
-	// 	request::validate([
+	// Route::get('/post', function(){
+	// 	Request::validate([
 	// 		'test' => 'size:2'
 	// 	]);
-	// 	$res = request::input('test');
+	// 	$res = Request::input('test');
 	// 	dd($res);
 	// });
 	

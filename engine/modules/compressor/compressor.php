@@ -1,10 +1,10 @@
 <?php
 namespace SME\Modules;
 
-use SME\Core\core;
+use SME\Core\Core;
 use SME\Core\Request\request;
 
-class compressor extends core {
+class compressor extends Core {
 	const nameCache = '_compressorData';
 
 	public static function make($files, $name = 'scripts.js', $type = null) {

@@ -1,7 +1,7 @@
 <?php
 namespace SME\Core\Request;
 
-class validateIs {
+class ValidateIs {
 
 	public function string($var) {
 		if (empty($var))
@@ -101,13 +101,13 @@ class validateIs {
 	public function same($var, $field) {
 		if (empty($var))
 			return true;
-		return request::input($field) == $var ? true : false;
+		return Request::input($field) == $var ? true : false;
 	}
 
 	public function different($var, $field) {
 		if (empty($var))
 			return true;
-		return request::input($field) != $var ? true : false;
+		return Request::input($field) != $var ? true : false;
 	}
 
 	public function array($var) {

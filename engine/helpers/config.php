@@ -1,5 +1,5 @@
 <?php
 
 function config($param = '') {
-	return SME\Core\config::get($param);
+	return SME\Core\Config::get($param);
 }

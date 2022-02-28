@@ -7,7 +7,7 @@ function route($name = NULL, $props = []) {
 				return SME\Core\Core::url();
 			}
 			public function getName() {
-				return route::getCurrent('name');
+				return Route::getCurrent('name');
 			}
 		});
 	$replaceVars = function($url,$vars=[]) {
@@ -30,7 +30,7 @@ function route($name = NULL, $props = []) {
 		return $url;
 	};
 	$searchRoute = function($name) {
-		foreach(route::getRoutes() as $page)
+		foreach(Route::getRoutes() as $page)
 			if (isset($page['name']) && $page['name']==$name)
 				return (object) $page;
 	};

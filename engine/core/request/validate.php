@@ -1,10 +1,10 @@
 <?php
 namespace SME\Core\Request;
 
-class validate {
+class Validate {
 
 	public static function checkVar($field, $var, $validate) {
-		$types = new validateIs;
+		$types = new ValidateIs;
 		$return = [];
 		$validate = is_array($validate) ? $validate : explode('|',$validate);
 		foreach($validate as $vl) {

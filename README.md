@@ -42,14 +42,14 @@ php console serve
 ####	В файле /route/web.php
 
 ```php 
-route::get('/','mainController@index')->name('home');
+Route::get('/','mainController@index')->name('home');
 ```
 
 #####	Создаём маршрут по пути `/` и вызываем метод `index` в контроллере `mainController`, так же даём имя маршруту `home` в цепочке методов `->name()`
 
 #####	Так же можно создать маршрут с замыканием
 ```php
-route::get('/',function() {  
+Route::get('/',function() {  
   //Тут мы что то выполняем например можем показать какой то вид View('home') 
   return View('home');
 })->name('home');
@@ -57,7 +57,7 @@ route::get('/',function() {
 
 #### Для отправки переменных в маршруте поместите их в фигурных скобках прямо в URL
 ```php
-route::get('/catalog/item/{id}',functio...
+Route::get('/catalog/item/{id}',functio...
 ```
 <h3 id="controller">Controller:</h3>
 
@@ -80,7 +80,7 @@ request()->route('id');
 ```
 ######	Или
 ```php
-route::get('/catalog/item/{id}',function($id) {
+Route::get('/catalog/item/{id}',function($id) {
   //В переменной $id будет первая переменная из маршрута
 ```
 
@@ -154,10 +154,10 @@ $var = 123;
 
 ###### 	В файле `appService.php` в методе `register` или же подключить свой класс через appService
 
-######	compiler::declare(`имя функции`,`анонимная функция(`агрументы переданные в функцию`,`последним всегда будет анонимная функция для добавления в конец буффера`)`)
+######	Compiler::declare(`имя функции`,`анонимная функция(`агрументы переданные в функцию`,`последним всегда будет анонимная функция для добавления в конец буффера`)`)
 
 ```php
-compiler::declare('plus',function($arg1,$arg2,$appendFnc){ 
+Compiler::declare('plus',function($arg1,$arg2,$appendFnc){ 
   $appendFnc('<?php echo '.$arg1.'; ?>');
   return "<?php echo ".($arg1+$arg2)."; ?>";
 });
@@ -270,25 +270,25 @@ $db->delete();
 ##### Сохранить файл на диск
 
 ```php
-storage::disk('local')->put('file.txt','какие то данные');
+Storage::disk('local')->put('file.txt','какие то данные');
 ```
 
 ##### Получить файл с диска
 
 ```php
-storage::disk('local')->get('file.txt');
+Storage::disk('local')->get('file.txt');
 ```
 
 ##### Удалить файл
 
 ```php
-storage::disk('local')->delete('file.txt');
+Storage::disk('local')->delete('file.txt');
 ```
 
 ##### Проверить существует ли файл
 
 ```php
-storage::disk('local')->exists('file.txt');
+Storage::disk('local')->exists('file.txt');
 ```
 
 ##### Так же можно сохранять файлы сразу из при их получении из формы
@@ -310,31 +310,31 @@ request()->file('file')->storeAs('',request()->input('fileName').'.jpg');
 ##### Сохранить данные в кэше put(`ключ`,`данные`,`время хранения в секундах`)
 
 ```php
-cache::put('message','Hello World!',60);
+Cache::put('message','Hello World!',60);
 ```
 
 ##### Получить данные
 
 ```php
-cache::get('message');
+Cache::get('message');
 ```
 
 ###### или получить и сразу удалить
 
 ```php
-cache::pull('message');
+Cache::pull('message');
 ```
 
 ##### Удалить
 
 ```php
-cache::forget('message');
+Cache::forget('message');
 ```
 
 ##### Проверить сущеутвование по ключу
 
 ```php
-cache::has('message');
+Cache::has('message');
 ```
 
 <h3 id="http_client">Http client:</h3>
@@ -406,13 +406,13 @@ http::post('http://url',['name'=>'value'])->throw(function($response, $error){
 
 #### Обьявить исключение можно в appService.php
 ```php
-exceptions::declare('имя_исключения',function($data=""){
+Exception::declare('имя_исключения',function($data=""){
   return response('что то сломалось '.$data);
 });
 ```
 #### Вызываем исключение
 ```php
-exceptions::throw('имя_исключения', 'Обновите страницу');
+Exception::throw('имя_исключения', 'Обновите страницу');
 ```
 ##### Или через хелпер
 ```php
@@ -421,7 +421,7 @@ abort('имя_исключения');
 ##### Так же мы можем переназначать системные исключения
 ###### Например переназначим исключение валидации на вывод json
 ```php
-exceptions::declare('validate',function($errors){
+Exception::declare('validate',function($errors){
   return response()->json([
           'status'=>false,
           'errors'=>$errors
@@ -482,7 +482,7 @@ php console cache:clear
 
 ###### В файле `route/console.php` создаём маршрут с методом `console` с замыканием
 ```php
-route::console('time',function(){
+Route::console('time',function(){
   while(true) { //Создаём вечный цикл
     log::thisLine(true)->info(date('H:i:s')); //Выводим текущее время и смещаем каретку в начало
     sleep(1); //Ставим задержку на выполнение в 1 секунду
@@ -496,7 +496,7 @@ php console time
 
 ###### Передача аргументов из консоли
 ```php
-route::console('hello:{arg1}',function($arg1){
+Route::console('hello:{arg1}',function($arg1){
   log::info('Hello '.$arg1);
   //или
   log::info('Hello '.request()->route('arg1'));

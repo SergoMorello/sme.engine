@@ -1,10 +1,10 @@
 <?php
 namespace SME\Core\View;
 
-use SME\Core\core;
+use SME\Core\Core;
 use SME\Core\config;
 
-class compiler extends core {
+class compiler extends Core {
 
 	const dirCompiler = STORAGE.'.cache/compiler/';
 
@@ -19,7 +19,7 @@ class compiler extends core {
 					if (!mkdir(self::dirCompiler))
 						die('cache dir, error create');
 		
-		if (config::get('app.debug'))
+		if (Config::get('app.debug'))
 			return 1;
 		
 		$cacheViewName = md5($dirV.$view);
