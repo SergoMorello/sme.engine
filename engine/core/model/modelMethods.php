@@ -43,8 +43,8 @@ class ModelMethods extends ModelSql {
 	}
 
 	public function save() {
-		$modelObject = new modelObject($obj);
-		$vars = get_object_vars($obj);
+		$modelObject = new modelObject($this);
+		$vars = get_object_vars($this);
 		unset($vars['table'],$vars['query']);
 		
 		if (get_object_vars(self::$__query)) {
@@ -63,7 +63,7 @@ class ModelMethods extends ModelSql {
 			$arrQuery = $this->getValues($props);
 
 			$this->isUpdate = self::dblink()->query("UPDATE `".$this->getTableName()."` SET ".implode(",",$arrQuery)." WHERE ".$this->srtWhere());
-			return new modelObject($obj);
+			return new modelObject($this);
 		}
 	}
 
@@ -73,6 +73,6 @@ class ModelMethods extends ModelSql {
 			$this->clearQuery();
 			return $ret;
 		}
-		return $obj;
+		return $this;
 	}
 }

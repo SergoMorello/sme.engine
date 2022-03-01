@@ -6,8 +6,7 @@ use SME\Core\Exception;
 use SME\Core\Config;
 
 class ModelCore extends Core {
-	private static $dblink, $model;
-    private $table;
+	private static $dblink, $table, $model;
 
 	private static function connect() {
 		if (!is_null(self::$dblink))
@@ -42,11 +41,11 @@ class ModelCore extends Core {
 	}
 
     protected function getTableName() {
-		return Config::get('app.dbPrefix').$this->table;
+		return Config::get('app.dbPrefix').self::$table;
 	}
 
     protected function setTableName($name) {
-        $this->table = $name;
+        self::$table = $name;
     }
 
 	protected static function value($value) {

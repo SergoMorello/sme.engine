@@ -1,7 +1,7 @@
 <?php
 namespace SME\Core\Model;
 
-class modelObject extends ModelCore {
+class ModelObject extends ModelCore {
 	public function __construct($result=[]) {
 		$this->setVars($result);
 		ModelSql::clearQuery();

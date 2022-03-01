@@ -1,17 +1,9 @@
 <?php
 namespace App\Controllers;
 
-use App\Models\Test;
-use App\Models\Test2;
-
 class main extends Controller {
 	
 	public function index() {
-		dd(Test2::where('id','=','dsfdf')->select('dsfdf','sdegse')
-		->leftJoin('test',function($join){
-			return $join->on('dsfds','=','dsgsg')->on('sdfgsgh','=','wgghdsgds');
-		})
-		->get());
 		$links = [
 			[
 				'link' => 'https://github.com/SergoMorello/sme.engine',
