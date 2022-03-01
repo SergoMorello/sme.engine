@@ -1,32 +1,33 @@
 <?php
 namespace SME\Core\Model;
 
-class model extends modelSql {
-
+class Model extends ModelSql {
+	protected $table;
+	
 	public function __init() {
-		parent::__construct();
 		self::clearQuery();
 		$this->setTableName($this->table ?? get_called_class());
+		return $this;
 	}
 
-	public function __sql() {
-		return $this->strQuerySelect();
+	public static function __sql() {
+		return self::model()->strQuerySelect();
 	}
 
-	public function get() {
-		return new modelObject(self::dblink()->get_list($this->strQuerySelect()));
+	public static function get() {
+		return new modelObject(self::dblink()->get_list(self::model()->strQuerySelect()));
 	}
 
-	public function first() {
-		return new modelObject(self::dblink()->get_row($this->strQuerySelect()));
+	public static function first() {
+		return new modelObject(self::dblink()->get_row(self::model()->strQuerySelect()));
 	}
 
-	public function count() {
-		return intval(self::dblink()->get_num($this->strQuerySelect()));
+	public static function count() {
+		return intval(self::dblink()->get_num(self::model()->strQuerySelect()));
 	}
 
-	public function find($id) {
-		return $this->where('id','=',$id);
+	public static function find($id) {
+		return self::model()->where('id','=',$id);
 	}
 
 	private function getValues($values, $onlyValues = false) {
@@ -43,37 +44,40 @@ class model extends modelSql {
 		return $return;
 	}
 
-	public function save() {
-		$modelObject = new modelObject($this);
-		$vars = get_object_vars($this);
+	public static function save() {
+		$obj = self::model();
+		$modelObject = new modelObject($obj);
+		$vars = get_object_vars($obj);
 		unset($vars['table'],$vars['query']);
 		
 		if (get_object_vars(self::$__query)) {
-			$arrQuery = $this->getValues($vars);
-			self::dblink()->query("UPDATE `".$this->getTableName()."` SET ".implode(",",$arrQuery)." WHERE ".$this->srtWhere());
+			$arrQuery = $obj->getValues($vars);
+			self::dblink()->query("UPDATE `".$obj->getTableName()."` SET ".implode(",",$arrQuery)." WHERE ".$obj->srtWhere());
 		}else{
-			$arrQuery = $this->getValues($vars, true);
-			$modelObject->id = self::dblink()->query("INSERT INTO `".$this->getTableName()."` (id,".implode(",",array_keys($vars)).") VALUES (NULL,".implode(",",$arrQuery).");",true);
+			$arrQuery = $obj->getValues($vars, true);
+			$modelObject->id = self::dblink()->query("INSERT INTO `".$obj->getTableName()."` (id,".implode(",",array_keys($vars)).") VALUES (NULL,".implode(",",$arrQuery).");",true);
 		}
 			
 		return $modelObject;
 	}
 
 	public function update($props) {
+		$obj = self::model();
 		if (is_array($props) && count($props)) {
-			$arrQuery = $this->getValues($props);
+			$arrQuery = $obj->getValues($props);
 
-			$this->isUpdate = self::dblink()->query("UPDATE `".$this->getTableName()."` SET ".implode(",",$arrQuery)." WHERE ".$this->srtWhere());
-			return new modelObject($this);
+			$obj->isUpdate = self::dblink()->query("UPDATE `".$obj->getTableName()."` SET ".implode(",",$arrQuery)." WHERE ".$obj->srtWhere());
+			return new modelObject($obj);
 		}
 	}
 
-	public function delete() {
+	public static function delete() {
+		$obj = self::model();
 		if (self::$__query) {
-			$ret = self::dblink()->query("DELETE FROM `".$this->getTableName()."`".(count(self::$__query->where) ? " WHERE " : NULL).$this->srtWhere());
-			$this->clearQuery();
+			$ret = self::dblink()->query("DELETE FROM `".$obj->getTableName()."`".(count(self::$__query->where) ? " WHERE " : NULL).$obj->srtWhere());
+			$obj->clearQuery();
 			return $ret;
 		}
-		return false;
+		return $obj;
 	}
 }

@@ -26,7 +26,7 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
 // Init
 Env::init();
 
-middleware::init();
+Middleware::init();
 
 // Config
 
@@ -37,7 +37,7 @@ Config::set('database', App::include('config.database'));
 Config::set('storage', App::include('config.storage'));
 
 
-middleware::declare('api', function($request, $next){
+Middleware::declare('api', function($request, $next){
 	
 	return $next($request);
 });
@@ -265,14 +265,14 @@ if (App::isConsole()) {
 if (App::isConsole()) {
 	
 	// Console
-	\console::command("serve",function() {
+	\Console::command("serve",function() {
 		$port = Request::route('port') ?? '8000';
 		$host = Request::route('host') ?? '127.0.0.1';
 		log::info('Start dev server on: http://'.$host.':'.$port);
 		exec('php -S '.$host.':'.$port.' -t public dev');
 	});
 	
-	\console::command("route:list",function() {
+	\Console::command("route:list",function() {
 		log::info('Route list:');
 		$list = [];
 		foreach(\Route::__list() as $el)
@@ -288,17 +288,17 @@ if (App::isConsole()) {
 		], $list);
 	});
 	
-	\console::command("cache:clear",function() {
+	\Console::command("cache:clear",function() {
 		if (Cache::flush())
 			log::info('Cache cleared');
 	});
 
-	\console::command("view:clear",function() {
+	\Console::command("view:clear",function() {
 		if (View::flush())
 			log::info('Views cleared');
 	});
 
-	\console::command("config:{func}",function($func) {
+	\Console::command("config:{func}",function($func) {
 		switch($func) {
 			case 'cache':
 				if (Env::__cache())
@@ -313,10 +313,16 @@ if (App::isConsole()) {
 		}
 	});
 
-	\console::command("make:{func} {name?}",function($func, $name) {
+	\Console::command("make:{func} {name?}",function($func, $name) {
 
 		Request::validate([
-			'name' => 'required|regex:/([a-zA-Z]{1,}[0-9]{0,})/i'
+			'name' => [
+				'required',
+					[
+						'regex',
+						['/([a-zA-Z]{1,}[0-9]{0,})/i']
+					]
+				]
 		]);
 		
 		switch($func) {

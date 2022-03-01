@@ -1,4 +1,6 @@
 <?php
+namespace SME\Core\Model;
+
 class database {
 	private $type, $host, $user, $pass, $name, $debug;
 	
@@ -20,12 +22,12 @@ class database {
 
 	public function connect($next=false) {
         try {
-            $this->dblink = new PDO($this->type.":host=".$this->host.";dbname=".$this->name.";charset=UTF8", $this->user, $this->pass,array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES UTF8"));
+            $this->dblink = new \PDO($this->type.":host=".$this->host.";dbname=".$this->name.";charset=UTF8", $this->user, $this->pass,array(\PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES UTF8"));
 			if ($this->debug)
-				$this->dblink->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		}catch (PDOException $e) {
+				$this->dblink->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+		}catch (\PDOException $e) {
 			if($next)
-				throw new PDOException($e);
+				throw new \PDOException($e);
 			else
 				die("Error: ".$e->getMessage());
 		}
@@ -50,7 +52,7 @@ class database {
 	public function get_row($query) {
 		$returned = [];
 		if ($result = $this->dblink->query($query)) {
-			$result->setFetchMode(PDO::FETCH_OBJ);
+			$result->setFetchMode(\PDO::FETCH_OBJ);
 			$returned = $result->fetch();
 		}
 		return $returned;
@@ -59,7 +61,7 @@ class database {
 	public function get_list($query) {
 		$returned = [];	
 		if ($result = $this->dblink->query($query)) {
-			$result->setFetchMode(PDO::FETCH_OBJ);
+			$result->setFetchMode(\PDO::FETCH_OBJ);
 			while ($row = $result->fetch()) {
 				$returned[] = $row;
 			}

@@ -22,17 +22,16 @@ class ControllerCore extends Core {
 		if (empty($model))
 			return (object)self::$model;
 		
-		if (App::include(self::getPath($model, 'app.model'))) {
-			
+		if (App::include(self::getPath($model, 'app.models'))) {
+			$model = '\\App\\Models\\'.$model;
 			if (class_exists($model)) {
 				$newModel = new $model;
-				$newModel->__init();
 				return self::$model[$model] = $newModel;
 			}else
-				throw new Exception('Class "'.$model.'" not found',1);
+				throw new \Exception('Class "'.$model.'" not found',1);
 			
 		}else
-			throw new Exception('Model "'.$model.'" not found',1);
+			throw new \Exception('Model "'.$model.'" not found',1);
 		
 	}
 }

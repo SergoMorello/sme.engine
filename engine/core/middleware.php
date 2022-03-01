@@ -1,7 +1,7 @@
 <?php
 namespace SME\Core;
 
-class middleware extends Core {
+class Middleware extends Core {
 	static $addMiddleware = [];
 
 	public static function init() {
@@ -48,7 +48,7 @@ class middleware extends Core {
 		foreach($arrCheck as $mdw) {
 			foreach(self::$addMiddleware as $mw) {
 				if ($mdw == $mw['name']) {
-					if (is_callable($mw['obj']) && $mw['obj'] instanceof Closure)
+					if (is_callable($mw['obj']) && $mw['obj'] instanceof \Closure)
 						self::checkResponse($mw['obj']($request, $nextClosure));
 					else{
 						self::checkResponse((new $mw['obj'])->handle($request, $nextClosure));

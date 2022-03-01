@@ -1,9 +1,13 @@
 <?php
 namespace App\Controllers;
 
+use App\Models\Test;
+use App\Models\Test2;
+
 class main extends Controller {
 	
 	public function index() {
+		
 		$links = [
 			[
 				'link' => 'https://github.com/SergoMorello/sme.engine',

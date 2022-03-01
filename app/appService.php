@@ -3,7 +3,7 @@ namespace App;
 
 use SME\Core\App;
 use SME\Core\Core;
-use SME\Core\middleware;
+use SME\Core\Middleware;
 
 class appService extends Core {
 	public function boot() {
@@ -12,7 +12,7 @@ class appService extends Core {
 	
 	public function register() {
 
-		middleware::declare('test');
+		Middleware::declare('test');
 
 		App::singleton('testClass', function(){
 			return new class{

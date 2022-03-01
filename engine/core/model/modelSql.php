@@ -10,70 +10,76 @@ class modelSql extends modelCore {
 	}
 
     //SELECT
-	public function select(...$data) {
+	public static function select(...$data) {
+		$obj = self::model();
 		$data = (is_array($data) && count($data) == 1) ? $data[0] : $data;
 		$data = is_array($data) ? $data : [$data];
 		foreach($data as $dt) {
-			self::$__query->select[] = preg_split("/ as /i",$dt);
+			$obj::$__query->select[] = preg_split("/ as /i",$dt);
 		}
-		return $this;
+		return self::model();
 	}
 
 	//WHERE
-	public function where(...$data) {
-        $this->genParams($data, function($a, $b, $c){
+	public static function where(...$data) {
+		$obj = self::model();
+        $obj->genParams($data, function($a, $b, $c){
             return $a.$b.self::value($c);
         }, self::$__query->where, ['b'=>'=']);
-        return $this;
+        return $obj;
 	}
 
 	//WHERE IN
-	public function whereIn(...$data) {
-        $this->genParams($data, function($a, $b, $c){
+	public static function whereIn(...$data) {
+		$obj = self::model();
+        $obj->genParams($data, function($a, $b, $c){
             return "`".$a."` IN (".self::values(',', $c).")";
         }, self::$__query->whereIn);
-        return $this;
+        return $obj;
 	}
 
 	//LIMIT
-	public function limit($limit) {
+	public static function limit($limit) {
 		self::$__query->limit[0] = $limit;
-		return $this;
+		return self::model();
 	}
 
 	//ORDER BY
-	public function orderBy(...$data) {
-        $this->genParams($data, function($a, $b, $c){
+	public static function orderBy(...$data) {
+		$obj = self::model();
+        $obj->genParams($data, function($a, $b, $c){
             return "`".$a."` ".strtoupper($c);
         }, self::$__query->orderBy,['c'=>'DESC']);
-        return $this;
+        return $obj;
 	}
 
 	//GROUP BY
-	public function groupBy($group) {
+	public static function groupBy($group) {
 		self::$__query->groupBy[0] = $group;
-		return $this;
+		return self::model();
 	}
 
 	//LEFT JOIN
-	public function leftJoin($table, $callback) {
-		return $callback(new class($table, $this->getTableName()) extends model{
-			private $query, $joinTable, $count, $index;
+	public static function leftJoin($table, $callback) {
+		return $callback((new class extends model {
+			private $query, $joinTable, $count, $index, $joinModel;
 
-			public function __construct($table, $curentTable) {
+			public function __invoke($table, $model) {
+				$this->joinModel = $model;
 				$this->joinTable = $table;
-				$this->setTableName($curentTable);
+				$this->setTableName($model->getTableName());
 				$this->count = 0;
 				$this->query = [];
-				$this->index = isset(self::$__query->leftJoin) ? array_key_last(self::$__query->leftJoin) + 1 : 0;
+				$this->index = isset(self::$__query->leftJoin) ? count(self::$__query->leftJoin) : 0;
+				return $this;
 			}
 
 			private function split() {
 				return count($this->query) > 0 ? ' AND ' :'`'.$this->joinTable.'` ON ';
 			}
 
-			public function save() {
-				self::$__query->leftJoin[$this->index] = implode('',$this->query);
+			public function joinSave() {
+				$this->joinModel::$__query->leftJoin[$this->index] = implode('',$this->query);
 			}
 
 			public function on(...$props) {
@@ -81,11 +87,11 @@ class modelSql extends modelCore {
                     return $this->split().$a.' '.$b.' '.self::value($c);
                 }, $this->query, ['b' => '=']);
 
-				$this->save();
+				$this->joinSave();
 
-                return $this;
+                return $this->joinModel;
 			}
-		});
+		})($table, self::model()));
 	}
 
     private function srtSelect() {

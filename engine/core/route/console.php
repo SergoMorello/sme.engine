@@ -1,7 +1,7 @@
 <?php
 use SME\Core\Route\RouteCore;
 
-class console extends RouteCore {
+class Console extends RouteCore {
 	
 	private function __construct($params) {
 		$this->setRoute($params);

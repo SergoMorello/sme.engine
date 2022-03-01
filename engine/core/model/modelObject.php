@@ -1,10 +1,10 @@
 <?php
 namespace SME\Core\Model;
 
-class modelObject extends modelCore {
+class modelObject extends ModelCore {
 	public function __construct($result=[]) {
 		$this->setVars($result);
-		modelSql::clearQuery();
+		ModelSql::clearQuery();
 	}
 
 	private function setVars($result) {

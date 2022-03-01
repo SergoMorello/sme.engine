@@ -2,12 +2,14 @@
 namespace SME\Core\Model;
 
 use SME\Core\Core;
+use SME\Core\Exception;
+use SME\Core\Config;
 
-class modelCore extends Core {
-	private static $dblink;
-    protected $table;
+class ModelCore extends Core {
+	private static $dblink, $model;
+    private $table;
 
-	public function __construct() {
+	private static function connect() {
 		if (!is_null(self::$dblink))
 			return;
 		self::$dblink = new database(
@@ -21,7 +23,7 @@ class modelCore extends Core {
 		
 		try {
 			self::$dblink->connect(true);
-		} catch (PDOException $e) {
+		} catch (\PDOException $e) {
 			if (Config::get('app.debug'))
 				Exception::throw('error',['message' => $e->getMessage()]);
 			else
@@ -35,7 +37,16 @@ class modelCore extends Core {
 	}
 
 	protected static function dblink() {
+		self::connect();
 		return self::$dblink;
+	}
+
+	protected static function model() {
+		$class = get_called_class();
+		if (is_null(self::$model) || (get_class(self::$model) != $class)) {
+			return self::$model = (new $class)->__init();
+		}else
+			return self::$model;
 	}
 
     protected function getTableName() {
@@ -46,11 +57,11 @@ class modelCore extends Core {
         $this->table = $name;
     }
 
-	protected function value($value) {
+	protected static function value($value) {
 		return (is_object($value) && method_exists($value, 'getValue')) ? $value->getValue() : "'".$value."'";
 	}
 
-	protected function values($split, $values) {
+	protected static function values($split, $values) {
 		$return = [];
 		foreach($values as $value)
 			$return[]= self::value($value);

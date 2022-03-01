@@ -3,7 +3,7 @@ namespace SME\Core;
 
 use SME\Core\Request\request;
 use SME\Core\Response\Response;
-use SME\Core\Model\modelCore;
+use SME\Core\Model\ModelCore;
 
 class App extends Core {
 	
@@ -27,6 +27,8 @@ class App extends Core {
 		self::$console = $console;
 
 		$this->checkFolders();
+
+		$this->autoload();
 
 		self::include('engine.core.configure');
 		
@@ -53,9 +55,15 @@ class App extends Core {
 	}
 
 	public function __destruct() {
-		modelCore::__close();
+		ModelCore::__close();
 	}
 	
+	private function autoload() {
+		spl_autoload_register(function($class){
+			self::include($class);
+		});
+	}
+
 	public static function getObj() {
 		return self::$objApp;
 	}
@@ -92,7 +100,7 @@ class App extends Core {
 	}
 	
 	public static function include($name) {
-		$name = str_replace('.','/',$name);
+		$name = str_replace(['.','\\'],'/',$name);
 		try {
 			if (file_exists(ROOT.$name.'.php'))
 				return require_once(ROOT.$name.'.php');
@@ -172,7 +180,7 @@ class App extends Core {
 				$return->call = [new $controller, $route['callback']->method];
 			}
 			
-			return middleware::check($route['middleware'] ?? null, $return, new request);
+			return Middleware::check($route['middleware'] ?? null, $return, new request);
 		};
 
 		try {
