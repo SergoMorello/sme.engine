@@ -61,6 +61,7 @@ class App extends Core {
 	private function autoload() {
 		spl_autoload_register(function($class){
 			self::include($class);
+			define($class, 123);
 		});
 	}
 

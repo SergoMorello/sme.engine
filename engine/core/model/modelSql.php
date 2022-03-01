@@ -1,7 +1,7 @@
 <?php
 namespace SME\Core\Model;
 
-class modelSql extends modelCore {
+class ModelSql extends ModelCore {
 
     protected static $__query;
 
@@ -10,68 +10,62 @@ class modelSql extends modelCore {
 	}
 
     //SELECT
-	public static function select(...$data) {
-		$obj = self::model();
+	public function select(...$data) {
 		$data = (is_array($data) && count($data) == 1) ? $data[0] : $data;
 		$data = is_array($data) ? $data : [$data];
 		foreach($data as $dt) {
-			$obj::$__query->select[] = preg_split("/ as /i",$dt);
+			self::$__query->select[] = preg_split("/ as /i",$dt);
 		}
-		return self::model();
+		return $this;
 	}
 
 	//WHERE
-	public static function where(...$data) {
-		$obj = self::model();
-        $obj->genParams($data, function($a, $b, $c){
+	public function where(...$data) {
+        $this->genParams($data, function($a, $b, $c){
             return $a.$b.self::value($c);
         }, self::$__query->where, ['b'=>'=']);
-        return $obj;
+        return $this;
 	}
 
 	//WHERE IN
-	public static function whereIn(...$data) {
-		$obj = self::model();
-        $obj->genParams($data, function($a, $b, $c){
+	public function whereIn(...$data) {
+        $this->genParams($data, function($a, $b, $c){
             return "`".$a."` IN (".self::values(',', $c).")";
         }, self::$__query->whereIn);
-        return $obj;
+        return $this;
 	}
 
 	//LIMIT
-	public static function limit($limit) {
+	public function limit($limit) {
 		self::$__query->limit[0] = $limit;
-		return self::model();
+		return $this;
 	}
 
 	//ORDER BY
-	public static function orderBy(...$data) {
-		$obj = self::model();
-        $obj->genParams($data, function($a, $b, $c){
+	public function orderBy(...$data) {
+        $this->genParams($data, function($a, $b, $c){
             return "`".$a."` ".strtoupper($c);
         }, self::$__query->orderBy,['c'=>'DESC']);
-        return $obj;
+        return $this;
 	}
 
 	//GROUP BY
-	public static function groupBy($group) {
+	public function groupBy($group) {
 		self::$__query->groupBy[0] = $group;
-		return self::model();
+		return $this;
 	}
 
 	//LEFT JOIN
-	public static function leftJoin($table, $callback) {
-		return $callback((new class extends model {
-			private $query, $joinTable, $count, $index, $joinModel;
+	public function leftJoin($table, $callback) {
+		return $callback(new class($table, $this->getTableName()) extends ModelMethods {
+			private $query, $joinTable, $count, $index;
 
-			public function __invoke($table, $model) {
-				$this->joinModel = $model;
+			public function __construct($table, $curentTable) {
 				$this->joinTable = $table;
-				$this->setTableName($model->getTableName());
+				$this->setTableName($curentTable);
 				$this->count = 0;
 				$this->query = [];
-				$this->index = isset(self::$__query->leftJoin) ? count(self::$__query->leftJoin) : 0;
-				return $this;
+				$this->index = isset(self::$__query->leftJoin) ? array_key_last(self::$__query->leftJoin) + 1 : 0;
 			}
 
 			private function split() {
@@ -79,7 +73,7 @@ class modelSql extends modelCore {
 			}
 
 			public function joinSave() {
-				$this->joinModel::$__query->leftJoin[$this->index] = implode('',$this->query);
+				self::$__query->leftJoin[$this->index] = implode('',$this->query);
 			}
 
 			public function on(...$props) {
@@ -89,9 +83,9 @@ class modelSql extends modelCore {
 
 				$this->joinSave();
 
-                return $this->joinModel;
+                return $this;
 			}
-		})($table, self::model()));
+		});
 	}
 
     private function srtSelect() {

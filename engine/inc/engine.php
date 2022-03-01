@@ -9,6 +9,7 @@ return [
 		'model/modelCore',
 		'model/modelObject',
 		'model/modelSql',
+		'model/modelMethods',
 		'model/model',
 		'model/DB',
 		'controllerCore',

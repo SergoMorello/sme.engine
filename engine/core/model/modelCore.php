@@ -41,14 +41,6 @@ class ModelCore extends Core {
 		return self::$dblink;
 	}
 
-	protected static function model() {
-		$class = get_called_class();
-		if (is_null(self::$model) || (get_class(self::$model) != $class)) {
-			return self::$model = (new $class)->__init();
-		}else
-			return self::$model;
-	}
-
     protected function getTableName() {
 		return Config::get('app.dbPrefix').$this->table;
 	}
