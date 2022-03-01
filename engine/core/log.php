@@ -1,7 +1,7 @@
 <?php
 namespace SME\Core;
 
-class log extends Core {
+class Log extends Core {
 	private static $props=[];
 	
 	private static function input($text) {

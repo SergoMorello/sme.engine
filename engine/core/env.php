@@ -1,7 +1,7 @@
 <?php
 namespace SME\Core;
 
-use SME\Modules\cache;
+use SME\Modules\Cache;
 
 class Env extends Core {
 
