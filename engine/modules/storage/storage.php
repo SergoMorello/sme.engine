@@ -2,6 +2,7 @@
 namespace SME\Modules;
 
 use SME\Core\Core;
+use SME\Core\Config;
 
 class Storage extends Core {
 	

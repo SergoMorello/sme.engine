@@ -5,14 +5,17 @@ use SME\Core\Core;
 use SME\Core\Exception;
 use SME\Modules\storage;
 
+use SME\Core\Request\Objects\Files;
+
 class Request extends Core {
 	
-	private static $_server, $_get, $_post, $_headers;
+	private static $_server, $_get, $_post, $_files, $_headers;
 	
 	public static function __init() {
 		self::$_server = $_SERVER;
 		self::$_get = Core::guardData($_GET);
 		self::$_post = Core::guardData($_POST);
+		self::$_files = $_FILES;
 		self::$_headers = self::getallheaders();
 	}
 	
@@ -73,60 +76,13 @@ class Request extends Core {
 	}
 	
 	public static function file($var) {
-		if (!is_string($var))
+		if (!is_string($var) || !isset(self::$_files[$var]) || empty(self::$_files[$var]['tmp_name']) || (isset(self::$_files[$var]['tmp_name'][0]) && empty(self::$_files[$var]['tmp_name'][0])))
 			return;
-		return (new class($_FILES[$var]) {
-			public function __construct($file) {
-
-				foreach($file['name'] as $key=>$value) {
-					if (empty($value))
-						continue;
-					$this->$key = new class([
-						'name'=>$value,
-						'type'=>$file['type'][$key],
-						'tmp_name'=>$file['tmp_name'][$key],
-						'error'=>$file['error'][$key],
-						'size'=>$file['size'][$key]
-					]) {
-						public function __construct($props) {
-							foreach($props as $key=>$value)
-								$this->$key = $value;
-						}
-						public function getData() {
-							return file_get_contents($this->tmp_name);
-						}
-						public function getName() {
-							return $this->name;
-						}
-						public function getType() {
-							return $this->type;
-						}
-						public function getPath() {
-							return $this->tmp_name;
-						}
-						public function getError() {
-							return $this->error;
-						}
-						public function getSize() {
-							return $this->size;
-						}
-						public function store($path="",$disk="") {
-							return Storage::disk($disk)->put($path.'/'.$this->name,$this->getData());
-						}
-						public function storeAs($path,$name,$disk="") {
-							return Storage::disk($disk)->put($path.'/'.$name,$this->getData());
-						}
-					};
-				}
-			}
-			
-			
-		});
-		return (object)$file;
+		return new Files(self::$_files[$var]);
 	}
 	
 	public static function hasFile($var) {
-		if (isset($_FILES[$var]))
+		if (isset(self::$_files[$var]))
 			return true;
 		return false;
 	}
@@ -137,6 +93,8 @@ class Request extends Core {
 		if (\Route::getProps($var))
 			return true;
 		if (isset(self::$_get[$var]))
+			return true;
+		if (self::hasFile($var))
 			return true;
 		return false;
 	}
@@ -152,7 +110,7 @@ class Request extends Core {
 		$arrErr = [];
 		foreach($data as $var=>$access)
 			if ($accessErr = Validate::checkVar($var,
-								self::input($var) ?? self::route($var)
+								self::file($var) ?? self::input($var) ?? self::route($var)
 									//isset(self::$_post[$var]) ? stripslashes(htmlspecialchars_decode(self::$_post[$var])) : (isset($_FILES[$var]) ? self::file($var) : NULL)
 								,$access))
 				$arrErr[] = [

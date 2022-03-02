@@ -2,6 +2,7 @@
 namespace SME\Core\Request;
 
 class Validate {
+	private static $__rules = [];
 
 	private static function params($value, $field) {
 		$params = is_string($value) ? preg_split('/((?<!\\\),)/', $value) : [];
@@ -12,18 +13,34 @@ class Validate {
 	}
 
 	public static function checkVar($field, $var, $validate) {
-		$types = new ValidateIs;
 		$return = [];
 		$validate = is_array($validate) ? $validate : preg_split('/((?<!\\\)\|)/', $validate);
 		foreach($validate as $vl) {
 			$vlArr = is_array($vl) ? $vl : preg_split('/((?<!\\\):)/', $vl);
-			$type = $vlArr[0];
+			$type = $vlArr[0] ?? '';
 			$params = self::params($vlArr[1] ?? null, $field);
-			
-			if (method_exists($types, $type))
-				if (!$types->$type($var, ...$params))
-					$return[] = $type.(count($params) ? ' '.implode(',',$params) : '');
+
+			if ($result = self::validateMethod($type, $var, $params))
+				$return[] = $result;
 		}
 		return $return;
+	}
+
+	private static function validateMethod($method, $var, $params) {
+		foreach(self::$__rules as $rule) {
+			if ($method == $rule['name'])
+				if (!$rule['callback']($var, ...$params))
+					return $method.(count($params) ? ' '.implode(',',$params) : '');
+		}
+		if (method_exists('\\SME\\Core\\Request\\ValidateIs', $method))
+			if (!ValidateIs::$method($var, ...$params))
+				return $method.(count($params) ? ' '.implode(',',$params) : '');
+	}
+
+	public static function rule($name, $callback) {
+		self::$__rules[] = [
+			'name' => $name,
+			'callback' => $callback
+		];
 	}
 }

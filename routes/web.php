@@ -11,10 +11,14 @@ Route::group(['prefix' => 'test'], function(){
 	});
 	Route::post('/submit', function(){
 		SME\Core\Request\Request::validate([
-			'tt' => 'min:11|required',
-			'dd' => 'min:0'
+			'dd' => 'min:11|unique:Test,id',
+			'file' => 'file|mimes:jpg,png,exe',
+			'tt' => 'test'
 		]);
-		dd(request()->input('tt'));
+		// foreach(request()->file('file') as $key => $file) {
+		// 	$file->storeAs('/test', $key.'test.'.$file->getExtension());
+		// }
+		
 	})->name('submit');
 	// Route::get('/post', function(){
 	// 	Request::validate([

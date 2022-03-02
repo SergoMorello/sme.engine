@@ -24,6 +24,8 @@ return [
 		'middleware',
 		'request/validateIs',
 		'request/validate',
+		'request/objects/file',
+		'request/objects/files',
 		'request/request',
 		'app',
 		'log',
