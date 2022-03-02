@@ -45,7 +45,6 @@ class ModelMethods extends ModelSql {
 	public function save() {
 		$modelObject = new modelObject($this);
 		$vars = get_object_vars($this);
-		unset($vars['table'],$vars['query']);
 		
 		if (get_object_vars(self::$__query)) {
 			$arrQuery = $this->getValues($vars);
