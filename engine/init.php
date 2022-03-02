@@ -4,10 +4,10 @@ define('ROOT',realpath(__DIR__ .'/..').'/');
 define('ROUTES',ROOT.'/routes/');
 define('APP',ROOT.'/app/');
 define('CONFIG',ROOT.'/config/');
-define('CONTROLLER',ROOT.'/app/controllers/');
-define('MODEL',ROOT.'/app/models/');
-define('EXCEPTIONS',ROOT.'/app/exceptions/');
-define('MIDDLEWARE',ROOT.'/app/middleware/');
+define('CONTROLLER',ROOT.'/app/Controllers/');
+define('MODEL',ROOT.'/app/Models/');
+define('EXCEPTIONS',ROOT.'/app/Exceptions/');
+define('MIDDLEWARE',ROOT.'/app/Middleware/');
 define('STORAGE',ROOT.'/storage/');
 define('LOGS',ROOT.'/storage/.logs/');
 define('ENGINE',ROOT.'/engine/');
@@ -16,7 +16,9 @@ define('MODULES',ROOT.'/engine/modules/');
 define('HELPERS',ROOT.'/engine/helpers/');
 define('INC',ROOT.'/engine/inc/');
 define('TEMP',ROOT.'/storage/.tmp/');
-define('PUBLIC_DIR',ROOT.'/public/');
+
+foreach(require_once(CONFIG.'path.php') as $constant => $path)
+	define($constant, ROOT.$path);
 
 foreach(require_once(INC.'engine.php') as $path => $files)
 	foreach($files as $file)

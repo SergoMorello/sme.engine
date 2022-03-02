@@ -24,6 +24,7 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
 });
 
 // Init
+
 Env::init();
 
 Middleware::init();
@@ -269,7 +270,7 @@ if (App::isConsole()) {
 		$port = Request::route('port') ?? '8000';
 		$host = Request::route('host') ?? '127.0.0.1';
 		log::info('Start dev server on: http://'.$host.':'.$port);
-		exec('php -S '.$host.':'.$port.' -t public dev');
+		exec('php -S '.$host.':'.$port.' -t '.PUBLIC_DIR.' dev');
 	});
 	
 	\Console::command("route:list",function() {

@@ -9,7 +9,7 @@ class Exception extends Core {
 	public static function throw($exceptionName, $arg) {
 		self::$exceptionName = $exceptionName;
 
-		if (App::include('app.exceptions.handlerException')) {
+		if (App::include('app.Exceptions.handlerException')) {
 
 			$handler = new \App\Exceptions\handlerException;
 

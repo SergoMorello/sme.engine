@@ -15,7 +15,7 @@ class App extends Core {
 		$configure=false,
 		$run = false;
 	
-	public function __construct($console=false) {
+	public function __construct($console = false) {
 		
 		if (self::$run)
 			return;
@@ -60,7 +60,7 @@ class App extends Core {
 	
 	private function autoload() {
 		spl_autoload_register(function($class){
-			self::include($class);
+			self::include(str_replace('App', 'app', $class));
 		});
 	}
 

@@ -25,8 +25,8 @@ class compressor extends Core {
 			$paths = [];
 			$str = '';
 			foreach($files as $file) {
-				if (file_exists(PUBLIC_DIR.$file) && !empty($file)) {
-					$str .= file_get_contents(PUBLIC_DIR.$file);
+				if (file_exists(PUBLIC_DIR.'/'.$file) && !empty($file)) {
+					$str .= file_get_contents(PUBLIC_DIR.'/'.$file);
 					$paths[] = pathinfo($file, PATHINFO_DIRNAME);
 				}
 			}
@@ -70,7 +70,7 @@ class compressor extends Core {
 		if ($cache->has(self::nameCache.$hash)) {
 			$paths = $cache->get(self::nameCache.$hash);
 			foreach($paths['paths'] as $path) {
-				$fullPath = PUBLIC_DIR.$path.'/'.$name;
+				$fullPath = PUBLIC_DIR.'/'.$path.'/'.$name;
 				if (file_exists($fullPath)) {
 					return file_get_contents($fullPath);
 				}
@@ -81,7 +81,7 @@ class compressor extends Core {
 	public function get(request $req) {
 		$hash = $req->route('hash');
 		$name = $req->route('name');
-
+		
 		$cache = cache();
 		
 		if ($cache->has(self::nameCache.$name)) {
