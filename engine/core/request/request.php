@@ -33,7 +33,12 @@ class Request extends Core {
 	}
 	
 	public static function all() {
-		return count(self::$_post)>0 ? self::$_post : (count(self::$_get)>0 ? self::$_get : (count($_FILES)>0 ? self::file : NULL));
+		return [
+			'post' => self::$_post,
+			'get' => self::$_get,
+			'route' => \Route::getProps(),
+			'files' => self::$_files
+		];
 	}
 
 	private static function getallheaders() {

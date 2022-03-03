@@ -99,6 +99,10 @@ class compiler extends Core {
 			return self::convertSpec($var[1])->encode();
 		}, $buffer);
 		
+		$buffer = preg_replace_callback('/\{\{\-\-(.*)\-\-\}\}/isU', function($var){
+			return "";
+		}, $buffer);
+
 		$buffer = preg_replace_callback('/\{\{(.*)\}\}/isU', function($var){
 			return "<?php e(".$var[1].")->html(); ?>";
 		}, $buffer);
