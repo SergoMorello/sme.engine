@@ -100,11 +100,11 @@ class compiler extends Core {
 		}, $buffer);
 		
 		$buffer = preg_replace_callback('/\{\{(.*)\}\}/isU', function($var){
-			return "<?php echo htmlspecialchars(".$var[1]."); ?>";
+			return "<?php e(".$var[1].")->html(); ?>";
 		}, $buffer);
 		
 		$buffer = preg_replace_callback('/\{\!\!(.*)\!\!\}/isU', function($var){
-			return "<?php echo ".$var[1]."; ?>";
+			return "<?php e(".$var[1]."); ?>";
 		}, $buffer);
 		
 

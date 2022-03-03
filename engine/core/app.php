@@ -3,6 +3,7 @@ namespace SME\Core;
 
 use SME\Core\Request\request;
 use SME\Core\Response\Response;
+use SME\Core\Response\ResponseObject;
 use SME\Core\Model\ModelCore;
 
 class App extends Core {
@@ -202,8 +203,7 @@ class App extends Core {
 	}
 
 	public static function __return($result) {
-		$result = (is_object($result) && method_exists($result, 'getContent')) ? $result->getContent() : $result;
-		$result = (is_array($result) || is_object($result)) ? Response::json($result)->getContent() : $result;
+		$result = ((is_array($result) || is_object($result)) && !$result instanceof ResponseObject) ? Response::json($result) : $result;
 
 		if (self::isDev() && self::checkPublicDir())
 			return false;
