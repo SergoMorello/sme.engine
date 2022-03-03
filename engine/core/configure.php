@@ -329,29 +329,63 @@ if (App::isConsole()) {
 				]
 		]);
 		
+		$getFoldersFile = function($name, $returnPath) {
+			$name = str_replace('.', '/', $name);
+			$splitPath = explode('/', $name);
+			$fileName = end($splitPath);
+			
+			if (count($splitPath) > 1)
+				array_pop($splitPath);
+			$returnClass = '';
+			foreach($splitPath as $dir) {
+				$path = $returnPath.$dir;
+				$returnPath .= '/'.$dir;
+				$returnClass .= '\\'.$dir;
+				if (!is_dir($path))
+					mkdir($returnPath);
+			}
+			return (object)[
+				'path' => $returnPath.'/',
+				'class' => $returnClass,
+				'file' => $fileName
+			];
+		};
+
 		switch($func) {
 			case 'controller':
-				$path = CONTROLLER.$name.'.php';
+				$gff = $getFoldersFile($name, CONTROLLER);
+				if (is_null($gff))
+					return;
+				$path = $gff->path.$gff->file.'.php';
 				$file = file_get_contents(ENGINE.'/make/controller.php');
-				$file = str_replace('__NAME__', $name, $file);
+				$file = str_replace(['__NAME__', '__CLASS__'], [$gff->file, $gff->class], $file);
+				
 				if (file_exists($path))
 					return log::info('Controller exists');
 				if (file_put_contents($path, $file))
 					log::info('Controller created');
 			break;
 			case 'model':
-				$path = MODEL.$name.'.php';
+				$gff = $getFoldersFile($name, MODEL);
+				if (is_null($gff))
+					return;
+				$path = $gff->path.$gff->file.'.php';
 				$file = file_get_contents(ENGINE.'/make/model.php');
-				$file = str_replace('__NAME__', $name, $file);
+				$file = str_replace(['__NAME__', '__CLASS__'], [$gff->file, $gff->class], $file);
+
 				if (file_exists($path))
 					return log::info('Model exists');
 				if (file_put_contents($path, $file))
 					log::info('Model created');
 			break;
 			case 'middleware':
-				$path = MIDDLEWARE.$name.'.php';
+				$gff = $getFoldersFile($name, MIDDLEWARE);
+				if (is_null($gff))
+					return;
+				$path = $gff->path.$gff->file.'.php';
 				$file = file_get_contents(ENGINE.'/make/middleware.php');
-				$file = str_replace('__NAME__', $name, $file);
+				$file = str_replace(['__NAME__', '__CLASS__'], [$gff->file, $gff->class], $file);
+				
 				if (file_exists($path))
 					return log::info('Middleware exists');
 				if (file_put_contents($path, $file))

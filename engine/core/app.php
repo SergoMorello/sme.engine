@@ -229,10 +229,14 @@ class App extends Core {
 			if (is_callable($route['callback'])) {
 				$return->call = $route['callback'];
 			}else{
-				$controller = strpos($route['callback']->controller, '\\') ? $route['callback']->controller : 'App\\Controllers\\'.$route['callback']->controller;
-				if (!class_exists($controller))
-					throw new \Exception('Controller "'.$controller.'" not found',1);
+				$controller = strpos($route['callback']->controller, '\\') ? 
+					$route['callback']->controller : 
+					'App\\Controllers\\'.str_replace('/','\\', $route['callback']->controller);
+				try {
 				$return->call = [new $controller, $route['callback']->method];
+				}catch(\Error $e) {
+					throw new \Exception('Controller "'.$controller.'" not found',1);
+				}
 			}
 			
 			return Middleware::check($route['middleware'] ?? null, $return, new request);

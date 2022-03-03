@@ -1,5 +1,5 @@
 <?php
-namespace App\Middleware;
+namespace App\Middleware__CLASS__;
 
 class __NAME__ {
 	

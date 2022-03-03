@@ -10,7 +10,7 @@ class ControllerCore extends Core {
 	}
 
 	public static function __init() {
-		App::include('app.controllers.controller');
+		App::include('app.Controllers.Controller');
 		foreach(\Route::getRoutes() as $page)
 			if (!is_callable($page['callback'])) {
 				App::include(self::getPath($page['callback']->controller, 'app.controllers'));

@@ -1,5 +1,5 @@
 <?php
-namespace App\Models;
+namespace App\Models__CLASS__;
 
 use SME\Core\Model\Model;
 
