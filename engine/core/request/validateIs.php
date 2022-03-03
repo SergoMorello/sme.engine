@@ -31,9 +31,10 @@ class ValidateIs {
 		if ($var instanceof \SME\Core\Request\Objects\Files) {
 			array_pop($ext);
 			if ($var->count()) {
-				return array_map(function($file) use (&$ext){
-					return in_array($file->getExtension(), $ext);
-				},$var);
+				foreach($var as $file) {
+					if (!in_array($file->getExtension(), $ext))
+						return false;
+				}
 			}else{
 				return in_array($var->getExtension(), $ext);
 			}
@@ -84,10 +85,27 @@ class ValidateIs {
 	public static function size($var, $value) {
 		if (empty($var))
 			return true;
+
+		$value = intval($value);
+
 		if (is_string($var))
 			return strlen($var) == $value ? true : false;
+
 		if (is_array($var))
 			return count($var) == $value ? true : false;
+
+		if ($var instanceof \SME\Core\Request\Objects\Files) {
+			if ($var->count()) {
+				foreach($var as $file) {
+					if ($file->getSize() > $value)
+						return false;
+				}
+			}else{
+				if ($var->getSize() > $value)
+					return false;
+			}
+			return true;
+		}
 	}
 
 	public static function unique($var, $model, $column) {

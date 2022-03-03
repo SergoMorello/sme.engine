@@ -17,9 +17,6 @@ define('HELPERS',ROOT.'/engine/helpers/');
 define('INC',ROOT.'/engine/inc/');
 define('TEMP',ROOT.'/storage/.tmp/');
 
-foreach(require_once(CONFIG.'path.php') as $constant => $path)
-	define($constant, ROOT.$path);
-
 foreach(require_once(INC.'engine.php') as $path => $files)
 	foreach($files as $file)
 		require_once(constant($path).$file.'.php');

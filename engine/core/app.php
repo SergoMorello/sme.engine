@@ -10,12 +10,13 @@ class App extends Core {
 	private $appService;
 	
 	private static $console,
+		$dev,
 		$classes = [],
 		$objApp,
-		$configure=false,
+		$configure = false,
 		$run = false;
 	
-	public function __construct($console = false) {
+	public function __construct($console = false, $dev = false) {
 		
 		if (self::$run)
 			return;
@@ -25,6 +26,8 @@ class App extends Core {
 		self::$run = true;
 		
 		self::$console = $console;
+
+		self::$dev = $dev;
 
 		$this->checkFolders();
 
@@ -57,7 +60,11 @@ class App extends Core {
 	public function __destruct() {
 		ModelCore::__close();
 	}
-	
+
+	public function __invoke() {
+		return false;
+	}
+
 	private function autoload() {
 		spl_autoload_register(function($class){
 			self::include(str_replace('App', 'app', $class));
@@ -77,6 +84,8 @@ class App extends Core {
 	}
 	
 	private function checkFolders() {
+		if (!self::isDev())
+			return;
 		foreach(get_defined_constants(true)['user'] as $folder) {
 			if (!file_exists($folder))
 				mkdir($folder);
@@ -87,11 +96,49 @@ class App extends Core {
 		return self::$console;
 	}
 
-	public static function singleton($name, $callback) {
-		self::$classes[] = [
-			'name'=>$name,
-			'obj'=>$callback()
+	public static function isDev() {
+		return self::$dev;
+	}
+
+	public static function findClassKey($name) {
+		if (!is_string($name))
+			throw new \Exception("Name bind or singleton is not string", 1);
+
+		foreach(self::$classes as $key => $value) {
+			if ($value['name'] == $name)
+				return $key;
+		}
+		return null;
+	}
+
+	public static function bind($name, $callback) {
+		$key = self::findClassKey($name);
+
+		$class = [
+			'name' => $name,
+			'obj' => $callback,
+			'type' => 'bind'
 		];
+
+		if (is_null($key))
+			self::$classes[] = $class;
+		else
+			self::$classes[$key] = $class;
+	}
+
+	public static function singleton($name, $callback) {
+		$key = self::findClassKey($name);
+
+		$class = [
+			'name' => $name,
+			'obj' => $callback(self::getObj()),
+			'type' => 'singleton'
+		];
+
+		if (is_null($key))
+			self::$classes[] = $class;
+		else
+			self::$classes[$key] = $class;
 	}
 	
 	private function singletonInit() {
@@ -99,6 +146,11 @@ class App extends Core {
 			self::$objApp->{$class['name']} = $class['obj'];
 	}
 	
+	private static function checkPublicDir() {
+		if (is_file(app('path.public').$_SERVER['REQUEST_URI']))
+			return true;
+	}
+
 	public static function include($name) {
 		$name = str_replace(['.','\\'],'/',$name);
 		try {
@@ -152,8 +204,11 @@ class App extends Core {
 	public static function __return($result) {
 		$result = (is_object($result) && method_exists($result, 'getContent')) ? $result->getContent() : $result;
 		$result = (is_array($result) || is_object($result)) ? Response::json($result)->getContent() : $result;
-		
-		die((string)$result);
+
+		if (self::isDev() && self::checkPublicDir())
+			return false;
+
+		exit((string)$result);
 	}
 
 	private function run() {

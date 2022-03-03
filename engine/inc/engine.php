@@ -62,6 +62,7 @@ return [
 	],
 	'HELPERS' => [
 		'app',
+		'base_path',
 		'env',
 		'config',
 		'view',

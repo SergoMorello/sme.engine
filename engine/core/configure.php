@@ -24,6 +24,9 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
 });
 
 // Init
+App::singleton('path.public', function(){
+	return base_path('public');
+});
 
 Env::init();
 
@@ -270,7 +273,7 @@ if (App::isConsole()) {
 		$port = Request::route('port') ?? '8000';
 		$host = Request::route('host') ?? '127.0.0.1';
 		log::info('Start dev server on: http://'.$host.':'.$port);
-		exec('php -S '.$host.':'.$port.' -t '.PUBLIC_DIR.' dev');
+		exec('php -S '.$host.':'.$port.' -t '.app('path.public').' dev');
 	});
 	
 	\Console::command("route:list",function() {

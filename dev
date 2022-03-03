@@ -2,7 +2,4 @@
 
 require_once(__DIR__ .'/engine/init.php');
 
-if (file_exists(PUBLIC_DIR.$_SERVER['REQUEST_URI']))
-	return false;
-
-new SME\Core\App();
+return (new SME\Core\App(false, true))();

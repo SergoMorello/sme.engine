@@ -17,6 +17,14 @@ class Files extends File {
 		return $this->{0} ?? null;
 	}
 
+	public function toArray() {
+		$return = [];
+		foreach($this as $key => $value)
+			if (is_numeric($key))
+				$return[$key] = $value;
+		return $return;
+	}
+
 	private function __updateFile($file) {
 		foreach($file as $key => $value) {
 			if (empty($value))
