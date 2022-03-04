@@ -43,6 +43,7 @@ class View extends Compiler {
 			
 			$errors = function() {
 				return (new class{
+					private static $fields = [];
 
 					public function __construct() {
 						if ($errors = session('__withErrors')) {
@@ -56,7 +57,7 @@ class View extends Compiler {
 					}
 					
 					public function has($name) {
-						return count($this->errors()) ? array_key_exists($name, $this->errors()) : false;
+						return empty($this->first($name)) ? false : true;
 					}
 
 					public function count() {
@@ -64,7 +65,15 @@ class View extends Compiler {
 					}
 
 					public function first($name) {
-						return $this->errors()[$name] ?? '';
+						if (!count($this->errors()))
+							return '';
+						if (isset(self::$fields[$name]))
+							return self::$fields[$name];
+						foreach($this->errors() as $error) {
+							if ($error['field'] == $name)
+								return self::$fields[$name] = $error['message'];
+						}
+						return '';
 					}
 
 					public function any() {

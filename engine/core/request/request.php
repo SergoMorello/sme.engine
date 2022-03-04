@@ -125,8 +125,17 @@ class Request extends Core {
 		if (count($validateErr)) {
 			if ($return)
 				return true;
-			else
-				throw new \SME\Core\Exceptions\Validate($validateErr);
+			else{
+				$validateErrMessages = [];
+				foreach($validateErr as $parentError) {
+					foreach($parentError as $error)
+						$validateErrMessages[] = [
+							'field' => $error['field'],
+							'message' => trans('validate.'.$error['method'], ['field' => $error['field'], 'params' => implode(',', $error['params'])])
+						];
+				}
+				throw new \SME\Core\Exceptions\Validate($validateErr, $validateErrMessages);
+			}	
 		}
 	}
 }

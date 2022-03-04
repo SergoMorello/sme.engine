@@ -172,7 +172,7 @@ Exception::make(\SME\Core\Exceptions\Validate::class, function($exception){
 	}
 	if (App::isConsole())
 		return Log::error(implode("\r\n",$list));
-	return redirect()->back()->withErrors($list);
+	return redirect()->back()->withErrors($exception->getMessageErrors());
 });
 
 // Http

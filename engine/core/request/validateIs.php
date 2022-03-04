@@ -73,13 +73,21 @@ class ValidateIs {
 	public static function max($var, $value) {
 		if (empty($var))
 			return true;
-		return $var <= $value ? true : false;
+		$value = intval($value);
+		if (is_numeric($var))
+			return $var <= $value ? true : false;
+		if (is_string($var))
+			return strlen($var) <= $value ? true : false;
 	}
 
 	public static function min($var, $value) {
 		if (empty($var))
 			return true;
-		return $var >= $value ? true : false;
+		$value = intval($value);
+		if (is_numeric($var))
+			return $var >= $value ? true : false;
+		if (is_string($var))
+			return strlen($var) >= $value ? true : false;
 	}
 
 	public static function size($var, $value) {
