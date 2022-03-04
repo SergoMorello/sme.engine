@@ -15,10 +15,11 @@ abstract class Core {
 			
 			$argvConsole = $_SERVER['argv'];
 			if (!isset($argvConsole[1]))
-				return Exception::throw('consoleError',[
-						'message'=>'Comand list:',
-						'routes'=>Route::__list('command')
-					]);
+				throw new Exceptions\Console('', [
+					'message' => 'Comand list:',
+					'routes' => \Route::__list('command')
+				]);
+
 			unset($argvConsole[0]);
 			$get = implode(' ', $argvConsole);
 			unset($argvConsole[1]);

@@ -168,23 +168,8 @@ class App extends Core {
 			if (file_exists(ROOT.$name.'.php')) {
 				return self::$include[$name] = self::$include[$name] ?? require_once(ROOT.$name.'.php');
 			}
-			
-		} catch (\ParseError $e) {
-			
-			Exception::throw('exception',$e);
-			
-		} catch (\Error $e) {
-			
-			Exception::throw('exception',$e);
-			
-		} catch (\Exception $e) {
-			
-			Exception::throw('exception',$e);
-			
-		} catch (\ErrorException $e) {
-			
-			Exception::throw('exception',$e);
-			
+		} catch (\Throwable $e) {
+			Exception::throw($e);
 		}
 	}
 
@@ -194,23 +179,9 @@ class App extends Core {
 			if (method_exists($this->appService, $method))
 				$this->appService->$method();
 			
-		} catch (\ParseError $e) {
-			
-			Exception::throw('exception',$e);
-			
-		} catch (\Error $e) {
-			
-			Exception::throw('exception',$e);
-			
-		} catch (\Exception $e) {
-			
-			Exception::throw('exception',$e);
-			
-		} catch (\ErrorException $e) {
-			
-			Exception::throw('exception',$e);
-			
-		}
+			} catch (\Throwable $e) {
+				Exception::throw($e);
+			}
 	}
 
 	public static function __return($result) {
@@ -260,22 +231,8 @@ class App extends Core {
 				array_values($callback->props)
 			));
 			
-		} catch (\ParseError $e) {
-			
-			Exception::throw('exception',$e);
-		
-		} catch (\Error $e) {
-			
-			Exception::throw('exception',$e);
-			
-		} catch (\Exception $e) {
-			
-			Exception::throw('exception',$e);
-			
-		} catch (\ErrorException $e) {
-			
-			Exception::throw('exception',$e);
-			
+		} catch (\Throwable $e) {
+			Exception::throw($e);
 		}
 	}
 }

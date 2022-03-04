@@ -4,31 +4,20 @@ namespace SME\Core;
 use SME\Core\Exceptions\Http;
 
 class Exception extends \Exception {
-	private $name, $errors;
+	
 	private static $exceptions = [], $exceptionName = '';
 
-	public function __construct($message = '', $errors = []) {
-		$this->message = $message;
-		$this->errors = $errors;
-		$this->code = 1;
-	}
+	public static function throw($arg) {
+		$handler = new \App\Exceptions\handlerException;
 
-	public static function throw($exceptionName, $arg) {
-		self::$exceptionName = $exceptionName;
-
-		if (App::include('app.Exceptions.handlerException')) {
-
-			$handler = new \App\Exceptions\handlerException;
-
-			App::__return($handler->render(request(), $arg));
-		}
+		App::__return($handler->render(request(), $arg));
 	}
 	
 	public static function abort($code, $props = []) {
 		try{
 			throw new Http("abort", $code);
 		} catch (Http $e) {
-			self::throw($code, $e);
+			self::throw($e);
 		}
 	}
 	
@@ -58,22 +47,14 @@ class Exception extends \Exception {
 				return App::__return($ex['closure']($exception));
 				continue;
 			}
-			if (self::$exceptionName == ($ex['name'] ?? false)) {
-				if (is_callable($ex['obj']) && $ex['obj'] instanceof \Closure) {
-					return App::__return($ex['obj']($exception));
-				}
-			}
+			// if (self::$exceptionName == ($ex['name'] ?? false)) {
+			// 	if (is_callable($ex['obj']) && $ex['obj'] instanceof \Closure) {
+			// 		return App::__return($ex['obj']($exception));
+			// 	}
+			// }
 		}
 		if (isset(self::$exceptions['default']))
 			App::__return(self::$exceptions['default']['closure']($exception));
 		App::__return($exception);
-	}
-
-	public function getErrors() {
-		return $this->errors;
-	}
-
-	public function getName() {
-		return $this->name;
 	}
 }

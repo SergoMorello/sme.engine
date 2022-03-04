@@ -6,13 +6,13 @@ Route::get("/doc","main@doc")->name('doc');
 Route::group(['prefix' => 'test'], function(){
 	
 	Route::get('/', function(){
+		
 		return View('test');
 	})->name('test');
 	Route::post('/submit', function(){
 		SME\Core\Request\Request::validate([
 			'tt' => 'required|min:10',
-			'file' => 'required|file|mimes:jpg,png,exe|size:3',
-			'dd' => 'required'
+			'file' => 'required|file|mimes:jpg,png,exe|size:13948'
 		]);
 		foreach(request()->file('file') as $key => $file) {
 			$file->storeAs('/test', $key.'test.'.$file->getExtension());

@@ -17,12 +17,6 @@ if (App::isConsole()) {
 	header('Content-Type: text/html; charset=utf-8');
 }
 
-set_error_handler(function($errno, $errstr, $errfile, $errline) {
-	if (0 === error_reporting())
-		return false;
-	throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
-});
-
 // Init
 App::singleton('path.public', function(){
 	return base_path('public');
@@ -40,246 +34,227 @@ Config::set('database', App::include('config.database'));
 
 Config::set('storage', App::include('config.storage'));
 
+if (!App::isConsole()) {
 
-Middleware::declare('api', function($request, $next){
-	
-	return $next($request);
-});
-
-if (config('app.compressorEnabled'))
-	\Route::get('/'.config("app.compressorName").'/{hash}/{name}', 'SME\\Modules\\compressor@get')->name('compressor-get');
-
-// Compiler
-
-// PHP
-Compiler::declare('php',function() {
-	return "<?php";
-});
-
-// END PHP
-Compiler::declare('endphp',function() {
-	return "?>";
-});
-
-// IF
-Compiler::declare('if',function($arg) {
-	return "<?php if(".$arg.") { ?>";
-});
-
-// END IF
-Compiler::declare('endif',function() {
-	return "<?php } ?>";
-});
-
-// FOR
-Compiler::declare('for',function($arg) {
-	return "<?php for(".$arg.") { ?>";
-});
-
-// END FOR
-Compiler::declare('endfor',function() {
-	return "<?php } ?>";
-});
-
-// FOREACH
-Compiler::declare('foreach',function($arg) {
-	return "<?php foreach(".$arg.") { ?>";
-});
-
-// END FOREACH
-Compiler::declare('endforeach',function() {
-	return "<?php } ?>";
-});
-
-// ELSE
-Compiler::declare('else',function() {
-	return "<?php }else{ ?>";
-});
-
-// SECTION SINGLE
-Compiler::declare('sectiond',function($arg) {
-	return "<?php ob_start(function(\$b){\$this->setSection(".$arg.",\$b);}); ?>";
-});
-
-// SECTION
-Compiler::declare('section',function($arg1, $arg2, $append = null) {
-	if (is_null($append))
-		return "<?php ob_start(function(\$b){\$this->setSection(".$arg1.",\$b);}); ?>";	
-	else{
-		return "<?php \$this->setSection(".$arg1.",".$arg2."); ?>";
-	}
+	Middleware::declare('api', function($request, $next){
 		
-});
+		return $next($request);
+	});
 
-// END SECTION
-Compiler::declare('endsection',function() {
-	return "<?php ob_end_clean(); ?>";
-});
 
-// YIELD
-Compiler::declare('yield',function($arg) {
-	return "<?php echo \$this->getSection(".$arg."); ?>";
-});
+	if (config('app.compressorEnabled'))
+		\Route::get('/'.config("app.compressorName").'/{hash}/{name}', 'SME\\Modules\\compressor@get')->name('compressor-get');
 
-// EXTENDS
-Compiler::declare('extends',function($arg, $append) {
-	$varSection = str_replace(['\'','\"'],'',$arg);
-	
-	$append("<?php ob_end_clean(); echo \$this->addView(".$arg.", [], \$__system); echo \$this->getSection('__view.".$varSection."'); ?>");
-	
-	return "<?php ob_start(function(\$b){self::\$_section['__view.".$varSection."']=\$b;}); ?>";
-});
+	// Compiler
 
-// INCLUDE
-Compiler::declare('include',function($arg1, $arg2) {
-	$arg2 = is_callable($arg2) ? '[]' : $arg2;
-	
-	return "<?php echo \$this->addView(".$arg1.", ".$arg2.", \$__system); ?>";
-});
+	// PHP
+	Compiler::declare('php',function() {
+		return "<?php";
+	});
 
-// LANG
-Compiler::declare('lang',function($arg1, $arg2) {
-	$arg2 = is_callable($arg2) ? '[]' : $arg2;
-	return "<?php e(trans(".$arg1.", ".$arg2.")); ?>";
-});
+	// END PHP
+	Compiler::declare('endphp',function() {
+		return "?>";
+	});
 
+	// IF
+	Compiler::declare('if',function($arg) {
+		return "<?php if(".$arg.") { ?>";
+	});
+
+	// END IF
+	Compiler::declare('endif',function() {
+		return "<?php } ?>";
+	});
+
+	// FOR
+	Compiler::declare('for',function($arg) {
+		return "<?php for(".$arg.") { ?>";
+	});
+
+	// END FOR
+	Compiler::declare('endfor',function() {
+		return "<?php } ?>";
+	});
+
+	// FOREACH
+	Compiler::declare('foreach',function($arg) {
+		return "<?php foreach(".$arg.") { ?>";
+	});
+
+	// END FOREACH
+	Compiler::declare('endforeach',function() {
+		return "<?php } ?>";
+	});
+
+	// ELSE
+	Compiler::declare('else',function() {
+		return "<?php }else{ ?>";
+	});
+
+	// SECTION SINGLE
+	Compiler::declare('sectiond',function($arg) {
+		return "<?php ob_start(function(\$b){\$this->setSection(".$arg.",\$b);}); ?>";
+	});
+
+	// SECTION
+	Compiler::declare('section',function($arg1, $arg2, $append = null) {
+		if (is_null($append))
+			return "<?php ob_start(function(\$b){\$this->setSection(".$arg1.",\$b);}); ?>";	
+		else{
+			return "<?php \$this->setSection(".$arg1.",".$arg2."); ?>";
+		}
+			
+	});
+
+	// END SECTION
+	Compiler::declare('endsection',function() {
+		return "<?php ob_end_clean(); ?>";
+	});
+
+	// YIELD
+	Compiler::declare('yield',function($arg) {
+		return "<?php echo \$this->getSection(".$arg."); ?>";
+	});
+
+	// EXTENDS
+	Compiler::declare('extends',function($arg, $append) {
+		$varSection = str_replace(['\'','\"'],'',$arg);
+		
+		$append("<?php ob_end_clean(); echo \$this->addView(".$arg.", [], \$__system); echo \$this->getSection('__view.".$varSection."'); ?>");
+		
+		return "<?php ob_start(function(\$b){self::\$_section['__view.".$varSection."']=\$b;}); ?>";
+	});
+
+	// INCLUDE
+	Compiler::declare('include',function($arg1, $arg2) {
+		$arg2 = is_callable($arg2) ? '[]' : $arg2;
+		
+		return "<?php echo \$this->addView(".$arg1.", ".$arg2.", \$__system); ?>";
+	});
+
+	// LANG
+	Compiler::declare('lang',function($arg1, $arg2) {
+		$arg2 = is_callable($arg2) ? '[]' : $arg2;
+		return "<?php e(trans(".$arg1.", ".$arg2.")); ?>";
+	});
+}
 
 // Exceptions
 
-if (App::isConsole()) {
-			
-	// 401
-	Exception::declare(401,function(){
-		return response('Not found');
-	});
+// Default
+Exception::make(null, function($exception){
 	
-	// 404
-	Exception::declare(404,function(){
-		return response('Not found');
-	});
-	
-	// 405
-	Exception::declare(405,function(){
-		return response('Method not allowed');
-	});
-	
-	// 500
-	Exception::declare(500,function(){
-		return response('Internal Server Error');
-	});
-
-	Exception::make(\SME\Core\Exceptions\Validate::class, function($exception){ 
-		$list = [];
-		foreach($exception->getErrors() as $parentError) {
-			foreach($parentError as $error)
-				$list[] = trans('validate.'.$error['method'], ['field' => $error['field'], 'params' => implode(',', $error['params'])]);
-		}
-		
-		return Log::error(implode("\r\n",$list));
-	});
-
-	Exception::make(null, function($exception){
+	if (App::isConsole())
 		return log::error($exception->getMessage()."
-			\r\non line: ".$exception->getLine().' in '.$exception->getFile()
-		);
-	});
-	
-	Exception::declare('httpError',function($e){
-		return response($e['message']."
-		\r\n".implode("\r\n",$e['lines'])
-		);
-	});
-	
-	Exception::declare('consoleError',function($e){
-		$routes = [];
-		foreach($e['routes'] as $route)
-			$routes[] = $route['url'];
-		return response($e['message']."
-		\r\n".implode("\r\n",$routes)
-		);
-	});
-	
-}else{
-	
-	Exception::make(null, function($exception){
-		if (Config::get('app.debug') && $exception->getCode()==0) {
-			$sourceLines = function($file) {
-				return explode(PHP_EOL,file_get_contents($file));
-			};
-			
-			return View::error('error',[
-				'message' => $exception->getMessage().' on line: '.$exception->getLine().' in '.$exception->getFile(),
-				'errorLine' => $exception->getLine(),
-				'sourceLines' => $sourceLines($exception->getFile())
-			]);
-		}else
-			return View::error('error',['message' => '']);
-	});
-
-	Exception::make(\SME\Core\Exceptions\Validate::class, function($exception){ 
-		$list = [];
-		foreach($exception->getErrors() as $parentError) {
-			foreach($parentError as $error)
-				$list[] = trans('validate.'.$error['method'], ['field' => $error['field'], 'params' => implode(',', $error['params'])]);
-		}
+				\r\non line: ".$exception->getLine().' in '.$exception->getFile()
+			);
+	if (Config::get('app.debug') && $exception->getCode()==0) {
+		$sourceLines = function($file) {
+			return explode(PHP_EOL,file_get_contents($file));
+		};
 		
-		return redirect()->back()->withErrors($list);
-	});
+		return View::error('error',[
+			'message' => $exception->getMessage().' on line: '.$exception->getLine().' in '.$exception->getFile(),
+			'errorLine' => $exception->getLine(),
+			'sourceLines' => $sourceLines($exception->getFile())
+		]);
+	}else
+		return View::error('error',['message' => '']);
+});
 
-	Exception::make(\SME\Core\Exceptions\Http::class, function($exception){
-		switch($exception->getHttpCode()){
-			case 401:
-				return View::error(
-					'error',
-					['message' => 'Not access'],
-					401
-				);
-			break;
-			case 404:
-				return View::error(
-					'error',
-					['message' => 'Not found'],
-					404
-				);
-			break;
-			case 405:
-				return View::error(
-					'error',
-					['message' => 'Method not allowed'],
-					405
-				);
-			break;
-			case 500:
-				return View::error(
-					'error',
-					['message' => 'Internal Server Error'],
-					500
-				);
-			break;
-			default:
-				return View::error(
-					'error',
-					['message' => 'Unkown error'],
-					500
-				);
-		}
-		
-	});
+// Validate
+Exception::make(\SME\Core\Exceptions\Validate::class, function($exception){ 
+	$list = [];
+	foreach($exception->getErrors() as $parentError) {
+		foreach($parentError as $error)
+			$list[] = trans('validate.'.$error['method'], ['field' => $error['field'], 'params' => implode(',', $error['params'])]);
+	}
+	if (App::isConsole())
+		return Log::error(implode("\r\n",$list));
+	return redirect()->back()->withErrors($list);
+});
+
+// Http
+Exception::make(\SME\Core\Exceptions\Http::class, function($exception){
+	switch($exception->getHttpCode()){
+		case 401:
+			if (App::isConsole())
+				return log::error('Not access');
+			return View::error(
+				'error',
+				['message' => 'Not access'],
+				401
+			);
+		break;
+		case 404:
+			if (App::isConsole())
+				return log::error('Not found');
+			return View::error(
+				'error',
+				['message' => 'Not found'],
+				404
+			);
+		break;
+		case 405:
+			if (App::isConsole())
+				return log::error('Method not allowed');
+			return View::error(
+				'error',
+				['message' => 'Method not allowed'],
+				405
+			);
+		break;
+		case 500:
+			if (App::isConsole())
+				return log::error('Internal Server Error');
+			return View::error(
+				'error',
+				['message' => 'Internal Server Error'],
+				500
+			);
+		break;
+		default:
+			if (App::isConsole())
+				return log::error('Unkown error');
+			return View::error(
+				'error',
+				['message' => 'Unkown error'],
+				500
+			);
+	}
 	
-	Exception::declare('httpError',function($e){
-		return View::error('error',[
-			'message'=>$e['message'],
-			'errorLine'=>0,
-			'sourceLines'=>$e['lines']
+});
+
+Exception::make(\SME\Core\Exceptions\HttpClient::class, function($exception){
+	$e = $exception->getMessage();
+	if (App::isConsole())
+		return Log::error($e['message']."
+			\r\n".implode("\r\n",$e['lines'])
+			);
+	return View::error('error',[
+		'message' => $e['message'],
+		'errorLine' => 0,
+		'sourceLines' => $e['lines']
+	]);
+});
+
+Exception::make(\SME\Core\Exceptions\Console::class, function($exception){
+	$e = $exception->getErrors();
+	$routes = [];
+	foreach($e['routes'] as $route)
+		$routes[] = $route['url'];
+	return Log::info($e['message']."
+	\r\n".implode("\r\n",$routes)
+	);
+});
+
+Exception::make(\SME\Core\Exceptions\Database::class, function($exception){
+	return View::error('error',[
+			'message' => $exception->getMessage()
 		]);
-	});
-	
-	Exception::declare('error',function($e){
-		return View::error('error',[
-			'message'=>$e['message']
-		]);
-	});
-}
+});
+
 
 if (App::isConsole()) {
 	

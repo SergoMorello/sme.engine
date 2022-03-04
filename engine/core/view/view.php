@@ -94,22 +94,8 @@ class View extends Compiler {
 				
 				return $connect($cacheViewPath, $data, $system, $errors);
 				
-			}catch (\ParseError $e) {
-				
-				Exception::throw('exception',$e);
-				
-			}catch (\Error $e) {
-				
-				Exception::throw('exception',$e);
-				
-			}catch (\Exception $e) {
-				
-				Exception::throw('exception',$e);
-				
-			}catch (\ErrorException $e) {
-				
-				Exception::throw('exception',$e);
-				
+			} catch (\Throwable $e) {
+				Exception::throw($e);
 			}
 		}else
 			throw new \Exception('View \''.$view.'\' not found',1);

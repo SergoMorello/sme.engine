@@ -24,9 +24,9 @@ class ModelCore extends Core {
 			self::$dblink->connect(true);
 		} catch (\PDOException $e) {
 			if (Config::get('app.debug'))
-				Exception::throw('error',['message' => $e->getMessage()]);
+				throw new \SME\Core\Exceptions\Database($e->getMessage());
 			else
-				Exception::throw('error',['message' => 'Connect DB']);
+				throw new \SME\Core\Exceptions\Database('Connect DB');
 		}
 	}
 
