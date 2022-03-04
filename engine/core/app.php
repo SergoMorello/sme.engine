@@ -20,7 +20,7 @@ class App extends Core {
 		$include = [];
 	
 	public function __construct($console = false, $dev = false) {
-		
+
 		if (self::$run)
 			return;
 		
@@ -175,25 +175,24 @@ class App extends Core {
 
 	private function defaultService($method) {
 		try {
-			
 			if (method_exists($this->appService, $method))
 				$this->appService->$method();
 			
-			} catch (\Throwable $e) {
-				Exception::throw($e);
-			}
+		} catch (\Throwable $e) {
+			Exception::throw($e);
+		}
 	}
 
 	public static function __return($result) {
 		$result = ((is_array($result) || is_object($result)) && !$result instanceof ResponseObject) ? Response::json($result) : $result;
-
-		if (self::isDev() && self::checkPublicDir())
-			return false;
-
 		exit((string)$result);
 	}
 
 	private function run() {
+
+		if (self::isDev() && self::checkPublicDir())
+			return false;
+
 		$route = \Route::getRoute();
 		
 		if (!$route)

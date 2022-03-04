@@ -14,11 +14,7 @@ class Exception extends \Exception {
 	}
 	
 	public static function abort($code, $props = []) {
-		try{
-			throw new Http("abort", $code);
-		} catch (Http $e) {
-			self::throw($e);
-		}
+		die(self::throw(new Http("abort", $code)));
 	}
 	
 	public static function make($class, $closure) {
