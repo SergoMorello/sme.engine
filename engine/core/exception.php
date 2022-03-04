@@ -33,10 +33,16 @@ class Exception extends \Exception {
 	}
 	
 	public static function make($class, $closure) {
-		self::$exceptions[] = [
-			'class' => $class,
-			'closure' => $closure
-		];
+		if (is_null($class))
+			self::$exceptions['default'] = [
+				'class' => null,
+				'closure' => $closure
+			];
+		else
+			self::$exceptions[] = [
+				'class' => $class,
+				'closure' => $closure
+			];
 	}
 
 	public static function declare($name, $obj = NULL) {
@@ -58,7 +64,8 @@ class Exception extends \Exception {
 				}
 			}
 		}
-
+		if (isset(self::$exceptions['default']))
+			App::__return(self::$exceptions['default']['closure']($exception));
 		App::__return($exception);
 	}
 

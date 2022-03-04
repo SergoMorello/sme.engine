@@ -167,18 +167,20 @@ if (App::isConsole()) {
 	Exception::declare(500,function(){
 		return response('Internal Server Error');
 	});
-	
-	Exception::declare('validate',function($errors){
+
+	Exception::make(\SME\Core\Exceptions\Validate::class, function($exception){ 
 		$list = [];
-		foreach($errors as $error)
-			$list[] = 'field '.$error['name'].' must be '.implode(' | ', $error['access']);
-		return response(implode("\r\n",$list));
-	});
-	
-	Exception::declare('exception',function($error){
+		foreach($exception->getErrors() as $parentError) {
+			foreach($parentError as $error)
+				$list[] = trans('validate.'.$error['method'], ['field' => $error['field'], 'params' => implode(',', $error['params'])]);
+		}
 		
-		return response($error->getMessage()."
-			\r\non line: ".$error->getLine().' in '.$error->getFile()
+		return Log::error(implode("\r\n",$list));
+	});
+
+	Exception::make(null, function($exception){
+		return log::error($exception->getMessage()."
+			\r\non line: ".$exception->getLine().' in '.$exception->getFile()
 		);
 	});
 	
@@ -199,7 +201,22 @@ if (App::isConsole()) {
 	
 }else{
 	
-	Exception::make(\SME\Core\Exceptions\Validate::class, function($exception){
+	Exception::make(null, function($exception){
+		if (Config::get('app.debug') && $exception->getCode()==0) {
+			$sourceLines = function($file) {
+				return explode(PHP_EOL,file_get_contents($file));
+			};
+			
+			return View::error('error',[
+				'message' => $exception->getMessage().' on line: '.$exception->getLine().' in '.$exception->getFile(),
+				'errorLine' => $exception->getLine(),
+				'sourceLines' => $sourceLines($exception->getFile())
+			]);
+		}else
+			return View::error('error',['message' => '']);
+	});
+
+	Exception::make(\SME\Core\Exceptions\Validate::class, function($exception){ 
 		$list = [];
 		foreach($exception->getErrors() as $parentError) {
 			foreach($parentError as $error)
@@ -247,29 +264,6 @@ if (App::isConsole()) {
 				);
 		}
 		
-	});
-
-	Exception::declare('validate',function($errors){
-		$list = [];
-		foreach($errors as $error)
-			$list[] = trans('validate.'.$error['method'], ['field' => $error['field'], 'params' => implode(',', $error['params'])]);
-		return redirect()->back()->withErrors($list);
-	});
-	
-	Exception::declare('exception',function($error, $short=false){
-		
-		if (Config::get('app.debug') && $error->getCode()==0 && !$short) {
-			$sourceLines = function($file) {
-				return explode(PHP_EOL,file_get_contents($file));
-			};
-			
-			return View::error('error',[
-				'message'=>$error->getMessage().' on line: '.$error->getLine().' in '.$error->getFile(),
-				'errorLine'=>$error->getLine(),
-				'sourceLines'=>$sourceLines($error->getFile())
-			]);
-		}else
-			return View::error('error',['message'=>$error->getMessage()]);
 	});
 	
 	Exception::declare('httpError',function($e){
