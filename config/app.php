@@ -11,5 +11,9 @@ return [
 
 	'compressorEnabled' => env('COMPRESSOR_ENABLED', true),
 
-	'compressorName' => env('COMPRESSOR_NAME', 'com')
+	'compressorName' => env('COMPRESSOR_NAME', 'com'),
+
+	'locale' => 'en',
+
+	'fallback_locale' => 'en'
 ];

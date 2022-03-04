@@ -1,10 +1,17 @@
 <?php
 namespace SME\Core;
 
-class HttpException extends \Exception {}
+use SME\Core\Exceptions\Http;
 
-class Exception extends Core {
+class Exception extends \Exception {
+	private $name, $errors;
 	private static $exceptions = [], $exceptionName = '';
+
+	public function __construct($message = '', $errors = []) {
+		$this->message = $message;
+		$this->errors = $errors;
+		$this->code = 1;
+	}
 
 	public static function throw($exceptionName, $arg) {
 		self::$exceptionName = $exceptionName;
@@ -19,22 +26,33 @@ class Exception extends Core {
 	
 	public static function abort($code, $props = []) {
 		try{
-			throw new HttpException("abort", $code);
-		} catch (HttpException $e) {
+			throw new Http("abort", $code);
+		} catch (Http $e) {
 			self::throw($code, $e);
 		}
 	}
 	
-	public static function declare($name,$obj=NULL) {
-		foreach(self::$exceptions as $key=>$exception)
-			if ($exception['name']==$name)
-				return self::$exceptions[$key] = ['name'=>$name,'obj'=>$obj];
-		self::$exceptions[] = ['name'=>$name,'obj'=>$obj];
+	public static function make($class, $closure) {
+		self::$exceptions[] = [
+			'class' => $class,
+			'closure' => $closure
+		];
+	}
+
+	public static function declare($name, $obj = NULL) {
+		foreach(self::$exceptions as $key => $exception)
+			if (($exception['name'] ?? false) == $name)
+				return self::$exceptions[$key] = ['name' => $name, 'obj' => $obj];
+		self::$exceptions[] = ['name' => $name, 'obj' => $obj];
 	}
 
 	protected function render($request, $exception) {
 		foreach(self::$exceptions as $ex) {
-			if (self::$exceptionName == $ex['name']) {
+			if (isset($ex['class']) && $exception instanceof $ex['class']) {
+				return App::__return($ex['closure']($exception));
+				continue;
+			}
+			if (self::$exceptionName == ($ex['name'] ?? false)) {
 				if (is_callable($ex['obj']) && $ex['obj'] instanceof \Closure) {
 					return App::__return($ex['obj']($exception));
 				}
@@ -42,5 +60,13 @@ class Exception extends Core {
 		}
 
 		App::__return($exception);
+	}
+
+	public function getErrors() {
+		return $this->errors;
+	}
+
+	public function getName() {
+		return $this->name;
 	}
 }

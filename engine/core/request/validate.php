@@ -1,6 +1,7 @@
 <?php
 namespace SME\Core\Request;
 
+
 class Validate {
 	private static $__rules = [];
 
@@ -34,7 +35,11 @@ class Validate {
 		}
 		if (method_exists('\\SME\\Core\\Request\\ValidateIs', $method))
 			if (!ValidateIs::$method($var, ...$params))
-				return $method.(count($params) ? ' '.implode(',',$params) : '');
+				return [
+					'method' => $method,
+					'field' => array_pop($params),
+					'params' => $params
+				];
 	}
 
 	public static function rule($name, $callback) {

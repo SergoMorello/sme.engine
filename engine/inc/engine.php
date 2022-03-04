@@ -22,6 +22,7 @@ return [
 		'route/route',
 		'route/console',
 		'exception',
+		'exceptions',
 		'middleware',
 		'request/validateIs',
 		'request/validate',
@@ -29,6 +30,7 @@ return [
 		'request/objects/files',
 		'request/request',
 		'app',
+		'lang',
 		'log',
 	],
 	'MODULES' => [
@@ -67,6 +69,7 @@ return [
 		'env',
 		'config',
 		'e',
+		'trans',
 		'view',
 		'response',
 		'dd',

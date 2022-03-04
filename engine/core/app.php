@@ -15,7 +15,9 @@ class App extends Core {
 		$classes = [],
 		$objApp,
 		$configure = false,
-		$run = false;
+		$run = false,
+		$locale = 'en',
+		$include = [];
 	
 	public function __construct($console = false, $dev = false) {
 		
@@ -84,6 +86,14 @@ class App extends Core {
 		return self::$configure;
 	}
 	
+	public static function getLocale() {
+		return self::$locale;
+	}
+
+	public static function setLocale($locale) {
+		self::$locale = $locale;
+	}
+
 	private function checkFolders() {
 		if (!self::isDev())
 			return;
@@ -155,8 +165,9 @@ class App extends Core {
 	public static function include($name) {
 		$name = str_replace(['.','\\'],'/',$name);
 		try {
-			if (file_exists(ROOT.$name.'.php'))
-				return require_once(ROOT.$name.'.php');
+			if (file_exists(ROOT.$name.'.php')) {
+				return self::$include[$name] = self::$include[$name] ?? require_once(ROOT.$name.'.php');
+			}
 			
 		} catch (\ParseError $e) {
 			

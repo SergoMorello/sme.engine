@@ -10,9 +10,9 @@ Route::group(['prefix' => 'test'], function(){
 	})->name('test');
 	Route::post('/submit', function(){
 		SME\Core\Request\Request::validate([
-			'dd' => 'min:11|unique:Test,id',
-			'file' => 'required|file|mimes:jpg,png,exe|size:3563',
-			'tt' => 'test'
+			'tt' => 'required|min:10',
+			'file' => 'required|file|mimes:jpg,png,exe|size:3',
+			'dd' => 'required'
 		]);
 		foreach(request()->file('file') as $key => $file) {
 			$file->storeAs('/test', $key.'test.'.$file->getExtension());

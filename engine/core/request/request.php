@@ -112,22 +112,21 @@ class Request extends Core {
 		if (!is_array($data))
 			return;
 
-		$arrErr = [];
-		foreach($data as $var=>$access)
-			if ($accessErr = Validate::checkVar($var,
-								self::file($var) ?? self::input($var) ?? self::route($var)
-									//isset(self::$_post[$var]) ? stripslashes(htmlspecialchars_decode(self::$_post[$var])) : (isset($_FILES[$var]) ? self::file($var) : NULL)
-								,$access))
-				$arrErr[] = [
-					'name' => $var,
-					'access' => $accessErr
-				];
+		$validateErr = [];
+		foreach($data as $var => $access) {
+			if ($validateResult = Validate::checkVar($var,
+				self::file($var) ?? self::input($var) ?? self::route($var)
+				,$access))
+				$validateErr[] = $validateResult;
+			
+		}
+			
 		
-		if (count($arrErr)) {
+		if (count($validateErr)) {
 			if ($return)
 				return true;
 			else
-				Exception::throw('validate', $arrErr);
+				throw new \SME\Core\Exceptions\Validate($validateErr);
 		}
 	}
 }

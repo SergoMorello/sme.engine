@@ -137,6 +137,12 @@ Compiler::declare('include',function($arg1, $arg2) {
 	return "<?php echo \$this->addView(".$arg1.", ".$arg2.", \$__system); ?>";
 });
 
+// LANG
+Compiler::declare('lang',function($arg1, $arg2) {
+	$arg2 = is_callable($arg2) ? '[]' : $arg2;
+	return "<?php e(trans(".$arg1.", ".$arg2.")); ?>";
+});
+
 
 // Exceptions
 
@@ -192,46 +198,61 @@ if (App::isConsole()) {
 	});
 	
 }else{
-	// 401
-	Exception::declare(401,function(){
-		return View::error(
-			'error',
-			['message'=>'Not found'],
-			401
-		);
-	});
 	
-	// 404
-	Exception::declare(404,function($e){
-		return View::error(
-			'error',
-			['message'=>'Not found'],
-			404
-		);
+	Exception::make(\SME\Core\Exceptions\Validate::class, function($exception){
+		$list = [];
+		foreach($exception->getErrors() as $parentError) {
+			foreach($parentError as $error)
+				$list[] = trans('validate.'.$error['method'], ['field' => $error['field'], 'params' => implode(',', $error['params'])]);
+		}
+		
+		return redirect()->back()->withErrors($list);
 	});
-	
-	// 405
-	Exception::declare(405,function(){
-		return View::error(
-			'error',
-			['message'=>'Method not allowed'],
-			405
-		);
+
+	Exception::make(\SME\Core\Exceptions\Http::class, function($exception){
+		switch($exception->getHttpCode()){
+			case 401:
+				return View::error(
+					'error',
+					['message' => 'Not access'],
+					401
+				);
+			break;
+			case 404:
+				return View::error(
+					'error',
+					['message' => 'Not found'],
+					404
+				);
+			break;
+			case 405:
+				return View::error(
+					'error',
+					['message' => 'Method not allowed'],
+					405
+				);
+			break;
+			case 500:
+				return View::error(
+					'error',
+					['message' => 'Internal Server Error'],
+					500
+				);
+			break;
+			default:
+				return View::error(
+					'error',
+					['message' => 'Unkown error'],
+					500
+				);
+		}
+		
 	});
-	
-	// 500
-	Exception::declare(500,function(){
-		return View::error(
-			'error',
-			['message'=>'Internal Server Error'],
-			500
-		);
-	});
-	
+
 	Exception::declare('validate',function($errors){
 		$list = [];
 		foreach($errors as $error)
-			$list[$error['name']] = 'field '.$error['name'].' must be '.implode(' | ', $error['access']);
+			$list[] = trans('validate.'.$error['method'], ['field' => $error['field'], 'params' => implode(',', $error['params'])]);
 		return redirect()->back()->withErrors($list);
 	});
 	
