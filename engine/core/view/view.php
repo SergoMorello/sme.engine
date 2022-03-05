@@ -6,8 +6,6 @@ use SME\Core\Exception;
 
 class View extends Compiler {	
 	
-	const dirVSys = ENGINE.'view/';
-
 	private static $shareVars = [];
 
 	public function __destruct() {
@@ -21,73 +19,55 @@ class View extends Compiler {
 		self::$shareVars[$name] = $value;
 	}
 
+	private static function getViewPath($view, $system = false) {
+		$view = str_replace(".", "/", $view);
+		$path = $system ? SVIEW : VIEW;
+		if ($isPHP = is_file($path.$view.".php") || $isHTML = is_file($path.$view.".html")) {
+			$ext = '';
+			if (isset($isHTML))
+				$ext = 'html';
+			if (isset($isPHP))
+				$ext = 'php';
+			return (object)[
+				'dir' => $path,
+				'view' => $view,
+				'file' => $view.'.'.$ext,
+				'full' => $path.$view.'.'.$ext,
+				'ext' => $ext
+			];
+		}
+		return '';
+	}
+
+	private static function getView($view, $system = false) {
+		if ($result = self::getViewPath($view, $system)) {
+			return (object)[
+				'path' => $result,
+				'data' => file_get_contents($result->full)
+			];
+		}
+	}
+
 	private function addView($view, $data = array(), $system = false) {
 
-		$view = str_replace(".","/",$view);
-		$pathV = $system ? self::dirVSys : self::dirV;
-		
-		if ($isPHP = file_exists($pathV.$view.".php") || $isHTML = file_exists($pathV.$view.".html")) {
-			if (isset($isHTML))
-				return file_get_contents($pathV.$view.'.html');
+		if ($result = self::getView($view, $system)) {
+			if ($result->path->ext == 'html')
+				return $result->data;
 
 			foreach(self::$shareVars as $nameVar => $valueVar)
 				$data[$nameVar] = $valueVar;
 
-			$cacheViewPath = self::dirCompiler.md5($pathV.$view);
+			$cacheViewPath = self::dirCompiler.md5($result->path->dir . $result->path->view);
 			
-			if (Compiler::genCache($view,$pathV))
+			if (Compiler::genCache($result->path->view, $result->path->dir))
 				file_put_contents(
 					$cacheViewPath,
-					Compiler::compile(file_get_contents($pathV.$view.'.php'))
+					Compiler::compile(file_get_contents($result->path->full))
 				);
-			
-			$errors = function() {
-				return (new class{
-					private static $fields = [];
 
-					public function __construct() {
-						if ($errors = session('__withErrors')) {
-							foreach($errors as $error => $access)
-								$this->{$error} = $access;
-						}
-					}
-
-					private function errors() {
-						return get_object_vars($this);
-					}
-					
-					public function has($name) {
-						return empty($this->first($name)) ? false : true;
-					}
-
-					public function count() {
-						return count($this->errors());
-					}
-
-					public function first($name) {
-						if (!count($this->errors()))
-							return '';
-						if (isset(self::$fields[$name]))
-							return self::$fields[$name];
-						foreach($this->errors() as $error) {
-							if ($error['field'] == $name)
-								return self::$fields[$name] = $error['message'];
-						}
-						return '';
-					}
-
-					public function any() {
-						return count($this->errors()) ? true : false;
-					}
-
-					public function all() {
-						return $this->errors();
-					}
-				});
-			};
 			
 			$connect = function($__file, $__data, $__system, $__errors) {
-				$errors = $__errors();
+				$errors = new Errors;
 				
 				if (count($__data)>0)
 					extract($__data);
@@ -107,13 +87,17 @@ class View extends Compiler {
 				Exception::throw($e);
 			}
 		}else
-			throw new \Exception('View \''.$view.'\' not found',1);
+			throw new Exception('View \''.$view.'\' not found', 1);
 	}
 	
-	public static function show($page, $data = []) {
-		return Response::make((new self)->addView($page, $data))->code(200);
+	public static function make($view, $data = []) {
+		return Response::make((new self)->addView($view, $data))->code(200);
 	}
 	
+	public static function exists($view) {
+		return !empty(self::getViewPath($view));
+	}
+
 	public static function error($page, $props = [], $code = 500) {
 		while(ob_list_handlers())
 			ob_end_clean();

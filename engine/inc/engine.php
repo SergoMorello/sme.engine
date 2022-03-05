@@ -14,6 +14,7 @@ return [
 		'model/model',
 		'controllerCore',
 		'view/e',
+		'view/errors',
 		'view/compiler',
 		'view/view',
 		'response/responseObject',
@@ -33,7 +34,7 @@ return [
 		'log',
 	],
 	'ENGINE' => [
-		'http/request',
-		'http/response'
+		'support/app',
+		'support/http'
 	]
 ];

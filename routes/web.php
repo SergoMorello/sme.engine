@@ -6,7 +6,7 @@ Route::get("/doc","main@doc")->name('doc');
 Route::group(['prefix' => 'test'], function(){
 	
 	Route::get('/', function(){
-		return View('test');
+		return \SME\Support\View::make('test');
 	})->name('test');
 	Route::post('/submit', function(){
 		SME\Core\Request\Request::validate([

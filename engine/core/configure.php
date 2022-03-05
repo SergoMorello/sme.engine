@@ -149,7 +149,11 @@ Exception::make(null, function($exception){
 		return log::error($exception->getMessage()."
 				\r\non line: ".$exception->getLine().' in '.$exception->getFile()
 			);
-	if (Config::get('app.debug') && $exception->getCode()==0) {
+	if ($exception->getCode()==1)
+		return View::error('error', [
+			'message' => $exception->getMessage()
+		]);
+	if (Config::get('app.debug')) {
 		$sourceLines = function($file) {
 			return explode(PHP_EOL,file_get_contents($file));
 		};
