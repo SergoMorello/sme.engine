@@ -15,6 +15,10 @@ class File {
 		return file_get_contents($this->tmp_name);
 	}
 
+	public function getHash($algo = 'md5') {
+		return hash_file($algo, $this->tmp_name);
+	}
+
 	public function getExtension() {
 		return substr($this->name, strrpos($this->name, '.') + 1);
 	}

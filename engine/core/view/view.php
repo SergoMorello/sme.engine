@@ -22,6 +22,7 @@ class View extends Compiler {
 	private static function getViewPath($view, $system = false) {
 		$view = str_replace(".", "/", $view);
 		$path = $system ? SVIEW : VIEW;
+		
 		if ($isPHP = is_file($path.$view.".php") || $isHTML = is_file($path.$view.".html")) {
 			$ext = '';
 			if (isset($isHTML))
@@ -66,7 +67,7 @@ class View extends Compiler {
 				);
 
 			
-			$connect = function($__file, $__data, $__system, $__errors) {
+			$connect = function($__file, $__data, $__system) {
 				$errors = new Errors;
 				
 				if (count($__data)>0)
@@ -81,7 +82,7 @@ class View extends Compiler {
 			
 			try {
 				
-				return $connect($cacheViewPath, $data, $system, $errors);
+				return $connect($cacheViewPath, $data, $system);
 				
 			} catch (\Throwable $e) {
 				Exception::throw($e);

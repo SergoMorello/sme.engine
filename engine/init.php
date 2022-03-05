@@ -1,5 +1,7 @@
 <?php
-
+ini_set('error_reporting', E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
 define('ROOT',realpath(__DIR__ .'/..').'/');
 define('ROUTES',ROOT.'/routes/');
 define('APP',ROOT.'/app/');
@@ -13,7 +15,7 @@ define('STORAGE',ROOT.'/storage/');
 define('LOGS',ROOT.'/storage/.logs/');
 define('ENGINE',ROOT.'/engine/');
 define('CORE',ROOT.'/engine/core/');
-define('SVIEW',ROOT.'/engine/View/');
+define('SVIEW',ROOT.'/engine/view/');
 define('ENGINE_EXCEPTIONS',ROOT.'/engine/exceptions/');
 define('MODULES',ROOT.'/engine/modules/');
 define('HELPERS',ROOT.'/engine/helpers/');

@@ -9,7 +9,7 @@ class Exception extends \Exception {
 
 	public static function throw($arg) {
 		$handler = new \App\Exceptions\handlerException;
-
+		
 		App::__return($handler->render(request(), $arg));
 	}
 	

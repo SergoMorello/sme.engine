@@ -16,6 +16,8 @@ class Lang {
 		}
 		if (is_array($tempGet))
 			return $string;
+		if (isset($obj->data['attributes']) && is_array($obj->data['attributes']))
+			return self::setParams($tempGet, $params, $obj->data['attributes']);
 		return self::setParams($tempGet, $params);
 	}
 
@@ -33,8 +35,10 @@ class Lang {
 		];
 	}
 
-	private static function setParams($string, $params) {
+	private static function setParams($string, $params, $replace = []) {
 		foreach($params as $key => $value) {
+			if (isset($replace[$value]))
+				$value = $replace[$value];
 			$string = str_ireplace(':'.$key, $value, $string);
 		}
 		return $string;
