@@ -85,7 +85,7 @@ class httpResponse {
 		}
 		if (count($this->error())>0) {
 			if (is_null($callback))
-				throw new \SME\Core\Exceptions\HttpClient([
+				throw new \SME\Exceptions\HttpClient([
 					 'message' => 'HTTP Client: '.(explode("):",$this->error()['message'])[1] ?? $this->error()['message']),
 					 'lines' => ['URL: '.$this->_url,'Response: '.$this->body()]]);
 				

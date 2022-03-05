@@ -6,7 +6,6 @@ Route::get("/doc","main@doc")->name('doc');
 Route::group(['prefix' => 'test'], function(){
 	
 	Route::get('/', function(){
-		
 		return View('test');
 	})->name('test');
 	Route::post('/submit', function(){

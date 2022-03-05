@@ -164,7 +164,7 @@ Exception::make(null, function($exception){
 });
 
 // Validate
-Exception::make(\SME\Core\Exceptions\Validate::class, function($exception){ 
+Exception::make(\SME\Exceptions\Validate::class, function($exception){ 
 	$list = [];
 	foreach($exception->getErrors() as $parentError) {
 		foreach($parentError as $error)
@@ -176,7 +176,7 @@ Exception::make(\SME\Core\Exceptions\Validate::class, function($exception){
 });
 
 // Http
-Exception::make(\SME\Core\Exceptions\Http::class, function($exception){
+Exception::make(\SME\Exceptions\Http::class, function($exception){
 	switch($exception->getHttpCode()){
 		case 401:
 			if (App::isConsole())
@@ -226,7 +226,7 @@ Exception::make(\SME\Core\Exceptions\Http::class, function($exception){
 	
 });
 
-Exception::make(\SME\Core\Exceptions\HttpClient::class, function($exception){
+Exception::make(\SME\Exceptions\HttpClient::class, function($exception){
 	$e = $exception->getMessage();
 	if (App::isConsole())
 		return Log::error($e['message']."
@@ -239,7 +239,7 @@ Exception::make(\SME\Core\Exceptions\HttpClient::class, function($exception){
 	]);
 });
 
-Exception::make(\SME\Core\Exceptions\Console::class, function($exception){
+Exception::make(\SME\Exceptions\Console::class, function($exception){
 	$e = $exception->getErrors();
 	$routes = [];
 	foreach($e['routes'] as $route)
@@ -249,7 +249,7 @@ Exception::make(\SME\Core\Exceptions\Console::class, function($exception){
 	);
 });
 
-Exception::make(\SME\Core\Exceptions\Database::class, function($exception){
+Exception::make(\SME\Exceptions\Database::class, function($exception){
 	return View::error('error',[
 			'message' => $exception->getMessage()
 		]);

@@ -19,6 +19,10 @@ class Response {
 			throw new \Exception("In response object method \"".$name."\" not found", 1);
 	}
 
+	public function __invoke($content, $code = 200) {
+		return self::make($content, $code);
+	}
+
 	public static function make($content, $code = 200) {
 		$response = new ResponseObject([
 			'content' => $content,

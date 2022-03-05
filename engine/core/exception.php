@@ -1,7 +1,7 @@
 <?php
 namespace SME\Core;
 
-use SME\Core\Exceptions\Http;
+use SME\Exceptions\Http;
 
 class Exception extends \Exception {
 	

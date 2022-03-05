@@ -134,7 +134,7 @@ class Request extends Core {
 							'message' => trans('validate.'.$error['method'], ['field' => $error['field'], 'params' => implode(',', $error['params'])])
 						];
 				}
-				throw new \SME\Core\Exceptions\Validate($validateErr, $validateErrMessages);
+				throw new \SME\Exceptions\Validate($validateErr, $validateErrMessages);
 			}	
 		}
 	}

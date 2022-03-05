@@ -22,7 +22,6 @@ return [
 		'route/route',
 		'route/console',
 		'exception',
-		'exceptions',
 		'middleware',
 		'request/validateIs',
 		'request/validate',
@@ -33,52 +32,8 @@ return [
 		'lang',
 		'log',
 	],
-	'MODULES' => [
-		//Http client
-		'httpClient/httpInc',
-		'httpClient/http',
-		'httpClient/httpResponse',
-		'httpClient/httpRequest',
-
-		//Cacher
-		'cache/cache',
-		'cache/helper',
-
-		//Storage
-		'storage/storage',
-
-		//Cookie
-		'cookie/cookie',
-		'cookie/helper',
-
-		//Session
-		'session/session',
-		'session/helper',
-
-		//Redirect
-		'redirect/redirect',
-		'redirect/helper',
-
-		//Compressor
-		'compressor/compressor',
-		'compressor/helper'
-	],
-	'HELPERS' => [
-		'app',
-		'base_path',
-		'env',
-		'config',
-		'e',
-		'trans',
-		'view',
-		'response',
-		'dd',
-		'route',
-		'request',
-		'abort',
-		'asset',
-		'old',
-		'log',
-		'is'
+	'ENGINE' => [
+		'http/request',
+		'http/response'
 	]
 ];
