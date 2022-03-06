@@ -20,12 +20,12 @@ class Exception extends \Exception {
 		if (!$exception instanceof ExceptionError) {
 			try {
 				if (App::include('app.Exceptions.handlerException'))
-					return (new \App\Exceptions\handlerException)->render(Request::class, $exception);
+					App::__return((new \App\Exceptions\handlerException)->render(request(), $exception));
 			} catch (\Throwable $e) {
 				throw new ExceptionError($e->getMessage(), $e->getFile(), $e->getLine());
 			}
 		}
-		(new self)->render(Request::class, $exception);
+		App::__return((new self)->render(request(), $exception));
 	}
 	
 	public static function abort($code, $props = []) {
