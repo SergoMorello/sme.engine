@@ -4,7 +4,7 @@ namespace SME\Exceptions;
 use SME\Core\Exception as _Exception;
 
 class Exception extends \Exception {
-	private $name, $errors;
+	protected $name, $errors;
 	public function __construct($message = '', $errors = []) {
 		$this->message = $message;
 		$this->errors = $errors;

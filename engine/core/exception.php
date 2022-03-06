@@ -7,6 +7,13 @@ class Exception extends \Exception {
 	
 	private static $exceptions = [], $exceptionName = '';
 
+	public static function __init() {
+		set_exception_handler([self::class, 'throw']);
+		set_error_handler(function($errno, $errstr, $errfile, $errline, $errcontext){
+			throw new \SME\Exceptions\Error($errstr, 0, $errfile, $errline);
+		});
+	}
+
 	public static function throw($arg) {
 		$handler = new \App\Exceptions\handlerException;
 		

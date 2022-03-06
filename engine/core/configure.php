@@ -1,10 +1,10 @@
 <?php
 namespace SME\Core;
 
-use SME\Core\Route\console;
-use SME\Core\View\compiler;
-use SME\Core\View\view;
-use SME\Core\Request\request;
+use SME\Core\Route\Console;
+use SME\Core\View\Compiler;
+use SME\Core\View\View;
+use SME\Core\Request\Request;
 
 if (App::isConsole()) {
 	ini_set('default_charset','UTF-8');
@@ -18,9 +18,6 @@ if (App::isConsole()) {
 }
 
 // Init
-App::singleton('path.public', function(){
-	return base_path('public');
-});
 
 Env::init();
 

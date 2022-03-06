@@ -32,6 +32,15 @@ class App extends Core {
 
 		self::$dev = $dev;
 
+		self::singleton('path.public', function(){
+			return base_path('public');
+		});
+
+		if (self::isDev() && self::checkPublicDir())
+			return false;
+
+		Exception::__init();
+
 		$this->checkFolders();
 
 		$this->autoload();
@@ -164,23 +173,14 @@ class App extends Core {
 
 	public static function include($name) {
 		$name = str_replace(['.','\\'],'/',$name);
-		try {
-			if (file_exists(ROOT.$name.'.php')) {
-				return self::$include[$name] = self::$include[$name] ?? require_once(ROOT.$name.'.php');
-			}
-		} catch (\Throwable $e) {
-			Exception::throw($e);
+		if (file_exists(ROOT.$name.'.php')) {
+			return self::$include[$name] = self::$include[$name] ?? require_once(ROOT.$name.'.php');
 		}
 	}
 
 	private function defaultService($method) {
-		try {
-			if (method_exists($this->appService, $method))
-				$this->appService->$method();
-			
-		} catch (\Throwable $e) {
-			Exception::throw($e);
-		}
+		if (method_exists($this->appService, $method))
+			$this->appService->$method();	
 	}
 
 	public static function __return($result) {
@@ -189,9 +189,6 @@ class App extends Core {
 	}
 
 	private function run() {
-
-		if (self::isDev() && self::checkPublicDir())
-			return false;
 
 		$route = \Route::getRoute();
 		
@@ -223,15 +220,11 @@ class App extends Core {
 			return Middleware::check($route['middleware'] ?? null, $return, new request);
 		};
 
-		try {
-			$callback = $routeCallback($route);
-			self::__return(call_user_func_array(
-				$callback->call, 
-				array_values($callback->props)
-			));
-			
-		} catch (\Throwable $e) {
-			Exception::throw($e);
-		}
+		$callback = $routeCallback($route);
+		self::__return(call_user_func_array(
+			$callback->call, 
+			array_values($callback->props)
+		));
+
 	}
 }
