@@ -4,7 +4,7 @@ namespace SME\Core\Model;
 class ModelObject extends ModelCore {
 	public function __construct($result=[]) {
 		$this->setVars($result);
-		ModelSql::clearQuery();
+		//ModelSql::clearQuery();
 	}
 
 	private function setVars($result) {
@@ -12,6 +12,10 @@ class ModelObject extends ModelCore {
 			foreach($result as $key => $value)
 				$this->$key = $value; 
 		}
+	}
+
+	public function first() {
+		return get_object_vars($this)[0] ?? null;
 	}
 
 	public function count() {

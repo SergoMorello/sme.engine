@@ -68,7 +68,8 @@ abstract class RouteCore extends Core {
 	}
 	
 	public static function getProps($var=null) {
-		return is_null($var) ? self::$props : (is_string($var) ? self::$props[$var] ?? null : self::$props);
+		$return = is_null($var) ? self::$props : (is_string($var) ? self::$props[$var] ?? null : self::$props);
+		return empty($return) ? null : $return;
 	}
 	
 	private static function setCurrent($route) {

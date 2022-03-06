@@ -52,6 +52,7 @@ class View extends Compiler {
 	private function addView($view, $data = array(), $system = false) {
 
 		if ($result = self::getView($view, $system)) {
+			
 			if ($result->path->ext == 'html')
 				return $result->data;
 
@@ -75,7 +76,7 @@ class View extends Compiler {
 						
 				ob_start();
 				
-				require_once($__file);
+				require($__file);
 				
 				return ob_get_clean();
 			};

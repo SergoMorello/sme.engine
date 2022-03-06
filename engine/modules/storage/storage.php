@@ -58,7 +58,7 @@ class Storage extends Core {
 	
 	public static function path($name) {
 		if (self::exists($name))
-			return STORAGE.self::getDisk()->path.'/';
+			return STORAGE.self::getDisk()->path.'/'.$name;
 	}
 	
 	public static function delete($name) {
