@@ -1,7 +1,9 @@
 <?php
 namespace SME\Core;
 
+use SME\Exceptions\ExceptionError;
 use SME\Exceptions\Http;
+use SME\Core\Request\Request;
 
 class Exception extends \Exception {
 	
@@ -14,10 +16,16 @@ class Exception extends \Exception {
 		});
 	}
 
-	public static function throw($arg) {
-		$handler = new \App\Exceptions\handlerException;
-		
-		App::__return($handler->render(request(), $arg));
+	public static function throw($exception) {
+		if (!$exception instanceof ExceptionError) {
+			try {
+				if (App::include('app.Exceptions.handlerException'))
+					return (new \App\Exceptions\handlerException)->render(Request::class, $exception);
+			} catch (\Throwable $e) {
+				throw new ExceptionError($e->getMessage(), $e->getFile(), $e->getLine());
+			}
+		}
+		(new self)->render(Request::class, $exception);
 	}
 	
 	public static function abort($code, $props = []) {
