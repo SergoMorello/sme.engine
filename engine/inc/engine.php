@@ -20,6 +20,7 @@ return [
 		'response/responseObject',
 		'response/response',
 		'route/routeCore',
+		'route/route_object',
 		'route/route',
 		'route/console',
 		'exception',

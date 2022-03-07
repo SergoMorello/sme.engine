@@ -3,6 +3,7 @@
 return [
 	'HELPERS' => [
 		'app',
+		'array_key_last',
 		'base_path',
 		'env',
 		'config',

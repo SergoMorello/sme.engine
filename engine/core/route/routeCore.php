@@ -6,7 +6,11 @@ use SME\Core\Core;
 
 abstract class RouteCore extends Core {
 	
-	protected static $routes = [], $props = [], $groupProps = [], $current = [];
+	protected static $routes = [],
+		$props = [],
+		$groupProps = [],
+		$groupStaticProps = [],
+		$current = [];
 	
 	protected $route;
 
@@ -27,27 +31,38 @@ abstract class RouteCore extends Core {
 	protected static function __instConsole() {
 		App::include('routes.console');
 	}
-
 	
-	public function name($name) {
-		$this->route['name'] = $name;
-		return $this;
-	}
+	// public function name($name) {
+	// 	$this->route['name'] = $name;
+	// 	return $this;
+	// }
 	
-	public function middleware($name) {
-		$this->route['middleware'] = (is_array($name) ? $name : [$name]);
-		return $this;
-	}
+	// public function middleware($name) {
+	// 	$this->route['middleware'] = (is_array($name) ? $name : [$name]);
+	// 	return $this;
+	// }
 	
-	public function where($where) {
-		$this->route['where'] = $where;
-		return $this;
-	}
+	// public function where($where) {
+	// 	$this->route['where'] = $where;
+	// 	return $this;
+	// }
 	
-	public static function group($params, $callback) {
-		self::$groupProps[] = $params;
+	public static function group(...$arg) {
+		$callback = null;
+		$params = self::$groupStaticProps;
+		if (is_callable($arg[0] ?? null))
+			$callback = $arg[0];
+		if (is_array($arg[0] ?? null) && is_callable($arg[1] ?? null)) {
+			$callback = $arg[1];
+			$params = $arg[0];
+		}
+		
+		if (is_null($callback))
+			return;
+		if (!is_null($params))
+			self::$groupProps[] = $params;
 		$callback();
-		unset(self::$groupProps[count(self::$groupProps) - 1]);
+		unset(self::$groupProps[array_key_last(self::$groupProps)]);
 	}
 	
 	public static function __list($method = '') {
@@ -88,6 +103,8 @@ abstract class RouteCore extends Core {
 						$params['middleware'][] = $middleware;
 					}
 				}
+				if (isset($gp['name']))
+					$params['name'] = $gp['name'].($params['name'] ?? '');
 			}
 		}
 		
@@ -123,7 +140,7 @@ abstract class RouteCore extends Core {
 	} 
 
 	public static function getRoute() {
-		$routes = self::$routes;
+		$routes = self::getRoutes();
 		
 		$allowChars = '0-9A-Za-z.-';
 		$urlMatch = function($url) use (&$allowChars) {
@@ -140,7 +157,7 @@ abstract class RouteCore extends Core {
 				'\\1(['.$allowChars.']{0,})|\\1'
 			],$url);
 		};
-		if ($routes)
+		if (count($routes))
 			foreach($routes as $route) {
 				$request = Core::request();
 

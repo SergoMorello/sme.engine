@@ -1,7 +1,34 @@
 <?php
+
 Route::get("/","main@index")->name('home');
 
 Route::get("/doc","main@doc")->name('doc');
+
+
+Route::prefix('test')->name('ddddd.')->group(function(){
+	Route::get('/bb', function(){
+		return 'bb';
+	})->name('arrrr');
+});
+
+
+Route::group([], function(){
+	Route::group(['prefix' => 'tt'], function(){
+		Route::get('/bb', function(){
+			return 'bb';
+		});
+		Route::group(['prefix' => 'vv'], function(){
+			Route::get('/cc', function(){
+				return 'bb';
+			});
+		});
+	});
+	Route::get('/aa', function(){
+		return \SME\Support\View::make('test');
+	})->name('test');
+});
+
+
 
 Route::group(['prefix' => 'test'], function(){
 	
