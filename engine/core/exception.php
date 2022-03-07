@@ -29,7 +29,7 @@ class Exception extends \Exception {
 	}
 	
 	public static function abort($code, $props = []) {
-		die(self::throw(new Http("abort", $code)));
+		die(self::throw(new Http("http ".$code, $code)));
 	}
 	
 	public static function make($class, $closure) {

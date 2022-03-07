@@ -3,9 +3,12 @@ namespace SME\Core\Model;
 
 class ModelMethods extends ModelSql {
 	public function __init($table) {
-		self::clearQuery();
 		$this->setTableName($table);
 		return $this;
+	}
+
+	public function __construct() {
+		$this->__query = (object)[];
 	}
 
 	public function __sql() {
@@ -44,9 +47,9 @@ class ModelMethods extends ModelSql {
 
 	public function save() {
 		$modelObject = new modelObject($this);
-		$vars = get_object_vars($this);
+		$vars = $this->getVars($this);
 		
-		if (get_object_vars(self::$__query)) {
+		if (get_object_vars($this->__query)) {
 			$arrQuery = $this->getValues($vars);
 			self::dblink()->query("UPDATE `".$this->getTableName()."` SET ".implode(",",$arrQuery)." WHERE ".$this->srtWhere());
 		}else{
@@ -67,9 +70,8 @@ class ModelMethods extends ModelSql {
 	}
 
 	public function delete() {
-		if (self::$__query) {
-			$ret = self::dblink()->query("DELETE FROM `".$this->getTableName()."`".(count(self::$__query->where) ? " WHERE " : NULL).$this->srtWhere());
-			$this->clearQuery();
+		if ($this->__query) {
+			$ret = self::dblink()->query("DELETE FROM `".$this->getTableName()."`".(count($this->__query->where) ? " WHERE " : NULL).$this->srtWhere());
 			return $ret;
 		}
 		return $this;

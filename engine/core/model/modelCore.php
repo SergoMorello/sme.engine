@@ -49,7 +49,10 @@ class ModelCore extends Core {
     }
 
 	protected static function value($value) {
-		return (is_object($value) && method_exists($value, 'getValue')) ? $value->getValue() : "'".$value."'";
+		if (is_string($value) || is_numeric($value))
+			return "'".$value."'";
+		if (is_object($value) && method_exists($value, 'getValue'))
+			return $value->getValue();
 	}
 
 	protected static function values($split, $values) {
