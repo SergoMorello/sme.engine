@@ -309,7 +309,7 @@ if (App::isConsole()) {
 	});
 
 	\Console::command("make:{func} {name?}",function($func, $name) {
-
+		dd($name);
 		Request::validate([
 			'name' => [
 				'required',
@@ -325,16 +325,20 @@ if (App::isConsole()) {
 			$splitPath = explode('/', $name);
 			$fileName = end($splitPath);
 			
-			if (count($splitPath) > 1)
-				array_pop($splitPath);
 			$returnClass = '';
-			foreach($splitPath as $dir) {
-				$path = $returnPath.$dir;
-				$returnPath .= '/'.$dir;
-				$returnClass .= '\\'.$dir;
-				if (!is_dir($path))
-					mkdir($returnPath);
+			if (count($splitPath) > 1) {
+				array_pop($splitPath);
+				foreach($splitPath as $dir) {
+					if (empty($dir))
+						continue;
+					$path = $returnPath.$dir;
+					$returnPath .= '/'.$dir;
+					$returnClass .= '\\'.$dir;
+					if (!is_dir($path))
+						mkdir($returnPath);
+				}
 			}
+	
 			return (object)[
 				'path' => $returnPath.'/',
 				'class' => $returnClass,

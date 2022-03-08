@@ -172,7 +172,7 @@ abstract class RouteCore extends Core {
 					return self::setCurrent($route);
 				
 				//Определяем нужный маршрут
-				if (preg_match('/\s'.$urlMatch($route['url']).'[\/|]{0,}\s/is', ' '.$request->get.' ', $matchUrl)) {
+				if (preg_match('/\A'.$urlMatch($route['url']).'[\/|]{0,}\Z/is', $request->get, $matchUrl)) {
 					
 					//Получаем названия переменных из маршрута
 					if (preg_match_all("/\{(.*)\}/isU", $route['url'], $matchVars)) {

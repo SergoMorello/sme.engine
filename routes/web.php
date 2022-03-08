@@ -33,6 +33,8 @@ Route::group([], function(){
 Route::group(['prefix' => 'test'], function(){
 	
 	Route::get('/', function(){
+		$url = '/test/234/ff';
+		//return preg_replace(['/\/test\/(.*)\/ff/'],['\\1'],$url);
 		return \SME\Support\View::make('test');
 	})->name('test');
 	Route::post('/submit', function(){
@@ -45,12 +47,9 @@ Route::group(['prefix' => 'test'], function(){
 		}
 		return redirect()->route('test');
 	})->name('submit');
-	// Route::get('/post', function(){
-	// 	Request::validate([
-	// 		'test' => 'size:2'
-	// 	]);
-	// 	$res = Request::input('test');
-	// 	dd($res);
-	// });
+	Route::get('/post/{id}-{df?}', function(){
+		$tst = \SME\http\Request::route('id');
+		dd($tst);
+	});
 	
 });
