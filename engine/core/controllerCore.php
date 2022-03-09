@@ -1,6 +1,8 @@
 <?php
 namespace SME\Core;
 
+use SME\Core\Route\RouteCore;
+
 class ControllerCore extends Core {
 	
 	private static $model;
@@ -11,7 +13,9 @@ class ControllerCore extends Core {
 
 	public static function __init() {
 		App::include('app.Controllers.Controller');
-		foreach(\Route::getRoutes() as $page)
+		foreach(RouteCore::getRoutes() as $page)
+			if (!$page)
+				continue;
 			if (!is_callable($page['callback'])) {
 				App::include(self::getPath($page['callback']->controller, 'app.controllers'));
 			}

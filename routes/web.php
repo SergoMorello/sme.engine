@@ -5,36 +5,9 @@ Route::get("/","main@index")->name('home');
 Route::get("/doc","main@doc")->name('doc');
 
 
-Route::prefix('test')->name('ddddd.')->group(function(){
-	Route::get('/bb', function(){
-		return 'bb';
-	})->name('arrrr');
-});
-
-
-Route::group([], function(){
-	Route::group(['prefix' => 'tt'], function(){
-		Route::get('/bb', function(){
-			return 'bb';
-		});
-		Route::group(['prefix' => 'vv'], function(){
-			Route::get('/cc', function(){
-				return 'bb';
-			});
-		});
-	});
-	Route::get('/aa', function(){
-		return \SME\Support\View::make('test');
-	})->name('test');
-});
-
-
-
 Route::group(['prefix' => 'test'], function(){
 	
 	Route::get('/', function(){
-		$url = '/test/234/ff';
-		//return preg_replace(['/\/test\/(.*)\/ff/'],['\\1'],$url);
 		return \SME\Support\View::make('test');
 	})->name('test');
 	Route::post('/submit', function(){
@@ -49,7 +22,7 @@ Route::group(['prefix' => 'test'], function(){
 	})->name('submit');
 	Route::get('/post/{id}-{df?}', function(){
 		$tst = \SME\http\Request::route('id');
-		dd($tst);
+		//dd($tst);
 	});
 	
 });

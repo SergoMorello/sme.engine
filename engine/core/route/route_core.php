@@ -4,20 +4,30 @@ namespace SME\Core\Route;
 use SME\Core\App;
 use SME\Core\Core;
 
-abstract class RouteCore extends Core {
+class RouteCore extends Core {
 	
-	protected static $routes = [],
+	private static $routes = [],
 		$props = [],
 		$groupProps = [],
-		$groupStaticProps = [],
 		$current = [];
 	
-	protected $route;
+	protected $route, $group;
+
+	public function __destruct() {
+		$this->saveRoute();
+	}
+
+	public static function __init() {
+		if (App::isConsole())
+			self::__instConsole();
+		else
+			self::__instHttp();
+	}
 
 	protected static function __instHttp() {
 		App::include('routes.web');
 
-		self::group(['prefix' => 'api', 'middleware' => 'api'], function() {
+		\Route::group(['prefix' => 'api', 'middleware' => 'api'], function() {
 			App::include('routes.api');
 		});
 		return (object)[
@@ -32,24 +42,9 @@ abstract class RouteCore extends Core {
 		App::include('routes.console');
 	}
 	
-	// public function name($name) {
-	// 	$this->route['name'] = $name;
-	// 	return $this;
-	// }
-	
-	// public function middleware($name) {
-	// 	$this->route['middleware'] = (is_array($name) ? $name : [$name]);
-	// 	return $this;
-	// }
-	
-	// public function where($where) {
-	// 	$this->route['where'] = $where;
-	// 	return $this;
-	// }
-	
-	public static function group(...$arg) {
+	public function group(...$arg) {
 		$callback = null;
-		$params = self::$groupStaticProps;
+		$params = $this->route;
 		if (is_callable($arg[0] ?? null))
 			$callback = $arg[0];
 		if (is_array($arg[0] ?? null) && is_callable($arg[1] ?? null)) {
@@ -93,6 +88,7 @@ abstract class RouteCore extends Core {
 	}
 	
 	protected function setRoute($params) {
+
 		if (count(self::$groupProps)) {
 			foreach(array_reverse(self::$groupProps) as $gp) {
 				if (isset($gp['prefix']))
@@ -111,8 +107,8 @@ abstract class RouteCore extends Core {
 		$params['callback'] = is_string($params['callback']) ? (function($callback) {
 			$split = explode("@",$callback);
 			return (object)[
-				'controller'=>$split[0],
-				'method'=>$split[1]
+				'controller' => $split[0],
+				'method' => $split[1] ?? ''
 			];
 		})($params['callback'])	: $params['callback'];
 		
@@ -120,9 +116,13 @@ abstract class RouteCore extends Core {
 			$params['system'] = true;
 		
 		$this->route = $params;
+		
+		return $this;
 	}
 	
 	protected function saveRoute() {
+		if (!isset($this->route['url']))
+			return;
 		self::$routes[] = $this->route;
 	}
 	
@@ -137,7 +137,7 @@ abstract class RouteCore extends Core {
 				$value = $var[1] ?? '';
 				$routeProps[$name] = $value;
 		}
-	} 
+	}
 
 	public static function getRoute() {
 		$routes = self::getRoutes();
@@ -154,7 +154,7 @@ abstract class RouteCore extends Core {
 				'\/',
 				'(['.$allowChars.']{1,})',
 				'[\/|]{0,1}(['.$allowChars.']{0,})',
-				'\\1(['.$allowChars.']{0,})|\\1'
+				'\\1(['.$allowChars.']{0,})|\s\\1'
 			],$url);
 		};
 		if (count($routes))
@@ -172,7 +172,7 @@ abstract class RouteCore extends Core {
 					return self::setCurrent($route);
 				
 				//Определяем нужный маршрут
-				if (preg_match('/\A'.$urlMatch($route['url']).'[\/|]{0,}\Z/is', $request->get, $matchUrl)) {
+				if (preg_match('/\s'.$urlMatch($route['url']).'[\/|\s]{0,}\s/is', ' '.$request->get.' ', $matchUrl)) {
 					
 					//Получаем названия переменных из маршрута
 					if (preg_match_all("/\{(.*)\}/isU", $route['url'], $matchVars)) {

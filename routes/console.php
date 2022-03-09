@@ -2,5 +2,5 @@
 //Route::console("command","main@index");
 
 Console::command('test', function(){
-	dd(app('path.public'));
+	//dd(app('path.public'));
 });

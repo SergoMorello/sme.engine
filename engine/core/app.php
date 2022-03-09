@@ -1,9 +1,10 @@
 <?php
 namespace SME\Core;
 
-use SME\Core\Request\request;
+use SME\Core\Request\Request;
 use SME\Core\Response\Response;
 use SME\Core\Response\ResponseObject;
+use SME\Core\Route\RouteCore;
 use SME\Core\Model\ModelCore;
 
 class App extends Core {
@@ -40,7 +41,7 @@ class App extends Core {
 			return false;
 
 		Exception::__init();
-
+		
 		$this->checkFolders();
 
 		$this->autoload();
@@ -59,7 +60,7 @@ class App extends Core {
 		
 		Request::__init();
 		
-		\Route::__init();
+		RouteCore::__init();
 		
 		ControllerCore::__init();
 		

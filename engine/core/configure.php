@@ -309,7 +309,6 @@ if (App::isConsole()) {
 	});
 
 	\Console::command("make:{func} {name?}",function($func, $name) {
-		dd($name);
 		Request::validate([
 			'name' => [
 				'required',
