@@ -309,6 +309,7 @@ if (App::isConsole()) {
 	});
 
 	\Console::command("make:{func} {name?}",function($func, $name) {
+	
 		Request::validate([
 			'name' => [
 				'required',
@@ -320,7 +321,7 @@ if (App::isConsole()) {
 		]);
 		
 		$getFoldersFile = function($name, $returnPath) {
-			$name = str_replace('.', '/', $name);
+			$name = str_replace(['.', '\\\\'], '/', $name);
 			$splitPath = explode('/', $name);
 			$fileName = end($splitPath);
 			

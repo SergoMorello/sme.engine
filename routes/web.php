@@ -20,9 +20,9 @@ Route::group(['prefix' => 'test'], function(){
 		}
 		return redirect()->route('test');
 	})->name('submit');
-	Route::get('/post/{id}-{df?}', function(){
-		$tst = \SME\http\Request::route('id');
-		//dd($tst);
+	Route::get('/post/{dd?}/{aa?}', function(){
+		$tst = \SME\http\Request::route('dd');
+		dd($tst);
 	});
 	
 });

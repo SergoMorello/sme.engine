@@ -139,24 +139,35 @@ class RouteCore extends Core {
 		}
 	}
 
-	public static function getRoute() {
-		$routes = self::getRoutes();
-		
-		$allowChars = '0-9A-Za-z.-';
-		$urlMatch = function($url) use (&$allowChars) {
+	private static function urlMatch($url) {
+		$allowChars = '0-9A-Za-z\\.\\-';
+		if (App::isConsole()) {
+			return preg_replace([
+				'`\{['.$allowChars.']{0,10}\}`is',
+				'`(.*)\{['.$allowChars.']{0,10}\?\}(.*)`isU'
+			],
+			[
+				'([\w\\\\\\\\]+)',
+				'\\1([\w\\\\\\\\]*)|\s'
+			],$url);
+		}	
+		else{
 			return preg_replace([
 				'`/`is',
-				'`\{['.$allowChars.']{0,10}\}`isU',
-				'`\\\/\{['.$allowChars.']{0,10}\?\}`isU',
-				'`([\s]{0,}){['.$allowChars.']{0,10}\?\}`isU'
+				'`\{['.$allowChars.']{0,10}\}`is',
+				'`\\\/\{['.$allowChars.']{0,10}\?\}`is'
 			],
 			[
 				'\/',
 				'(['.$allowChars.']{1,})',
-				'[\/|]{0,1}(['.$allowChars.']{0,})',
-				'\\1(['.$allowChars.']{0,})|\s\\1'
-			],$url);
-		};
+				'[\/|]{0,1}(['.$allowChars.']{0,})'
+			],$url).'[\/|\s]{0,}';
+		}	
+	}
+
+	public static function getRoute() {
+		$routes = self::getRoutes();
+		
 		if (count($routes))
 			foreach($routes as $route) {
 				$request = Core::request();
@@ -168,11 +179,11 @@ class RouteCore extends Core {
 				if ($request->props && !App::isConsole())
 					$route['props'] = $request->props;
 				
-				if ($request->get==$route['url'])
+				if ($request->get == $route['url'])
 					return self::setCurrent($route);
 				
 				//Определяем нужный маршрут
-				if (preg_match('/\s'.$urlMatch($route['url']).'[\/|\s]{0,}\s/is', ' '.$request->get.' ', $matchUrl)) {
+				if (preg_match('/\s'.self::urlMatch($route['url']).'\s/is', ' '.$request->get.' ', $matchUrl)) {
 					
 					//Получаем названия переменных из маршрута
 					if (preg_match_all("/\{(.*)\}/isU", $route['url'], $matchVars)) {
