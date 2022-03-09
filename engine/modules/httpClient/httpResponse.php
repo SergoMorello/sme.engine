@@ -1,4 +1,5 @@
 <?php
+namespace SME\Modules\HttpClient;
 
 class httpResponse {
 	
@@ -84,9 +85,9 @@ class httpResponse {
 		}
 		if (count($this->error())>0) {
 			if (is_null($callback))
-				exceptions::throw('httpError',[
-				'message'=>'HTTP Client: '.explode("):",$this->error()['message'])[1],
-				'lines'=>['URL: '.$this->_url,'Response: '.$this->body()]]);
+				throw new \SME\Exceptions\HttpClient([
+					 'message' => 'HTTP Client: '.(explode("):",$this->error()['message'])[1] ?? $this->error()['message']),
+					 'lines' => ['URL: '.$this->_url,'Response: '.$this->body()]]);
 				
 			if (is_callable($callback))
 				$callback($this, $this->error());

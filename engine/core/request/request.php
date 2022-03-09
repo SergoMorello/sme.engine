@@ -1,18 +1,27 @@
 <?php
-class request extends core {
-	
-	private static $_server, $_get, $_post, $_headers;
-	
-	public function __construct() {
-		self::$_server = $_SERVER;
-		self::$_get = core::guardData($_GET);
-		self::$_post = core::guardData($_POST);
-		self::$_headers = $this->getallheaders();
-	}
+namespace SME\Core\Request;
 
+use SME\Core\Core;
+use SME\Core\Exception;
+use SME\Modules\storage;
+
+use SME\Core\Request\Objects\Files;
+
+class Request extends Core {
+	
+	private static $_server, $_get, $_post, $_files, $_headers;
+	
+	public static function __init() {
+		self::$_server = $_SERVER;
+		self::$_get = Core::guardData($_GET);
+		self::$_post = Core::guardData($_POST);
+		self::$_files = $_FILES;
+		self::$_headers = self::getallheaders();
+	}
+	
 	public static function route($var) {
 		if (is_string($var))
-			return route::getProps($var);
+			return \Route::getProps($var);
 	}
 	
 	public static function server($var='') {
@@ -24,10 +33,15 @@ class request extends core {
 	}
 	
 	public static function all() {
-		return count(self::$_post)>0 ? self::$_post : (count(self::$_get)>0 ? self::$_get : (count($_FILES)>0 ? self::file : NULL));
+		return [
+			'post' => self::$_post,
+			'get' => self::$_get,
+			'route' => \Route::getProps(),
+			'files' => self::$_files
+		];
 	}
 
-	private function getallheaders() {
+	private static function getallheaders() {
 		$headers = [];
 		foreach (self::$_server as $name => $value) {
 			if (substr($name, 0, 5) == 'HTTP_') {
@@ -67,60 +81,13 @@ class request extends core {
 	}
 	
 	public static function file($var) {
-		if (!is_string($var))
+		if (!is_string($var) || !isset(self::$_files[$var]) || empty(self::$_files[$var]['tmp_name']) || (isset(self::$_files[$var]['tmp_name'][0]) && empty(self::$_files[$var]['tmp_name'][0])))
 			return;
-		return (new class($_FILES[$var]) {
-			public function __construct($file) {
-
-				foreach($file['name'] as $key=>$value) {
-					if (empty($value))
-						continue;
-					$this->$key = new class([
-						'name'=>$value,
-						'type'=>$file['type'][$key],
-						'tmp_name'=>$file['tmp_name'][$key],
-						'error'=>$file['error'][$key],
-						'size'=>$file['size'][$key]
-					]) {
-						public function __construct($props) {
-							foreach($props as $key=>$value)
-								$this->$key = $value;
-						}
-						public function getData() {
-							return file_get_contents($this->tmp_name);
-						}
-						public function getName() {
-							return $this->name;
-						}
-						public function getType() {
-							return $this->type;
-						}
-						public function getPath() {
-							return $this->tmp_name;
-						}
-						public function getError() {
-							return $this->error;
-						}
-						public function getSize() {
-							return $this->size;
-						}
-						public function store($path="",$disk="") {
-							return storage::disk($disk)->put($path.'/'.$this->name,$this->getData());
-						}
-						public function storeAs($path,$name,$disk="") {
-							return storage::disk($disk)->put($path.'/'.$name,$this->getData());
-						}
-					};
-				}
-			}
-			
-			
-		});
-		return (object)$file;
+		return new Files(self::$_files[$var]);
 	}
 	
 	public static function hasFile($var) {
-		if (isset($_FILES[$var]))
+		if (isset(self::$_files[$var]))
 			return true;
 		return false;
 	}
@@ -128,9 +95,11 @@ class request extends core {
 	public static function has($var) {
 		if (isset(self::$_post[$var]))
 			return true;
-		if (route::getProps($var))
+		if (\Route::getProps($var))
 			return true;
 		if (isset(self::$_get[$var]))
+			return true;
+		if (self::hasFile($var))
 			return true;
 		return false;
 	}
@@ -143,22 +112,30 @@ class request extends core {
 		if (!is_array($data))
 			return;
 
-		$arrErr = [];
-		foreach($data as $var=>$access)
-			if ($accessErr = validate::checkVar(
-								self::input($var) ?? self::route($var)
-									//isset(self::$_post[$var]) ? stripslashes(htmlspecialchars_decode(self::$_post[$var])) : (isset($_FILES[$var]) ? self::file($var) : NULL)
-								,$access))
-				$arrErr[] = [
-					'name' => $var,
-					'access' => $accessErr
-				];
+		$validateErr = [];
+		foreach($data as $var => $access) {
+			if ($validateResult = Validate::checkVar($var,
+				self::file($var) ?? self::input($var) ?? self::route($var)
+				,$access))
+				$validateErr[] = $validateResult;
+			
+		}
+			
 		
-		if (count($arrErr)) {
+		if (count($validateErr)) {
 			if ($return)
 				return true;
-			else
-				exceptions::throw('validate', $arrErr);
+			else{
+				$validateErrMessages = [];
+				foreach($validateErr as $parentError) {
+					foreach($parentError as $error)
+						$validateErrMessages[] = [
+							'field' => $error['field'],
+							'message' => trans('validate.'.$error['method'], ['field' => $error['field'], 'params' => implode(',', $error['params'])])
+						];
+				}
+				throw new \SME\Exceptions\Validate($validateErr, $validateErrMessages);
+			}	
 		}
 	}
 }

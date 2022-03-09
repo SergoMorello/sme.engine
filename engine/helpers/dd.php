@@ -1,4 +1,6 @@
 <?php
+use SME\Core\App;
+use SME\Core\View\view;
 function dd($data) {
 
 	$varDump = function($data = null) {
@@ -15,8 +17,8 @@ function dd($data) {
 		return $resVarDump;
 	};
 	
-	if (app::isConsole())
-		app::__return(var_dump($data));
+	if (App::isConsole())
+		App::__return(var_dump($data));
 	else
-		app::__return(view::error('dd', ['data'=>$varDumpView($data)]));
+		App::__return(View::error('dd', ['data'=>$varDumpView($data)]));
 }

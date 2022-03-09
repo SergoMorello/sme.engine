@@ -2,7 +2,7 @@
 
 function session($data=null) {
 	if (is_null($data))
-		return new session;
+		return new SME\Modules\session;
 	if (is_array($data)) {
 		foreach($data as $key=>$val)
 			$_SESSION[$key] = $val;

@@ -1,3 +1,3 @@
 <?php
 
-// route::get("/request","main@index");
+// Route::get("/request","main@index");

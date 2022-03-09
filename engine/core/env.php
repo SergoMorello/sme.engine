@@ -1,12 +1,20 @@
 <?php
+namespace SME\Core;
 
-class env extends core {
+use SME\Modules\Cache;
+
+class Env extends Core {
+
+	const cacheName = '__env';
 
 	private static $env;
 
 	public static function init() {
 		if (!file_exists(ROOT.'.env'))
 			die('.env not found');
+
+		if (Cache::has(self::cacheName)) 
+			return self::$env = Cache::get(self::cacheName);
 		
 		if ($file = file_get_contents(ROOT.'.env')) {
 			$list = explode(PHP_EOL,$file);
@@ -27,6 +35,15 @@ class env extends core {
 				self::$env[$key] = $value;
 			}
 		}
+		
+	}
+
+	public static function __cache() {
+		return Cache::put(self::cacheName, self::$env);
+	}
+
+	public static function __cacheClear() {
+		return Cache::forget(self::cacheName);
 	}
 
 	public static function get($name, $default = '') {

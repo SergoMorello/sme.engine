@@ -1,5 +1,10 @@
 <?php
-class compiler extends core {
+namespace SME\Core\View;
+
+use SME\Core\Core;
+use SME\Core\config;
+
+class compiler extends Core {
 
 	const dirCompiler = STORAGE.'.cache/compiler/';
 
@@ -7,14 +12,14 @@ class compiler extends core {
 
 	protected static function genCache($view, $dirV) {
 		
-		if (!file_exists(core::dirCache))
-					if (!mkdir(core::dirCache))
+		if (!file_exists(Core::dirCache))
+					if (!mkdir(Core::dirCache))
 						die('cache dir, error create');
 		if (!file_exists(self::dirCompiler))
 					if (!mkdir(self::dirCompiler))
 						die('cache dir, error create');
 		
-		if (config::get('app.debug'))
+		if (Config::get('app.debug'))
 			return 1;
 		
 		$cacheViewName = md5($dirV.$view);
@@ -59,7 +64,7 @@ class compiler extends core {
 
 	protected static function compile($buffer) {
 		
-		$buffer .= "\r\n";
+		$buffer .= PHP_EOL;
 		
 		$appendBuffer = "";
 		
@@ -90,37 +95,20 @@ class compiler extends core {
 			return $return;
 		};
 		
-		$convertSpec = [
-			[
-				'{',
-				'}',
-				'@',
-				':',
-				'$',
-				'<?',
-				'?>'
-			],
-			[
-				'&lcub;',
-				'&rcub;',
-				'&commat;',
-				'&colon;',
-				'&dollar;',
-				'&lt;&quest;',
-				'&quest;&rt;'
-			]
-		];
-		
-		$buffer = preg_replace_callback('/\@nc(.*)@endnc/isU', function($var) use (&$convertSpec){
-			return str_replace($convertSpec[0],$convertSpec[1],$var[1]);
+		$buffer = preg_replace_callback('/\@html(.*)@endhtml/isU', function($var) use (&$convertSpec){
+			return self::convertSpec($var[1])->encode();
 		}, $buffer);
 		
+		$buffer = preg_replace_callback('/\{\{\-\-(.*)\-\-\}\}/isU', function($var){
+			return "";
+		}, $buffer);
+
 		$buffer = preg_replace_callback('/\{\{(.*)\}\}/isU', function($var){
-			return "<?php echo htmlspecialchars(".$var[1]."); ?>";
+			return "<?php e(".$var[1].")->html(); ?>";
 		}, $buffer);
 		
 		$buffer = preg_replace_callback('/\{\!\!(.*)\!\!\}/isU', function($var){
-			return "<?php echo ".$var[1]."; ?>";
+			return "<?php e(".$var[1]."); ?>";
 		}, $buffer);
 		
 
@@ -131,7 +119,7 @@ class compiler extends core {
 				$args = (isset($var[3]) && $var[3]) ? $splitArg($var[3]) : [];
 				foreach(self::$arrCompilerView as $rule) {
 					if ($name == $rule['name']) {
-						if (count($args) <= (new ReflectionFunction($rule['return']))->getNumberOfParameters()) {
+						if (count($args) <= (new \ReflectionFunction($rule['return']))->getNumberOfParameters()) {
 							$args[] = &$append;		
 							return $rule['return'](...$args);
 						}
@@ -143,12 +131,50 @@ class compiler extends core {
 		}, $buffer);
 		
 		$buffer .= $appendBuffer ?? NULL;
-		
-		unset($convertSpec[0][5],$convertSpec[0][6],$convertSpec[1][5],$convertSpec[1][6]);
-		
-		$buffer = str_replace($convertSpec[1],$convertSpec[0],$buffer);
+
+		$buffer = self::convertSpec($buffer)->decode();
 		
 		return $buffer;
+	}
+
+	private static function convertSpec($buffer) {
+		return new class($buffer){
+			private $buffer, $spec;
+
+			public function __construct($buffer) {
+				$this->buffer = $buffer;
+				$this->spec = [
+					[
+						'{',
+						'}',
+						'@',
+						':',
+						'$',
+						'<?',
+						'?>'
+					],
+					[
+						'&lcub;',
+						'&rcub;',
+						'&commat;',
+						'&colon;',
+						'&dollar;',
+						'&lt;?',
+						'?&gt;'
+					]
+				];
+			}
+
+			public function encode() {
+				return str_replace($this->spec[0], $this->spec[1], $this->buffer);
+			}
+
+			public function decode() {
+				unset($this->spec[0][5],$this->spec[0][6],$this->spec[1][5],$this->spec[1][6]);
+		
+				return str_replace($this->spec[1], $this->spec[0], $this->buffer);
+			}
+		};
 	}
 
 	public static function declare($name, $return) {

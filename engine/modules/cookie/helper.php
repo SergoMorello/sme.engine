@@ -1,11 +1,13 @@
 <?php
 
+use SME\Modules\Cookie;
+
 function cookie($data = null, $time = 0) {
 	if (is_null($data))
-		return new cookie;
+		return new Cookie;
 	if (is_array($data)) {
-		return cookie::make($data, $time);
+		return Cookie::make($data, $time);
 	}elseif(is_string($data)){
-		return cookie::get($data);
+		return Cookie::get($data);
 	}
 }

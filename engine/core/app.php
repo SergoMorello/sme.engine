@@ -1,27 +1,50 @@
 <?php
+namespace SME\Core;
 
-class app extends core {
+use SME\Core\Request\Request;
+use SME\Core\Response\Response;
+use SME\Core\Response\ResponseObject;
+use SME\Core\Route\RouteCore;
+use SME\Core\Model\ModelCore;
+
+class App extends Core {
 	
 	private $appService;
 	
 	private static $console,
+		$dev,
 		$classes = [],
 		$objApp,
-		$configure=false,
-		$run = false;
+		$configure = false,
+		$run = false,
+		$locale = 'en',
+		$include = [];
 	
-	public function __construct($console=false) {
-		
+	public function __construct($console = false, $dev = false) {
+
 		if (self::$run)
 			return;
 		
-		self::$objApp = new class extends core{};
+		self::$objApp = new class extends Core{};
 		
 		self::$run = true;
 		
 		self::$console = $console;
 
+		self::$dev = $dev;
+
+		self::singleton('path.public', function(){
+			return base_path('public');
+		});
+
+		if (self::isDev() && self::checkPublicDir())
+			return false;
+
+		Exception::__init();
+		
 		$this->checkFolders();
+
+		$this->autoload();
 
 		self::include('engine.core.configure');
 		
@@ -29,19 +52,17 @@ class app extends core {
 		
 		self::include('app.appService');
 		
-		$this->appService = new appService;
+		$this->appService = new \App\appService;
 		
 		$this->defaultService('register');
 		
 		$this->singletonInit();
 		
-		new request;
+		Request::__init();
 		
-		route::__init();
+		RouteCore::__init();
 		
-		core::connectDB();
-		
-		controller::__init();
+		ControllerCore::__init();
 		
 		$this->defaultService('boot');
 		
@@ -50,12 +71,19 @@ class app extends core {
 	}
 
 	public function __destruct() {
-		if (self::$run)
-			return;
-		
-		core::disconnectDB();
+		ModelCore::__close();
 	}
-	
+
+	public function __invoke() {
+		return false;
+	}
+
+	private function autoload() {
+		spl_autoload_register(function($class){
+			self::include(str_replace('App', 'app', $class));
+		});
+	}
+
 	public static function getObj() {
 		return self::$objApp;
 	}
@@ -68,7 +96,17 @@ class app extends core {
 		return self::$configure;
 	}
 	
+	public static function getLocale() {
+		return self::$locale;
+	}
+
+	public static function setLocale($locale) {
+		self::$locale = $locale;
+	}
+
 	private function checkFolders() {
+		if (!self::isDev())
+			return;
 		foreach(get_defined_constants(true)['user'] as $folder) {
 			if (!file_exists($folder))
 				mkdir($folder);
@@ -79,11 +117,49 @@ class app extends core {
 		return self::$console;
 	}
 
-	public static function singleton($name, $callback) {
-		self::$classes[] = [
-			'name'=>$name,
-			'obj'=>$callback()
+	public static function isDev() {
+		return self::$dev;
+	}
+
+	public static function findClassKey($name) {
+		if (!is_string($name))
+			throw new \Exception("Name bind or singleton is not string", 1);
+
+		foreach(self::$classes as $key => $value) {
+			if ($value['name'] == $name)
+				return $key;
+		}
+		return null;
+	}
+
+	public static function bind($name, $callback) {
+		$key = self::findClassKey($name);
+
+		$class = [
+			'name' => $name,
+			'obj' => $callback,
+			'type' => 'bind'
 		];
+
+		if (is_null($key))
+			self::$classes[] = $class;
+		else
+			self::$classes[$key] = $class;
+	}
+
+	public static function singleton($name, $callback) {
+		$key = self::findClassKey($name);
+
+		$class = [
+			'name' => $name,
+			'obj' => $callback(self::getObj()),
+			'type' => 'singleton'
+		];
+
+		if (is_null($key))
+			self::$classes[] = $class;
+		else
+			self::$classes[$key] = $class;
 	}
 	
 	private function singletonInit() {
@@ -91,65 +167,31 @@ class app extends core {
 			self::$objApp->{$class['name']} = $class['obj'];
 	}
 	
+	private static function checkPublicDir() {
+		if (is_file(app('path.public').$_SERVER['REQUEST_URI']))
+			return true;
+	}
+
 	public static function include($name) {
-		$name = str_replace('.','/',$name);
-		try {
-			if (file_exists(ROOT.$name.'.php'))
-				return require_once(ROOT.$name.'.php');
-			
-		} catch (ParseError $e) {
-			
-			exceptions::throw('exception',$e);
-			
-		} catch (Error $e) {
-			
-			exceptions::throw('exception',$e);
-			
-		} catch (Exception $e) {
-			
-			exceptions::throw('exception',$e);
-			
-		} catch (ErrorException $e) {
-			
-			exceptions::throw('exception',$e);
-			
+		$name = str_replace(['.','\\'],'/',$name);
+		if (file_exists(ROOT.$name.'.php')) {
+			return self::$include[$name] = self::$include[$name] ?? require_once(ROOT.$name.'.php');
 		}
 	}
 
 	private function defaultService($method) {
-		try {
-			
-			if (method_exists($this->appService, $method))
-				$this->appService->$method();
-			
-		} catch (ParseError $e) {
-			
-			exceptions::throw('exception',$e);
-			
-		} catch (Error $e) {
-			
-			exceptions::throw('exception',$e);
-			
-		} catch (Exception $e) {
-			
-			exceptions::throw('exception',$e);
-			
-		} catch (ErrorException $e) {
-			
-			exceptions::throw('exception',$e);
-			
-		}
+		if (method_exists($this->appService, $method))
+			$this->appService->$method();	
 	}
 
 	public static function __return($result) {
-		$result = (is_object($result) && method_exists($result, 'getContent')) ? $result->getContent() : $result;
-		$result = (is_array($result) || is_object($result)) ? response::json($result)->getContent() : $result;
-		
-		die((string)$result);
+		$result = ((is_array($result) || is_object($result)) && !$result instanceof ResponseObject) ? Response::json($result) : $result;
+		exit((string)$result);
 	}
 
 	private function run() {
-		$route = route::getRoute();
+
+		$route = \Route::getRoute();
 		
 		if (!$route)
 			abort(404);
@@ -166,37 +208,24 @@ class app extends core {
 			if (is_callable($route['callback'])) {
 				$return->call = $route['callback'];
 			}else{
-				if (!class_exists($route['callback']->controller))
-					throw new Exception('Controller "'.$route['callback']->controller.'" not found',1);
-				$return->call = [new $route['callback']->controller, $route['callback']->method];
+				$controller = strpos($route['callback']->controller, '\\') ? 
+					$route['callback']->controller : 
+					'App\\Controllers\\'.str_replace('/','\\', $route['callback']->controller);
+				try {
+				$return->call = [new $controller, $route['callback']->method];
+				}catch(\Error $e) {
+					throw new \Exception('Controller "'.$controller.'" not found',1);
+				}
 			}
 			
-			return middleware::check($route['middleware'] ?? null, $return, new request);
+			return Middleware::check($route['middleware'] ?? null, $return, new request);
 		};
 
-		try {
-			$callback = $routeCallback($route);
-			self::__return(call_user_func_array(
-				$callback->call, 
-				array_values($callback->props)
-			));
-			
-		} catch (ParseError $e) {
-			
-			exceptions::throw('exception',$e);
-		
-		} catch (Error $e) {
-			
-			exceptions::throw('exception',$e);
-			
-		} catch (Exception $e) {
-			
-			exceptions::throw('exception',$e);
-			
-		} catch (ErrorException $e) {
-			
-			exceptions::throw('exception',$e);
-			
-		}
+		$callback = $routeCallback($route);
+		self::__return(call_user_func_array(
+			$callback->call, 
+			array_values($callback->props)
+		));
+
 	}
 }

@@ -1,6 +1,7 @@
 <?php
+namespace App\Middleware__CLASS__;
 
-class __NAME__ extends middleware {
+class __NAME__ {
 	
 	public function handle($request, $next) {
 		

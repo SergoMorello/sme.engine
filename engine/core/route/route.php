@@ -1,51 +1,15 @@
 <?php
 
-class route extends routeInc {
-	
-	private function __construct($params) {
-		$this->setRoute($params);
-	}
-	
-	public function __destruct() {
-		$this->saveRoute();
+class Route {
+
+	public static function __callStatic($name, $args) {
+		return self::callMethod($name, $args);
 	}
 
-	public static function __init() {
-		if (app::isConsole())
-			self::__instConsole();
-		else
-			self::__instHttp();
-	}
-	
-	public static function get($url, $callback) {
-		return new self([
-			"url" => $url,
-			"callback" => $callback,
-			"method" => "get"
-			]);
-	}
-	
-	public static function post($url, $callback) {
-		return new self([
-			"url" => $url,
-			"callback" => $callback,
-			"method" => "post"
-			]);
-	}
-	
-	public static function put($url, $callback) {
-		return new self([
-			"url" => $url,
-			"callback" => $callback,
-			"method" => "put"
-			]);
-	}
-	
-	public static function delete($url, $callback) {
-		return new self([
-			"url" => $url,
-			"callback" => $callback,
-			"method" => "delete"
-			]);
+	private static function callMethod($name, $args) {
+		$obj = new \SME\Core\Route\RouteWeb;
+		if (!method_exists($obj, $name))
+			throw new \Exception("Method ".$name." in route not found", 1);
+		return $obj->$name(...$args);
 	}
 }

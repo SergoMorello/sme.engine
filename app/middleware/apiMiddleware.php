@@ -1,6 +1,9 @@
 <?php
+namespace App\Middleware;
 
-class apiMiddleware extends middleware {
+use SME\Core\Middleware;
+
+class apiMiddleware extends Middleware {
 	
 	public function handle($request, $next) {
 		

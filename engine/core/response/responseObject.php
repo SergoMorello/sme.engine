@@ -1,6 +1,7 @@
 <?php
+namespace SME\Core\Response;
 
-class responseObject {
+class ResponseObject {
 
 	private $headers, $content, $code;
 
@@ -11,8 +12,12 @@ class responseObject {
 		$this->code($code);
 	}
 
+	public function __toString() {
+		return $this->getContent();
+	}
+
 	public function getContent() {
-		return $this->content;
+		return (is_array($this->content) || is_object($this->content)) ? $this->json($this->content) : $this->content;
 	}
 
 	public function code($code) {

@@ -1,3 +1,3 @@
 <?php
 
-//console::command("command","main@index");
+// Console::command("command","main@index");

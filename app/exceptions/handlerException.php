@@ -1,6 +1,9 @@
 <?php
+namespace App\Exceptions;
 
-class handlerException extends exceptions {
+use SME\Core\Exception;
+
+class handlerException extends Exception {
 
 	public function render($request, $exception) {
 		

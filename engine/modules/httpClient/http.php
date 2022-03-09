@@ -1,4 +1,5 @@
 <?php
+namespace SME\Modules\HttpClient;
 
 class http extends httpInc {
 

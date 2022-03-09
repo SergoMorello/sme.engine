@@ -1,6 +1,10 @@
 <?php
+namespace App\Controllers__CLASS__;
 
-class __NAME__ extends controller {
+use App\Controllers\Controller;
+use SME\Core\Request\Request;
+
+class __NAME__ extends Controller {
 
 	public function index() {
 

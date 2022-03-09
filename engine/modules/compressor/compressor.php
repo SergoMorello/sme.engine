@@ -1,11 +1,15 @@
 <?php
+namespace SME\Modules;
 
-class compressor extends core {
+use SME\Core\Core;
+use SME\Core\Request\request;
+
+class compressor extends Core {
 	const nameCache = '_compressorData';
 
 	public static function make($files, $name = 'scripts.js', $type = null) {
 		if (!is_array($files)) {
-			throw new Exception('compressor make, files is not array!');
+			throw new \Exception('compressor make, files is not array!');
 		}
 
 		$cache = cache();
@@ -21,8 +25,8 @@ class compressor extends core {
 			$paths = [];
 			$str = '';
 			foreach($files as $file) {
-				if (file_exists(PUBLIC_DIR.$file) && !empty($file)) {
-					$str .= file_get_contents(PUBLIC_DIR.$file);
+				if (file_exists(app('path.public').'/'.$file) && !empty($file)) {
+					$str .= file_get_contents(app('path.public').'/'.$file);
 					$paths[] = pathinfo($file, PATHINFO_DIRNAME);
 				}
 			}
@@ -66,7 +70,7 @@ class compressor extends core {
 		if ($cache->has(self::nameCache.$hash)) {
 			$paths = $cache->get(self::nameCache.$hash);
 			foreach($paths['paths'] as $path) {
-				$fullPath = PUBLIC_DIR.$path.'/'.$name;
+				$fullPath = app('path.public').'/'.$path.'/'.$name;
 				if (file_exists($fullPath)) {
 					return file_get_contents($fullPath);
 				}
@@ -77,7 +81,7 @@ class compressor extends core {
 	public function get(request $req) {
 		$hash = $req->route('hash');
 		$name = $req->route('name');
-
+		
 		$cache = cache();
 		
 		if ($cache->has(self::nameCache.$name)) {

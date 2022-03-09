@@ -5,71 +5,38 @@ return [
 		'core',
 		'env',
 		'config',
-		'database',
+		'model/database',
+		'model/DB',
 		'model/modelCore',
 		'model/modelObject',
 		'model/modelSql',
+		'model/modelMethods',
 		'model/model',
-		'model/DB',
-		'controller',
+		'controllerCore',
+		'view/e',
+		'view/errors',
 		'view/compiler',
 		'view/view',
 		'response/responseObject',
 		'response/response',
-		'route/routeInc',
+		'route/route_core',
+		'route/route_console',
+		'route/route_web',
 		'route/route',
 		'route/console',
-		'exceptions',
+		'exception',
 		'middleware',
 		'request/validateIs',
 		'request/validate',
+		'request/objects/file',
+		'request/objects/files',
 		'request/request',
 		'app',
+		'lang',
 		'log',
 	],
-	'MODULES' => [
-		//Http client
-		'httpClient/httpInc',
-		'httpClient/http',
-		'httpClient/httpResponse',
-		'httpClient/httpRequest',
-
-		//Cacher
-		'cache/cache',
-		'cache/helper',
-
-		//Storage
-		'storage/storage',
-
-		//Cookie
-		'cookie/cookie',
-		'cookie/helper',
-
-		//Session
-		'session/session',
-		'session/helper',
-
-		//Redirect
-		'redirect/redirect',
-		'redirect/helper',
-
-		//Compressor
-		'compressor/compressor',
-		'compressor/helper'
-	],
-	'HELPERS' => [
-		'app',
-		'env',
-		'config',
-		'view',
-		'response',
-		'dd',
-		'route',
-		'request',
-		'abort',
-		'asset',
-		'old',
-		'log',
-		'is'
+	'ENGINE' => [
+		'support/app',
+		'support/http'
 	]
 ];

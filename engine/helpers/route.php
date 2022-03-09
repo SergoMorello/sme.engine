@@ -1,13 +1,15 @@
 <?php
 
+use SME\Core\Route\RouteCore;
+
 function route($name = NULL, $props = []) {
 	if (is_null($name))
 		return (new class{
 			public function current() {
-				return core::url();
+				return SME\Core\Core::url();
 			}
 			public function getName() {
-				return route::getCurrent('name');
+				return RouteCore::getCurrent('name');
 			}
 		});
 	$replaceVars = function($url,$vars=[]) {
@@ -30,7 +32,7 @@ function route($name = NULL, $props = []) {
 		return $url;
 	};
 	$searchRoute = function($name) {
-		foreach(route::getRoutes() as $page)
+		foreach(RouteCore::getRoutes() as $page)
 			if (isset($page['name']) && $page['name']==$name)
 				return (object) $page;
 	};

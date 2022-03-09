@@ -1,19 +1,65 @@
 <?php
+namespace SME\Core\Model;
 
-class modelCore extends core {
+use SME\Core\Core;
+use SME\Core\Exception;
+use SME\Core\Config;
 
-    protected $table;
+class ModelCore extends Core {
+	private static $dblink, $table, $model;
+
+	private static function connect() {
+		if (!is_null(self::$dblink))
+			return;
+		self::$dblink = new database(
+			Config::get('database.dbType'),
+			Config::get('database.dbHost'),
+			Config::get('database.dbUser'),
+			Config::get('database.dbPassword'),
+			Config::get('database.dbName'),
+			Config::get('app.debug')
+		);
+		
+		try {
+			self::$dblink->connect(true);
+		} catch (\PDOException $e) {
+			if (Config::get('app.debug'))
+				throw new \SME\Exceptions\Database($e->getMessage());
+			else
+				throw new \SME\Exceptions\Database('Connect DB');
+		}
+	}
+
+	public static function __close() {
+		if (!is_null(self::$dblink))
+			self::$dblink->disconnect();
+	}
+
+	protected static function dblink() {
+		self::connect();
+		return self::$dblink;
+	}
 
     protected function getTableName() {
-		return config::get('app.dbPrefix').$this->table;
+		return Config::get('app.dbPrefix').self::$table;
 	}
 
     protected function setTableName($name) {
-        $this->table = $name;
+        self::$table = $name;
     }
 
-	protected function value($value) {
-		$value = (is_object($value) && method_exists($value, 'getValue')) ? $value->getValue() : "'".$value."'";
+	protected static function value($value) {
+		if (is_string($value) || is_numeric($value))
+			return "'".$value."'";
+		if (is_object($value) && method_exists($value, 'getValue'))
+			return $value->getValue();
+	}
+
+	protected static function values($split, $values) {
+		$return = [];
+		foreach($values as $value)
+			$return[]= self::value($value);
+		return implode($split, $return);
 	}
 
     protected function genParams($params, $callback, &$data, $default=[]) {

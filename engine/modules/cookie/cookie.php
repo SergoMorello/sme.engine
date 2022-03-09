@@ -1,6 +1,7 @@
 <?php
+namespace SME\Modules;
 
-class cookie {
+class Cookie {
 
 	public static function make($data, $time = 0) {
 		if (is_array($data)) {
@@ -19,7 +20,7 @@ class cookie {
 	public static function delete($vars) {
 		$vars = is_array($vars) ? $vars : [$vars];
 		foreach($vars as $var) {
-			setcookie($var, NULL);
+			setcookie($var, null, -1, '/');
 		}
 		return true;
 	}

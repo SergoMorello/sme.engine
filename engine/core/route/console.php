@@ -1,20 +1,15 @@
 <?php
 
-class console extends routeInc {
+class Console {
 	
-	private function __construct($params) {
-		$this->setRoute($params);
+	public static function __callStatic($name, $args) {
+		return self::callMethod($name, $args);
 	}
-	
-	public function __destruct() {
-		$this->saveRoute();
-	}
-	
-	public static function command($url, $callback) {
-		return new self([
-			"url"=>$url,
-			"callback"=>$callback,
-			"method"=>"command"
-			]);
+
+	private static function callMethod($name, $args) {
+		$obj = new \SME\Core\Route\RouteConsole;
+		if (!method_exists($obj, $name))
+			throw new \Exception("Method ".$name." in route not found", 1);
+		return $obj->$name(...$args);
 	}
 }

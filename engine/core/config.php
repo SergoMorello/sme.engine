@@ -1,6 +1,7 @@
 <?php
+namespace SME\Core;
 
-class config extends core {
+class Config extends Core {
 	
 	private static $config;
 

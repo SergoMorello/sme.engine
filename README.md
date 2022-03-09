@@ -7,6 +7,8 @@
 
 ###	Это нечто похожее на laravel но намного быстрее и проще
 
+### Внимание, документация является устаревшей, в ближайшее время постараюсь переписать
+
 [Первый запуск](#first)  
 
 [Route](#route)  
@@ -42,14 +44,14 @@ php console serve
 ####	В файле /route/web.php
 
 ```php 
-route::get('/','mainController@index')->name('home');
+Route::get('/','mainController@index')->name('home');
 ```
 
 #####	Создаём маршрут по пути `/` и вызываем метод `index` в контроллере `mainController`, так же даём имя маршруту `home` в цепочке методов `->name()`
 
 #####	Так же можно создать маршрут с замыканием
 ```php
-route::get('/',function() {  
+Route::get('/',function() {  
   //Тут мы что то выполняем например можем показать какой то вид View('home') 
   return View('home');
 })->name('home');
@@ -57,7 +59,7 @@ route::get('/',function() {
 
 #### Для отправки переменных в маршруте поместите их в фигурных скобках прямо в URL
 ```php
-route::get('/catalog/item/{id}',functio...
+Route::get('/catalog/item/{id}',functio...
 ```
 <h3 id="controller">Controller:</h3>
 
@@ -80,7 +82,7 @@ request()->route('id');
 ```
 ######	Или
 ```php
-route::get('/catalog/item/{id}',function($id) {
+Route::get('/catalog/item/{id}',function($id) {
   //В переменной $id будет первая переменная из маршрута
 ```
 
@@ -154,10 +156,10 @@ $var = 123;
 
 ###### 	В файле `appService.php` в методе `register` или же подключить свой класс через appService
 
-######	compiler::declare(`имя функции`,`анонимная функция(`агрументы переданные в функцию`,`последним всегда будет анонимная функция для добавления в конец буффера`)`)
+######	Compiler::declare(`имя функции`,`анонимная функция(`агрументы переданные в функцию`,`последним всегда будет анонимная функция для добавления в конец буффера`)`)
 
 ```php
-compiler::declare('plus',function($arg1,$arg2,$appendFnc){ 
+Compiler::declare('plus',function($arg1,$arg2,$appendFnc){ 
   $appendFnc('<?php echo '.$arg1.'; ?>');
   return "<?php echo ".($arg1+$arg2)."; ?>";
 });
@@ -209,7 +211,7 @@ $this->model("db");
 ##### Или если нужно использовать в замыкании маршрута
 
 ```php
-controller::model("db");
+Controller::model("db");
 ```
 
 #####	Чтобы обратится к модели используем тот же метод только без аргументов: model()->`имя модели`:
@@ -221,7 +223,7 @@ $db = $this->model()->db;
 ##### Так же можно обратится к модели сразу после подключения
 
 ```php
-controller::model("db")->find(1)->delete()
+Controller::model("db")->find(1)->delete()
 ```
 
 #####	Для работы с данными используется цепочка методов родительского класса:
@@ -270,25 +272,25 @@ $db->delete();
 ##### Сохранить файл на диск
 
 ```php
-storage::disk('local')->put('file.txt','какие то данные');
+Storage::disk('local')->put('file.txt','какие то данные');
 ```
 
 ##### Получить файл с диска
 
 ```php
-storage::disk('local')->get('file.txt');
+Storage::disk('local')->get('file.txt');
 ```
 
 ##### Удалить файл
 
 ```php
-storage::disk('local')->delete('file.txt');
+Storage::disk('local')->delete('file.txt');
 ```
 
 ##### Проверить существует ли файл
 
 ```php
-storage::disk('local')->exists('file.txt');
+Storage::disk('local')->exists('file.txt');
 ```
 
 ##### Так же можно сохранять файлы сразу из при их получении из формы
@@ -310,38 +312,38 @@ request()->file('file')->storeAs('',request()->input('fileName').'.jpg');
 ##### Сохранить данные в кэше put(`ключ`,`данные`,`время хранения в секундах`)
 
 ```php
-cache::put('message','Hello World!',60);
+Cache::put('message','Hello World!',60);
 ```
 
 ##### Получить данные
 
 ```php
-cache::get('message');
+Cache::get('message');
 ```
 
 ###### или получить и сразу удалить
 
 ```php
-cache::pull('message');
+Cache::pull('message');
 ```
 
 ##### Удалить
 
 ```php
-cache::forget('message');
+Cache::forget('message');
 ```
 
 ##### Проверить сущеутвование по ключу
 
 ```php
-cache::has('message');
+Cache::has('message');
 ```
 
 <h3 id="http_client">Http client:</h3>
 
 #### Простой GET запрос
 ```php
-$response = http::get('http://url');
+$response = Http::get('http://url');
 ```
 ##### В ответ получаем обьект:
 
@@ -359,44 +361,44 @@ $response->serverError(); //Если код 500
 
 #### POST запрос с параметрами
 ```php
-http::post('http://url',['name'=>'value']);
+Http::post('http://url',['name'=>'value']);
 ```
 
 ##### По умолчанию запрос выполняется в виде json обьекта с типом `application/json`
 ##### Если нужно выполнить обычный `application/x-www-form-urlencoded` то добавьте метод asForm перед выполнением запроса
 ```php
-http::asForm()->post('http://url',['name'=>'value']);
+Http::asForm()->post('http://url',['name'=>'value']);
 ```
 ##### Если нужен `multipart/form-data`
 ```php
-http::asMultipart()->post('http://url',['name'=>'value']);
+Http::asMultipart()->post('http://url',['name'=>'value']);
 ```
 
 #### Basic авторизация
 ```php
-http::withBasicAuth('user', 'password')->get('http://url');
+Http::withBasicAuth('user', 'password')->get('http://url');
 ```
 ##### или Digest авторизация
 ```php
-http::withDigestAuth('user', 'password')->get('http://url');
+Http::withDigestAuth('user', 'password')->get('http://url');
 ```
 #####  если Realm статичен, можем указать
 ```php
-http::withDigestAuth('user', 'password')->withRealm('realm')->get('http://url');
+Http::withDigestAuth('user', 'password')->withRealm('realm')->get('http://url');
 ```
 
 #### Таймаут в секундах
 ```php
-http::timeout('20')->get('http://url');
+Http::timeout('20')->get('http://url');
 ```
 
 #### Вызвать исключение в случае ошибки
 ```php
-http::post('http://url',['name'=>'value'])->throw();
+Http::post('http://url',['name'=>'value'])->throw();
 ```
 ##### Если нужно обработать ошибку, можно использовать замыкание
 ```php
-http::post('http://url',['name'=>'value'])->throw(function($response, $error){
+Http::post('http://url',['name'=>'value'])->throw(function($response, $error){
   die("ой, что-то пошло не так");
 });
 ```
@@ -406,13 +408,13 @@ http::post('http://url',['name'=>'value'])->throw(function($response, $error){
 
 #### Обьявить исключение можно в appService.php
 ```php
-exceptions::declare('имя_исключения',function($data=""){
+Exceptions::declare('имя_исключения',function($data=""){
   return response('что то сломалось '.$data);
 });
 ```
 #### Вызываем исключение
 ```php
-exceptions::throw('имя_исключения', 'Обновите страницу');
+Exceptions::throw('имя_исключения', 'Обновите страницу');
 ```
 ##### Или через хелпер
 ```php
@@ -421,7 +423,7 @@ abort('имя_исключения');
 ##### Так же мы можем переназначать системные исключения
 ###### Например переназначим исключение валидации на вывод json
 ```php
-exceptions::declare('validate',function($errors){
+Exceptions::declare('validate',function($errors){
   return response()->json([
           'status'=>false,
           'errors'=>$errors
@@ -446,20 +448,20 @@ LOG_ENABLED=true
 ##### Сохранить информацию в лог
 
 ```php
-log::info('Какой то вывод');
+Log::info('Какой то вывод');
 ```
 
 ##### Если нужно записать ошибку используется метод `error`
 
 ```php
-log::error('Ошибка');
+Log::error('Ошибка');
 ```
 
 ##### Лог так же выводится в консольных командах
 ###### Например если мы хотим вывести таймер или что то подобное можно использовать метод `thisLine` в этом случае информация не запишется в файл а будет перезаписываться на этой же строке в консоле
 
 ```php
-log::thisLine(true)->info(date('s'));
+Log::thisLine(true)->info(date('s'));
 ```
 
 <h3 id="console">Console:</h3>
@@ -482,9 +484,9 @@ php console cache:clear
 
 ###### В файле `route/console.php` создаём маршрут с методом `console` с замыканием
 ```php
-route::console('time',function(){
+Route::console('time',function(){
   while(true) { //Создаём вечный цикл
-    log::thisLine(true)->info(date('H:i:s')); //Выводим текущее время и смещаем каретку в начало
+    Log::thisLine(true)->info(date('H:i:s')); //Выводим текущее время и смещаем каретку в начало
     sleep(1); //Ставим задержку на выполнение в 1 секунду
   }
 });
@@ -496,10 +498,10 @@ php console time
 
 ###### Передача аргументов из консоли
 ```php
-route::console('hello:{arg1}',function($arg1){
-  log::info('Hello '.$arg1);
+Route::console('hello:{arg1}',function($arg1){
+  Log::info('Hello '.$arg1);
   //или
-  log::info('Hello '.request()->route('arg1'));
+  Log::info('Hello '.request()->route('arg1'));
 ...
 ```
 ###### Выполняем

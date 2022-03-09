@@ -1,19 +1,23 @@
 <?php
+namespace SME\Modules;
 
-class storage extends core {
+use SME\Core\Core;
+use SME\Core\Config;
+
+class Storage extends Core {
 	
 	private static $props=[];
 
 	public static function disk($name="") {
 		if (!empty($name))
 			self::$props['disk'] = $name;
-		return (new storage);
+		return (new Storage);
 	}
 	
 	private static function getDisk($name="") {
 		$name = empty($name) ? self::$props['disk'] ?? NULL : $name;
 		
-		foreach(config::get('storage') as $disk) {
+		foreach(Config::get('storage') as $disk) {
 			if (empty($name))
 				if (isset($disk['default']) && $disk['default'])
 					return (object)$disk;
@@ -54,7 +58,7 @@ class storage extends core {
 	
 	public static function path($name) {
 		if (self::exists($name))
-			return STORAGE.self::getDisk()->path.'/';
+			return STORAGE.self::getDisk()->path.'/'.$name;
 	}
 	
 	public static function delete($name) {

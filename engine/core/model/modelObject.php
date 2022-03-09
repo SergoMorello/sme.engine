@@ -1,9 +1,9 @@
 <?php
+namespace SME\Core\Model;
 
-class modelObject extends modelCore {
-	public function __construct($result=[]) {
+class ModelObject extends ModelCore {
+	public function __construct($result = []) {
 		$this->setVars($result);
-		modelSql::clearQuery();
 	}
 
 	private function setVars($result) {
@@ -13,8 +13,12 @@ class modelObject extends modelCore {
 		}
 	}
 
+	public function first() {
+		return get_object_vars($this)[0] ?? null;
+	}
+
 	public function count() {
-		return count($this->toArray()) - 1;
+		return count($this->toArray());
 	}
 
 	public function toArray() {

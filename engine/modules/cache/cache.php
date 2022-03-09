@@ -1,6 +1,9 @@
 <?php
+namespace SME\Modules;
 
-class cache extends core {
+use SME\Core\Core;
+
+class Cache extends Core {
 	//const dirCache = config('app.');
 
 	public static function put($key, $value, $time = 0) {
@@ -14,13 +17,13 @@ class cache extends core {
 				$this->check();
 			}
 			private function check() {
-				if (!file_exists(core::dirCache.'.index'))
+				if (!file_exists(Core::dirCache.'.index'))
 					$this->update();
 				
 				foreach($this->get() as $line)
 					if ($line->time > 0 && time() > $line->time)
 						if ($obj = $this->delete($line->key))
-							@unlink(core::dirCache.$obj->name);
+							@unlink(Core::dirCache.$obj->name);
 			}
 			private function findKey($obj, $key) {
 				foreach($obj as $keyIt => $line)
@@ -29,7 +32,7 @@ class cache extends core {
 				return -1;
 			}
 			private function update($obj = "") {
-				file_put_contents(core::dirCache.'.index',(empty($obj) ? '[]' : json_encode($obj)));
+				file_put_contents(Core::dirCache.'.index',(empty($obj) ? '[]' : json_encode($obj)));
 			}
 			private function remArrKey($arr,$key) {
 				$res = [];
@@ -41,7 +44,7 @@ class cache extends core {
 				return $res;
 			}
 			public function get($key = "") {
-				$res = json_decode(file_get_contents(core::dirCache.'.index'));
+				$res = json_decode(file_get_contents(Core::dirCache.'.index'));
 				if (empty($key))
 					return $res;
 				foreach($res as $line)
