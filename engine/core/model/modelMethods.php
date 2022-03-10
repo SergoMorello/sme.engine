@@ -40,8 +40,10 @@ class ModelMethods extends ModelSql {
 		$pages = round($count / $num);
 		$ofsbgn = ($page * $num) - $num;
 		$this->limit($ofsbgn, $num);
-		return (new modelObject(self::dblink()->get_list($this->strQuerySelect())))([
-			'paginate' => new Paginate($count, $num, $page, $pages)
+		$query = self::dblink()->get_list($this->strQuerySelect());
+		$countPage = count($query);
+		return (new modelObject($query))([
+			'paginate' => new Paginate($count, $num, $page, $pages, $countPage)
 		]);
 	}
 

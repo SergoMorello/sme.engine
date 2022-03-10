@@ -14,6 +14,8 @@ class e {
 	}
 
 	public function html() {
+		if (is_object($this->var) && method_exists($this->var, '__toString' ))
+			return $this->echo = (string)$this->var;
 		$this->echo = htmlspecialchars($this->getVar());
 	}
 

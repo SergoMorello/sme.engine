@@ -50,7 +50,6 @@ class View extends Compiler {
 	}
 
 	private function addView($view, $data = array(), $system = false) {
-
 		if ($result = self::getView($view, $system)) {
 			
 			if ($result->path->ext == 'html')
@@ -92,8 +91,8 @@ class View extends Compiler {
 			throw new Exception('View \''.$view.'\' not found', 1);
 	}
 	
-	public static function make($view, $data = []) {
-		return Response::make((new self)->addView($view, $data))->code(200);
+	public static function make($view, $data = [], $system = false) {
+		return Response::make((new self)->addView($view, $data, $system))->code(200);
 	}
 	
 	public static function exists($view) {

@@ -2,21 +2,29 @@
 namespace SME\Core\Model;
 
 use SME\Http\Request;
+use SME\Support\View;
 
 class Paginate {
-	private $url, $total, $count, $perPage, $currentPage, $totalPages;
+	private $url, $view, $total, $count, $perPage, $currentPage, $totalPages;
 
-	public function __construct($total, $perPage, $currentPage, $totalPages) {
+	public function __construct($total, $perPage, $currentPage, $totalPages, $countPage) {
 		$this->total = $total;
 		$this->perPage = $perPage;
 		$this->currentPage = $currentPage;
 		$this->totalPages = $totalPages;
+		$this->count = $countPage;
 		$this->url = (!empty(Request::server('HTTPS')) ? 'https' : 'http').'://'.Request::server('HTTP_HOST').Request::server('PATH_INFO');
 	}
 
-	public function __init($view = null, $count = 0) {
-		$this->count = $count;
+	public function __init($view = null) {
+		$this->view = $view ?? 'paginator';
 		return $this;
+	}
+
+	public function __toString() {
+		return (string)View::make($this->view, [
+			'links' => $this
+		], true);
 	}
 
 	public function count() {
@@ -28,7 +36,7 @@ class Paginate {
 	}
 
 	public function perPage() {
-		return $this->perPage = $perPage;
+		return $this->perPage;
 	}
 
 	public function currentPage() {
