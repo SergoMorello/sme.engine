@@ -2,6 +2,7 @@
 namespace SME\Core\Configure;
 
 use SME\Core\App;
+use SME\Core\Config;
 use SME\Core\Log;
 use SME\Core\Exception;
 use SME\Core\View\View;
@@ -10,7 +11,6 @@ use SME\Core\View\View;
 
 // Default
 Exception::make(null, function($exception){
-	
 	if (App::isConsole())
 		return log::error($exception->getMessage()."
 				\r\non line: ".$exception->getLine().' in '.$exception->getFile()

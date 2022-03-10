@@ -151,8 +151,7 @@ class RouteCore extends Core {
 				'(['.$consoleChars.']+)',
 				'[\s|]*(['.$consoleChars.']+|['.$consoleChars.']*)'
 			],$url);
-		}	
-		else{
+		}else{
 			return preg_replace([
 				'`/`is',
 				'`\{['.$varChars.']{0,10}\}`is',

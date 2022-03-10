@@ -11,6 +11,7 @@
 <form method="post" action="{{route('submit')}}" enctype="multipart/form-data">
 <div><input type="text" name="tt" value="{{old('tt', 'test')}}" autocomplete="off"></div>
 <div><input type="file" name="file[]" multiple></div>
+<div><input type="checkbox" name="checkbox"></div>
 <input type="submit" value="ok">
 </form>
 @endsection

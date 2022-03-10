@@ -30,6 +30,8 @@ return [
 		'request/objects/file',
 		'request/objects/files',
 		'request/request',
+		'daten/daten_object',
+		'daten/daten',
 		'app',
 		'lang',
 		'log',

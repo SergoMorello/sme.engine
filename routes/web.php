@@ -8,10 +8,12 @@ Route::get("/doc","main@doc")->name('doc');
 Route::group(['prefix' => 'test'], function(){
 	
 	Route::get('/', function(){
+
 		return \SME\Support\View::make('test');
 	})->name('test');
 	Route::post('/submit', function(){
 		SME\Core\Request\Request::validate([
+			'checkbox' => 'accepted',
 			'tt' => 'required|min:10',
 			'file' => 'required|file|mimes:jpg,png,exe|size:13948'
 		]);

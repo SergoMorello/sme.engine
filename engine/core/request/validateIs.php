@@ -19,6 +19,15 @@ class ValidateIs {
 		return (!empty($var)) ? true : false;
 	}
 
+	public static function accepted($var) {
+		return (in_array($var, [
+			'yes',
+			'on',
+			1,
+			true
+		])) ? true : false;
+	}
+
 	public static function file($var) {
 		if (empty($var))
 			return true;
