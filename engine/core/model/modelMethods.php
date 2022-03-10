@@ -36,6 +36,8 @@ class ModelMethods extends ModelSql {
 		if (!is_array($values))
 			return $return;
 		foreach($values as $key => $value) {
+			if (is_null($value))
+				continue;
 			$value = self::value($value);
 			if ($onlyValues) 
 				$return[] = $value;
@@ -63,8 +65,8 @@ class ModelMethods extends ModelSql {
 	public function update($props) {
 		if (is_array($props) && count($props)) {
 			$arrQuery = $this->getValues($props);
-
-			$this->isUpdate = self::dblink()->query("UPDATE `".$this->getTableName()."` SET ".implode(",",$arrQuery)." WHERE ".$this->srtWhere());
+			if (count($arrQuery))
+				$this->isUpdate = self::dblink()->query("UPDATE `".$this->getTableName()."` SET ".implode(",",$arrQuery)." WHERE ".$this->srtWhere());
 			return new modelObject($this);
 		}
 	}
