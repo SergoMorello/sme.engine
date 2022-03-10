@@ -140,27 +140,28 @@ class RouteCore extends Core {
 	}
 
 	private static function urlMatch($url) {
-		$allowChars = '0-9A-Za-z\\.\\-';
+		$varChars = '0-9A-Za-z\\.\\-';
 		if (App::isConsole()) {
+			$consoleChars = '\\-\\w\\\\\\\\';
 			return preg_replace([
-				'`\{['.$allowChars.']{0,10}\}`is',
-				'`(.*)\{['.$allowChars.']{0,10}\?\}(.*)`isU'
+				'`\{['.$varChars.']{0,10}\}`is',
+				'`[\s|]\{['.$varChars.']{0,10}\?\}`is'
 			],
 			[
-				'([\w\\\\\\\\]+)',
-				'\\1([\w\\\\\\\\]*)|\s'
+				'(['.$consoleChars.']+)',
+				'[\s|]*(['.$consoleChars.']+|['.$consoleChars.']*)'
 			],$url);
 		}	
 		else{
 			return preg_replace([
 				'`/`is',
-				'`\{['.$allowChars.']{0,10}\}`is',
-				'`\\\/\{['.$allowChars.']{0,10}\?\}`is'
+				'`\{['.$varChars.']{0,10}\}`is',
+				'`\\\/\{['.$varChars.']{0,10}\?\}`is'
 			],
 			[
 				'\/',
-				'(['.$allowChars.']{1,})',
-				'[\/|]{0,1}(['.$allowChars.']{0,})'
+				'(['.$varChars.']{1,})',
+				'[\/|]{0,1}(['.$varChars.']{0,})'
 			],$url).'[\/|\s]{0,}';
 		}	
 	}

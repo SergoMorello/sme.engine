@@ -20,10 +20,9 @@ return [
 		'response/responseObject',
 		'response/response',
 		'route/route_core',
+		'route/route_instance',
 		'route/route_console',
 		'route/route_web',
-		'route/route',
-		'route/console',
 		'exception',
 		'middleware',
 		'request/validateIs',
@@ -34,9 +33,5 @@ return [
 		'app',
 		'lang',
 		'log',
-	],
-	'ENGINE' => [
-		'support/app',
-		'support/http'
 	]
 ];
