@@ -8,7 +8,9 @@ Route::get("/doc","main@doc")->name('doc');
 Route::group(['prefix' => 'test'], function(){
 	
 	Route::get('/', function(){
-
+		//dd(parse_url(\SME\Http\Request::server('QUERY_STRING')));
+		//dd(\SME\Http\Request::server());
+		dd(\SME\Support\DB::table('files')->select('file')->paginate(5)->links()->nextPageUrl());
 		return \SME\Support\View::make('test');
 	})->name('test');
 	Route::post('/submit', function(){

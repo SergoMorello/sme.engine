@@ -2,8 +2,15 @@
 namespace SME\Core\Model;
 
 class ModelObject extends ModelCore {
+	private $__paginate;
+
 	public function __construct($result = []) {
 		$this->setVars($result);
+	}
+
+	public function __invoke($params) {
+		$this->__paginate = $params['paginate'] ?? null;
+		return $this;
 	}
 
 	private function setVars($result) {
@@ -11,6 +18,11 @@ class ModelObject extends ModelCore {
 			foreach($result as $key => $value)
 				$this->$key = $value; 
 		}
+	}
+
+	public function links($view = null) {
+		if (!is_null($this->__paginate))
+			return $this->__paginate->__init($view, $this->count());
 	}
 
 	public function first() {

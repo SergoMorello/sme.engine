@@ -24,9 +24,9 @@ class ModelSql extends ModelCore {
 
 	//WHERE
 	public function where(...$data) {
-        $this->genParams($data, function($a, $b, $c){
-            return $a.$b.self::value($c);
-        }, $this->__query->where, ['b'=>'=']);
+		$this->genParams($data, function($a, $b, $c){
+			return $a.$b.self::value($c);
+		}, $this->__query->where, ['b'=>'=']);
         return $this;
 	}
 
@@ -39,8 +39,13 @@ class ModelSql extends ModelCore {
 	}
 
 	//LIMIT
-	public function limit($limit) {
-		$this->__query->limit[0] = $limit;
+	public function limit(...$data) {
+		// $this->__query->limit[] = $limit;
+		// if (is_numeric($limit2))
+		// 	$this->__query->limit[] = $limit2;
+		$this->genParams($data, function($a, $b, $c){
+			return $a.$b.$c;
+		}, $this->__query->limit, ['b'=>',']);
 		return $this;
 	}
 
@@ -115,8 +120,8 @@ class ModelSql extends ModelCore {
 	}
 
 	protected function strLimit() {
-		if (isset($this->__query->limit[0]) && $this->__query->limit[0])
-			return " LIMIT ".$this->__query->limit[0];
+		if (($this->__query->limit[0] ?? false))
+			return " LIMIT ".implode(',', $this->__query->limit);
 	}
 
 	protected function srtOrderBy() {

@@ -12,19 +12,18 @@ class Model {
 
 	private static function callMethod($name, $arg, $vars = null) {
 		$obj = new ModelMethods;
-		if (!method_exists($obj, $name))
-			throw new \Exception("Method ".$name." in model not found", 1);
 		$class = get_called_class();
+		if (!method_exists($obj, $name))
+			throw new \Exception('Method "'.$name.'" in model "'.$class.'" not found', 1);
 		$model = new $class;
 		if (is_array($vars)) {
 			foreach($vars as $key => $value) {
 				if ($key == 'table')
 					continue;
 				$obj->{$key} = $value;
-			}
-				
+			}	
 		}
-		return $obj->__init($model->table ?? self::className($class))->$name(...$arg);
+		return $obj($model->table ?? self::className($class))->$name(...$arg);
 	}
 
 	private static function className($class) {

@@ -73,6 +73,14 @@ class RouteCore extends Core {
 		return self::$routes;
 	}
 	
+	public static function current() {
+		return new class extends RouteCore {
+			public function getName() {
+				return self::getCurrent()->name ?? null;
+			}
+		};
+	}
+
 	public static function getCurrent($var=null) {
 		return is_null($var) ? (object)self::$current : (is_string($var) ? self::$current[$var] ?? null : (object)self::$current);
 	}

@@ -1,8 +1,10 @@
 <?php
 namespace SME\Core\Model;
 
+use SME\Http\Request;
+
 class ModelMethods extends ModelSql {
-	public function __init($table) {
+	public function __invoke($table) {
 		$this->setTableName($table);
 		return $this;
 	}
@@ -29,6 +31,18 @@ class ModelMethods extends ModelSql {
 
 	public function find($id) {
 		return $this->where('id','=',$id);
+	}
+
+	public function paginate($num) {
+		$page = Request::route('page');
+		$page = $page < 1 ? 1 : $page;
+		$count = $this->count();
+		$pages = round($count / $num);
+		$ofsbgn = ($page * $num) - $num;
+		$this->limit($ofsbgn, $num);
+		return (new modelObject(self::dblink()->get_list($this->strQuerySelect())))([
+			'paginate' => new Paginate($count, $num, $page, $pages)
+		]);
 	}
 
 	private function getValues($values, $onlyValues = false) {
