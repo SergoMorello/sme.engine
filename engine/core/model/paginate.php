@@ -28,9 +28,13 @@ class Paginate {
 			$system = false;
 			$view = $this->view;
 		}
-		return (string)View::make($view, [
-			'paginator' => $this
-		], $system);
+		try {
+			return (string)View::make($view, [
+				'paginator' => $this
+			], $system);
+		} catch (\Throwable $e) {
+			throw new \SME\Exceptions\Exception($e);
+		}
 	}
 
 	public function lastPage() {
