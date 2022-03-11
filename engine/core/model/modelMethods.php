@@ -37,8 +37,10 @@ class ModelMethods extends ModelSql {
 		$page = Request::route('page');
 		$page = $page < 1 ? 1 : $page;
 		$count = $this->count();
-		$pages = round($count / $num);
+		$pages = ceil($count / $num);
+		$page = $pages >= $page ? $page : $pages;
 		$ofsbgn = ($page * $num) - $num;
+
 		$this->limit($ofsbgn, $num);
 		$query = self::dblink()->get_list($this->strQuerySelect());
 		$countPage = count($query);

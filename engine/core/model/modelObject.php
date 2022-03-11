@@ -2,9 +2,10 @@
 namespace SME\Core\Model;
 
 class ModelObject extends ModelCore {
-	private $__paginate;
+	private $__paginate, $__count;
 
 	public function __construct($result = []) {
+		$this->__count = count($result);
 		$this->setVars($result);
 	}
 
@@ -20,22 +21,29 @@ class ModelObject extends ModelCore {
 		}
 	}
 
+	private function getVars() {
+		$vars = get_object_vars($this);
+		unset($vars['__paginate'], $vars['__count']);
+		return $vars;
+	}
+
 	public function links($view = null) {
 		if (!is_null($this->__paginate))
 			return $this->__paginate->__init($view, $this->count());
 	}
 
 	public function first() {
-		return get_object_vars($this)[0] ?? null;
+		$vars = $this->getVars();
+		return array_shift($vars) ?? null;
 	}
 
 	public function count() {
-		return count($this->toArray());
+		return $this->__count;
 	}
 
 	public function toArray() {
-		$array = [];
-		foreach(get_object_vars($this) as $key => $value) {
+		$array = [];	
+		foreach($this->getVars() as $key => $value) {
 			if (is_object($value) && method_exists($value, 'getValue'))
 				$value = $value->getValue();
 			$array[$key] = $value;

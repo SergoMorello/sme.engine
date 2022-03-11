@@ -17,14 +17,24 @@ class Paginate {
 	}
 
 	public function __init($view = null) {
-		$this->view = $view ?? 'paginator';
+		$this->view = $view;
 		return $this;
 	}
 
 	public function __toString() {
-		return (string)View::make($this->view, [
-			'links' => $this
-		], true);
+		$system = true;
+		$view = 'paginator';
+		if (is_string($this->view)) {
+			$system = false;
+			$view = $this->view;
+		}
+		return (string)View::make($view, [
+			'paginator' => $this
+		], $system);
+	}
+
+	public function lastPage() {
+		return $this->totalPages;
 	}
 
 	public function count() {
@@ -50,12 +60,18 @@ class Paginate {
 	}
 
 	public function previousPageUrl() {
-		$value = $this->currentPage > 1 ? --$this->currentPage : $this->currentPage;
+		$page = $this->currentPage();
+		$value = $page > 1 ? --$page : $page;
 		return $this->requestPageVar($value);
 	}
 
 	public function nextPageUrl() {
-		$value = $this->currentPage < $this->totalPages ? ++$this->currentPage : $this->currentPage;
+		$page = $this->currentPage();
+		$value = $page < $this->totalPages ? ++$page : $page;
 		return $this->requestPageVar($value);
+	}
+
+	public function url($page) {
+		return $this->requestPageVar($page);
 	}
 }
