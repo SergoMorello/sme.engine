@@ -60,22 +60,28 @@ class Request extends Core {
 		}
 	}
 
+	private static function getDotArray($string, $data) {
+		$splitVars = preg_split('/((?<!\\\)\.)/', $string);
+
+		$findData = function($splitVars, $data) use (&$findData) {
+			foreach($splitVars as $key) {
+				if (isset($data[$key])) {
+					if (is_array($data[$key]) || is_object($data[$key]))
+						return $findData($splitVars, $data[$key]);
+					else
+						return $data[$key];
+				}
+			}
+		};
+
+		return $findData($splitVars, $data);
+	}
+
 	public static function input($var) {
 		if (is_string($var)) {
-			$splitVars = explode('.',$var);
-			if (isset($_POST[$splitVars[0]]) && is()->json($_POST[$splitVars[0]])) {
-				$json = json_decode($_POST[$splitVars[0]]);
-				unset($splitVars[0]);
-				
-				foreach($splitVars as $var) {
-					if (is_numeric($var) && isset($json[$var]))
-						$json = $json[$var];
-					if (is_string($var) && isset($json->$var))
-						$json = $json->$var;
-				}
-				
-				return $json;
-			}
+			if ($value = self::getDotArray($var, self::$_post))
+				return $value;
+			
 			return self::$_post[$var] ?? self::$_get[$var] ?? (isset($_FILES[$var]) ? self::file($var) : NULL);
 		}
 	}

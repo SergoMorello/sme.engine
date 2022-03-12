@@ -73,6 +73,7 @@ class ModelSql extends ModelCore {
 				$this->setTableName($curentTable);
 				$this->count = 0;
 				$this->query = [];
+				$this->__query = (object)[];
 				$this->index = isset($this->__query->leftJoin) ? array_key_last($this->__query->leftJoin) + 1 : 0;
 			}
 
@@ -81,12 +82,13 @@ class ModelSql extends ModelCore {
 			}
 
 			public function joinSave() {
+				//dd($this->__query);
 				$this->__query->leftJoin[$this->index] = implode('',$this->query);
 			}
 
 			public function on(...$props) {
                 $this->genParams($props, function($a, $b, $c){
-                    return $this->split().$a.' '.$b.' '.self::value($c);
+                    return $this->split().$a.' '.$b.' '.$c;
                 }, $this->query, ['b' => '=']);
 
 				$this->joinSave();
