@@ -5,7 +5,7 @@ class ModelObject extends ModelCore {
 	private $__paginate, $__count;
 
 	public function __construct($result = []) {
-		$this->__count = count($result);
+		$this->__count = count((array)$result);
 		$this->setVars($result);
 	}
 
