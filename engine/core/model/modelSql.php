@@ -52,7 +52,7 @@ class ModelSql extends ModelCore {
 	//ORDER BY
 	public function orderBy(...$data) {
         $this->genParams($data, function($a, $b, $c){
-            return "`".$a."` ".strtoupper($c);
+            return $a." ".strtoupper($c);
         }, $this->__query->orderBy,['c'=>'DESC']);
         return $this;
 	}
@@ -65,15 +65,15 @@ class ModelSql extends ModelCore {
 
 	//LEFT JOIN
 	public function leftJoin($table, $callback) {
-		return $callback(new class($table, $this->getTableName()) extends ModelMethods {
+		return $callback(new class($table, $this->getTableName(), $this->__query) extends ModelMethods {
 			private $query, $joinTable, $count, $index;
 
-			public function __construct($table, $curentTable) {
+			public function __construct($table, $curentTable, $query) {
 				$this->joinTable = $table;
 				$this->setTableName($curentTable);
 				$this->count = 0;
 				$this->query = [];
-				$this->__query = (object)[];
+				$this->__query = $query;
 				$this->index = isset($this->__query->leftJoin) ? array_key_last($this->__query->leftJoin) + 1 : 0;
 			}
 
@@ -82,7 +82,6 @@ class ModelSql extends ModelCore {
 			}
 
 			public function joinSave() {
-				//dd($this->__query);
 				$this->__query->leftJoin[$this->index] = implode('',$this->query);
 			}
 
