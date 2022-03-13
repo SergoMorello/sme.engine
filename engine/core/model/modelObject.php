@@ -5,7 +5,7 @@ class ModelObject extends ModelCore {
 	private $__paginate, $__count;
 
 	public function __construct($result = []) {
-		$this->__count = count((array)$result);
+		$this->__count = 0;
 		$this->setVars($result);
 	}
 
@@ -16,8 +16,10 @@ class ModelObject extends ModelCore {
 
 	private function setVars($result) {
 		if (is_array($result) || is_object($result)) {
-			foreach($result as $key => $value)
+			foreach($result as $key => $value) {
 				$this->$key = $value; 
+				++$this->__count;
+			}	
 		}
 	}
 
