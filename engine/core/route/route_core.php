@@ -207,7 +207,7 @@ class RouteCore extends Core {
 								if (isset($where[$varName]) && !empty($varValue) && !preg_match('/^'.$where[$varName].'$/isU', $varValue))
 									return [];
 							}
-
+							$route['request'][$varName] = new \SME\Http\Request($varValue);
 							$route['props'][$varName] = $varValue;
 						}
 					}

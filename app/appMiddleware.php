@@ -2,6 +2,6 @@
 
 return [
 	'http' => [
-		'api' => 'app.middleware.apiMiddleware',
+		'api' => '\\app\\Middleware\\apiMiddleware',
 	]
 ];

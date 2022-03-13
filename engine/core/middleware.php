@@ -25,23 +25,13 @@ class Middleware extends Core {
 			}	
 		}
 	}
-
-	private static function checkResponse($obj) {
-		if (is_object($obj) && property_exists($obj, 'call') && property_exists($obj, 'props'))
-			return $obj;
-		else
-			return App::__return($obj);
-	}
 	
-	public static function check($arrCheck, $controllerReturn, $request) {
+	public static function check($arrCheck, $request) {
 		$arrCheck = is_array($arrCheck) ? $arrCheck : [$arrCheck];
 		
-		$nextClosure = function($request) use (&$controllerReturn){
-			if (!App::isConsole())
-				array_unshift($controllerReturn->props, $request);
+		$nextClosure = function(...$request) {
 			return (object)[
-				'call' => $controllerReturn->call,
-				'props' => $controllerReturn->props
+				'__request' => $request
 			];
 		};
 
@@ -49,17 +39,16 @@ class Middleware extends Core {
 			foreach(self::$addMiddleware as $mw) {
 				if ($mdw == $mw['name']) {
 					if (is_callable($mw['obj']) && $mw['obj'] instanceof \Closure)
-						self::checkResponse($mw['obj']($request, $nextClosure));
+						return $mw['obj']($request, $nextClosure);
 					else{
-						self::checkResponse((new $mw['obj'])->handle($request, $nextClosure));
+						return (new $mw['obj'])->handle($request, $nextClosure);
 					}
 				}
 			}
 		}
-		
 		return $nextClosure($request);
 	}
-	
+
 	public static function declare($name, $obj = NULL) {
 		self::$addMiddleware[] = ['name' => $name, 'obj' => $obj];
 	}

@@ -8,9 +8,18 @@ use SME\Modules\storage;
 use SME\Core\Request\Objects\Files;
 
 class Request extends Core {
-	
+	private $value;
+
 	private static $_server, $_get, $_post, $_files, $_headers;
 	
+	public function __construct($value = '') {
+		$this->value = $value;
+	}
+
+	public function __toString() {
+		return $this->value;
+	}
+
 	public static function __init() {
 		self::$_server = $_SERVER;
 		self::$_get = Core::guardData($_GET);
@@ -18,7 +27,7 @@ class Request extends Core {
 		self::$_files = $_FILES;
 		self::$_headers = self::getallheaders();
 	}
-	
+
 	public static function route($var) {
 		if (is_string($var))
 			return \Route::getProps($var);
@@ -31,7 +40,7 @@ class Request extends Core {
 			return (object)self::$_server;
 		return self::$_server[$var] ?? null;
 	}
-	
+
 	public static function all() {
 		return [
 			'post' => self::$_post,

@@ -7,14 +7,15 @@ Route::get("/doc","main@doc")->name('doc');
 
 Route::group(['prefix' => 'test'], function(){
 	
-	Route::get('/', function(){
-		//dd(parse_url(\SME\Http\Request::server('QUERY_STRING')));
-		//dd(\SME\Http\Request::server());
-		$testList = \SME\Support\DB::table('files')->select('file')->paginate(5);
-		return \SME\Support\View::make('test', [
-			'testList' => $testList
-		]);
-	})->name('test');
+	//Route::get('/{id}/{dd}', 'TestController@index')->middleware('api');
+
+	Route::get('/{id}/{dd}', function($test, $test2){
+		dd($test);
+	})->middleware('api');
+
+	// Route::get('/', function(){
+	// 	return \SME\Support\View::make('test');
+	// })->name('test');
 	Route::post('/submit', function(){
 		SME\Core\Request\Request::validate([
 			'checkbox' => 'accepted',

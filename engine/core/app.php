@@ -200,28 +200,43 @@ class App extends Core {
 			abort(405);
 
 		$routeCallback = function($route) {
-			$return = (object)[
-				'call' => null,
-				'props' => $route['props'] ?? []
-			];
+			$request = new \SME\Http\Request;
+			$props = null;
+			$closure = null;
+
+			$middleware = Middleware::check($route['middleware'] ?? null, $request);
+			if (isset($middleware->__request[0])) {
+				if ($middleware->__request[0] instanceof $request)
+					$props = $route['request'] ?? $middleware->__request;
+				else
+					$props = $middleware->__request;
+			}else{
+				return self::__return($middleware);
+			}
 
 			if (is_callable($route['callback'])) {
-				$return->call = $route['callback'];
+				$closure = $route['callback'];
 			}else{
 				$controller = strpos($route['callback']->controller, '\\') ? 
 					$route['callback']->controller : 
 					'App\\Controllers\\'.str_replace('/','\\', $route['callback']->controller);
 				try {
-				$return->call = [new $controller, $route['callback']->method];
+					$closure = \Closure::bind(function(...$args) use (&$route) {
+						return $this->{$route['callback']->method}(...$args);
+					}, new $controller);
 				}catch(\Error $e) {
 					throw new \Exception('Controller "'.$controller.'" not found',1);
 				}
 			}
 			
-			return Middleware::check($route['middleware'] ?? null, $return, new request);
+			return (object)[
+				'call' => $closure,
+				'props' => $props
+			];
 		};
 
 		$callback = $routeCallback($route);
+		
 		self::__return(call_user_func_array(
 			$callback->call, 
 			array_values($callback->props)
