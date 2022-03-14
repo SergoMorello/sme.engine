@@ -7,11 +7,11 @@ Route::get("/doc","main@doc")->name('doc');
 
 Route::group(['prefix' => 'test'], function(){
 	
-	//Route::get('/{id}/{dd}', 'TestController@index')->middleware('api');
+	Route::get('/{id}/{dd}', 'TestController@index')->middleware('api');
 
-	Route::get('/{id}/{dd}', function($test, $test2){
-		dd($test);
-	})->middleware('api');
+	// Route::get('/{id}/{dd}', function($test, $test2){
+	// 	dd($test);
+	// })->middleware(['api','test']);
 
 	// Route::get('/', function(){
 	// 	return \SME\Support\View::make('test');

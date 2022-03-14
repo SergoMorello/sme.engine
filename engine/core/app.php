@@ -199,21 +199,9 @@ class App extends Core {
 		if (!$this->checkMethod($route['method'] ?? ''))
 			abort(405);
 
-		$routeCallback = function($route) {
-			$request = new \SME\Http\Request;
-			$props = null;
+		$next = function($request) use (&$route) {
 			$closure = null;
-
-			$middleware = Middleware::check($route['middleware'] ?? null, $request);
-			if (isset($middleware->__request[0])) {
-				if ($middleware->__request[0] instanceof $request)
-					$props = $route['request'] ?? $middleware->__request;
-				else
-					$props = $middleware->__request;
-			}else{
-				return self::__return($middleware);
-			}
-
+			
 			if (is_callable($route['callback'])) {
 				$closure = $route['callback'];
 			}else{
@@ -230,17 +218,17 @@ class App extends Core {
 			}
 			
 			return (object)[
-				'call' => $closure,
-				'props' => $props
+				'closure' => $closure,
+				'request' => $request
 			];
 		};
 
-		$callback = $routeCallback($route);
-		
-		self::__return(call_user_func_array(
-			$callback->call, 
-			array_values($callback->props)
-		));
+		$callback = Middleware::check($route['middleware'] ?? null, new \SME\Http\Request, $next, $route);
+		if ($callback->closure && $callback->request)
+			self::__return(call_user_func_array(
+				$callback->closure, 
+				array_values($callback->request)
+			));
 
 	}
 }
