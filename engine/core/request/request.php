@@ -8,18 +8,8 @@ use SME\Modules\storage;
 use SME\Core\Request\Objects\Files;
 
 class Request extends Core {
-	private $value;
-
 	private static $_server, $_get, $_post, $_files, $_headers;
 	
-	public function __construct($value = '') {
-		$this->value = $value;
-	}
-
-	public function __toString() {
-		return $this->value;
-	}
-
 	public static function __init() {
 		self::$_server = $_SERVER;
 		self::$_get = Core::guardData($_GET);

@@ -30,7 +30,7 @@ use SME\Core\Log;
 });
 
 \Console::command("cache:clear",function() {
-	if (Cache::flush())
+	if (\SME\Modules\Cache::flush())
 		Log::info('Cache cleared');
 });
 

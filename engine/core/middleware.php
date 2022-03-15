@@ -29,10 +29,12 @@ class Middleware extends Core {
 	public static function check($arrCheck, $request, $runClosure, $route) {
 		$arrCheck = is_array($arrCheck) ? $arrCheck : (is_null($arrCheck) ? null : [$arrCheck]);
 
-		$nextClosure = function(...$req) use (&$request, &$runClosure, &$route) {
+		$args = count($route['args']) > 0 ? $route['args'] : null;
+
+		$nextClosure = function(...$req) use (&$request, &$runClosure, &$route, &$args) {
 			$return = (object)['__next' => null];
 			if (isset($req[0]) && is_object($req[0]) && $req[0] instanceof $request)
-				$return->__next = $route['request'] ?? [$req];
+				$return->__next = $args ?? [$req];
 			else
 				$return->__next = $req;
 			return $return;
@@ -50,7 +52,7 @@ class Middleware extends Core {
 			}
 		};
 		
-		if (count($arrCheck)) {
+		if ($arrCheck && count($arrCheck)) {
 			$nextRequest = null;
 			foreach($arrCheck as $mdw) {
 				if (!$nextRequest = $check($mdw))
@@ -61,7 +63,7 @@ class Middleware extends Core {
 			else
 				App::__return($nextRequest);
 		}else
-			return $runClosure($route['request'] ?? [$request]);
+			return $runClosure($args ?? [$request]);
 	}
 
 	public static function declare($name, $obj = NULL) {

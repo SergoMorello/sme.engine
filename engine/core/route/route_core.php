@@ -113,7 +113,7 @@ class RouteCore extends Core {
 		}
 		
 		$params['callback'] = $this->__routeCallback($params['callback']);
-
+		
 		if (!App::isConfigure())
 			$params['system'] = true;
 		
@@ -126,6 +126,7 @@ class RouteCore extends Core {
 		$obj = (object)[
 			'controller' => null,
 			'method' => null,
+			'args' => null,
 			'closure' => null
 		];
 
@@ -143,24 +144,29 @@ class RouteCore extends Core {
 		if ($obj->controller && $obj->method) {
 			$obj->controller = strpos($obj->controller, '\\') ? $obj->controller : '\\App\\Controllers\\'.str_replace('/','\\', $obj->controller);
 			try {
-				// $test = new \ReflectionClass(new $obj->controller);
-				// $args = array_map(function($arg){
-				// 	return $arg->getClass();
-				// }, $test->getMethod($obj->method)->getParameters());
-				// dd($args);
-				$obj->closure = \Closure::bind(function(...$args) use (&$obj) {
-					return $this->{$obj->method}(...$args);
-				}, new $obj->controller);
-			}catch(\Error $e) {
-				throw new \Exception('Controller "'.$obj->controller.'" not found',1);
+				$contr = new $obj->controller;
+				$method = new \ReflectionMethod($contr, $obj->method);
+				$obj->closure = $method->getClosure($contr);
+			}catch(\Throwable $e) {
+				throw new \Exception('Controller "'.$obj->controller.'" not found', 1);
 			}
 		}
 		
 		if (is_callable($callback) && $callback instanceof \Closure) {
 			$obj->closure = $callback;
 		}
+
+		$test = new \ReflectionFunction($obj->closure);
+		$args = [];
+		foreach($test->getParameters() as $arg) {
+			try {
+				if ($class = $arg->getClass())
+					$args[] = new $class->name;
+			}catch(\Throwable $e) {}
+		}
+		$obj->args = $args;
 		
-		return $obj->closure;
+		return $obj;
 	}
 
 	protected function saveRoute() {
@@ -251,10 +257,11 @@ class RouteCore extends Core {
 								if (isset($where[$varName]) && !empty($varValue) && !preg_match('/^'.$where[$varName].'$/isU', $varValue))
 									return ['code' => 500];
 							}
-							$route['request'][$varName] = new \SME\Http\Request($varValue);
+							
 							$route['props'][$varName] = $varValue;
 						}
 					}
+					$route['args'] = array_merge($route['callback']->args ?? [], $route['props'] ?? []);
 					
 					if (isset($route['props']))
 						self::$props = $route['props'];

@@ -5,8 +5,8 @@ use SME\Http\Request;
 
 class TestController extends Controller {
 
-	public function index($test, $test2) {
-		dd($test);
+	public function index(Request $req, $test, $test2) {
+		dd($test2);
 		return $id;
 	}
 	

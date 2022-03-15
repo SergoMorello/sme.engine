@@ -60,8 +60,6 @@ class App extends Core {
 		
 		RouteCore::__init();
 		
-		ControllerCore::__init();
-		
 		$this->defaultService('boot');
 		
 		$this->run();
@@ -191,24 +189,29 @@ class App extends Core {
 	}
 
 	private function run() {
-
+		$request = new \SME\Http\Request;
 		$route = RouteCore::getRoute();
+		$run = null;
 
 		if (isset($route['code']))
 			abort($route['code']);
 
-		$next = function($request) use (&$route) {
+		$runClosure = function($request) use (&$route) {
 			return (object)[
-				'closure' => $route['callback'],
+				'closure' => $route['callback']->closure,
 				'request' => $request
 			];
 		};
-
-		$callback = Middleware::check($route['middleware'] ?? null, new \SME\Http\Request, $next, $route);
-		if ($callback->closure && $callback->request)
+		
+		if (App::isConsole())
+			$run = $runClosure([$request]);
+		else
+			$run = Middleware::check($route['middleware'] ?? null, $request, $runClosure, $route);
+		
+		if ($run->closure && $run->request)
 			self::__return(call_user_func_array(
-				$callback->closure, 
-				array_values($callback->request)
+				$run->closure, 
+				array_values($run->request)
 			));
 
 	}
