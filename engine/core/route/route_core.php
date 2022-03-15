@@ -143,6 +143,11 @@ class RouteCore extends Core {
 		if ($obj->controller && $obj->method) {
 			$obj->controller = strpos($obj->controller, '\\') ? $obj->controller : '\\App\\Controllers\\'.str_replace('/','\\', $obj->controller);
 			try {
+				// $test = new \ReflectionClass(new $obj->controller);
+				// $args = array_map(function($arg){
+				// 	return $arg->getClass();
+				// }, $test->getMethod($obj->method)->getParameters());
+				// dd($args);
 				$obj->closure = \Closure::bind(function(...$args) use (&$obj) {
 					return $this->{$obj->method}(...$args);
 				}, new $obj->controller);
