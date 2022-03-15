@@ -58,7 +58,7 @@ abstract class Core {
 		return htmlspecialchars(addslashes($data));
 	}
 	
-	protected function checkMethod($method) {
+	protected static function checkMethod($method) {
 		if (App::isConsole())
 			return strtolower($method)=='command' ? true : false;
 		else

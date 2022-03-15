@@ -20,7 +20,7 @@ class appService extends Core {
 		});
 
 		Middleware::declare('test');
-	
+		
 
 		App::singleton('testClass', function($app){
 			return $app;

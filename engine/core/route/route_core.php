@@ -112,14 +112,8 @@ class RouteCore extends Core {
 			}
 		}
 		
-		$params['callback'] = is_string($params['callback']) ? (function($callback) {
-			$split = explode("@",$callback);
-			return (object)[
-				'controller' => $split[0],
-				'method' => $split[1] ?? ''
-			];
-		})($params['callback'])	: $params['callback'];
-		
+		$params['callback'] = $this->__routeCallback($params['callback']);
+
 		if (!App::isConfigure())
 			$params['system'] = true;
 		
@@ -128,6 +122,42 @@ class RouteCore extends Core {
 		return $this;
 	}
 	
+	private function __routeCallback($callback) {
+		$obj = (object)[
+			'controller' => null,
+			'method' => null,
+			'closure' => null
+		];
+
+		if (is_string($callback)) {
+			$split = explode("@", $callback);
+			$obj->controller = $split[0] ?? null;
+			$obj->method = $split[1] ?? null;
+		}
+
+		if (is_array($callback)) {
+			$obj->controller = $callback[0] ?? null;
+			$obj->method = $callback[1] ?? null;
+		}
+
+		if ($obj->controller && $obj->method) {
+			$obj->controller = strpos($obj->controller, '\\') ? $obj->controller : '\\App\\Controllers\\'.str_replace('/','\\', $obj->controller);
+			try {
+				$obj->closure = \Closure::bind(function(...$args) use (&$obj) {
+					return $this->{$obj->method}(...$args);
+				}, new $obj->controller);
+			}catch(\Error $e) {
+				throw new \Exception('Controller "'.$obj->controller.'" not found',1);
+			}
+		}
+		
+		if (is_callable($callback) && $callback instanceof \Closure) {
+			$obj->closure = $callback;
+		}
+		
+		return $obj->closure;
+	}
+
 	protected function saveRoute() {
 		if (!isset($this->route['url']))
 			return;
@@ -175,9 +205,13 @@ class RouteCore extends Core {
 
 	public static function getRoute() {
 		$routes = self::getRoutes();
-		
+
+		$code = 404;
+
 		if (count($routes))
 			foreach($routes as $route) {
+				
+
 				$request = Core::request();
 
 				//Получаем переменные в консоли
@@ -192,7 +226,12 @@ class RouteCore extends Core {
 				
 				//Определяем нужный маршрут
 				if (preg_match('/\s'.self::urlMatch($route['url']).'\s/is', ' '.$request->get.' ', $matchUrl)) {
-					
+
+					if (!self::checkMethod($route['method'])) {
+						$code = 405;
+						continue;
+					}
+
 					//Получаем названия переменных из маршрута
 					if (preg_match_all("/\{(.*)\}/isU", $route['url'], $matchVars)) {
 						
@@ -205,7 +244,7 @@ class RouteCore extends Core {
 							if (isset($route['where'])) {
 								$where = (isset($route['where'][0]) && is_array($route['where'][0])) ? $route['where'][0] : $route['where'];
 								if (isset($where[$varName]) && !empty($varValue) && !preg_match('/^'.$where[$varName].'$/isU', $varValue))
-									return [];
+									return ['code' => 500];
 							}
 							$route['request'][$varName] = new \SME\Http\Request($varValue);
 							$route['props'][$varName] = $varValue;
@@ -219,6 +258,6 @@ class RouteCore extends Core {
 				}
 			}
 			
-		return [];
+		return ['code' => $code];
 	}
 }

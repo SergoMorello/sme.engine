@@ -49,9 +49,7 @@ class App extends Core {
 		self::include('engine.core.configure');
 		
 		self::$configure = true;
-		
-		self::include('app.appService');
-		
+			
 		$this->appService = new \App\appService;
 		
 		$this->defaultService('register');
@@ -180,45 +178,28 @@ class App extends Core {
 	}
 
 	private function defaultService($method) {
+		if (self::isConsole())
+			return;
 		if (method_exists($this->appService, $method))
 			$this->appService->$method();	
 	}
 
 	public static function __return($result) {
+		$result = (is_object($result) && method_exists($result, '__toString')) ? (string)$result : $result;
 		$result = ((is_array($result) || is_object($result)) && !$result instanceof ResponseObject) ? Response::json($result) : $result;
 		exit((string)$result);
 	}
 
 	private function run() {
 
-		$route = \Route::getRoute();
-		
-		if (!$route)
-			abort(404);
-		
-		if (!$this->checkMethod($route['method'] ?? ''))
-			abort(405);
+		$route = RouteCore::getRoute();
+
+		if (isset($route['code']))
+			abort($route['code']);
 
 		$next = function($request) use (&$route) {
-			$closure = null;
-			
-			if (is_callable($route['callback'])) {
-				$closure = $route['callback'];
-			}else{
-				$controller = strpos($route['callback']->controller, '\\') ? 
-					$route['callback']->controller : 
-					'App\\Controllers\\'.str_replace('/','\\', $route['callback']->controller);
-				try {
-					$closure = \Closure::bind(function(...$args) use (&$route) {
-						return $this->{$route['callback']->method}(...$args);
-					}, new $controller);
-				}catch(\Error $e) {
-					throw new \Exception('Controller "'.$controller.'" not found',1);
-				}
-			}
-			
 			return (object)[
-				'closure' => $closure,
+				'closure' => $route['callback'],
 				'request' => $request
 			];
 		};
