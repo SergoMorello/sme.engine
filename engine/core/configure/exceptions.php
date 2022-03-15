@@ -120,7 +120,10 @@ Exception::make(\SME\Exceptions\Console::class, function($exception){
 });
 
 Exception::make(\SME\Exceptions\Database::class, function($exception){
-	return View::error('error',[
+	if (App::isConsole())
+		return $exception->getMessage();
+	else
+		return View::error('error',[
 			'message' => $exception->getMessage()
 		]);
 });
