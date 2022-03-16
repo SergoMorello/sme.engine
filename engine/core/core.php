@@ -15,7 +15,7 @@ abstract class Core {
 			
 			$argvConsole = $_SERVER['argv'];
 			if (!isset($argvConsole[1]))
-				throw new Exceptions\Console('', [
+				throw new \SME\Exceptions\Console('', [
 					'message' => 'Comand list:',
 					'routes' => \Route::__list('command')
 				]);
