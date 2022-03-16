@@ -7,15 +7,20 @@ Route::get("/doc","main@doc")->name('doc');
 
 Route::group(['prefix' => 'test'], function(){
 	
-	Route::get('/{id}/{dd}', 'TestController@index')->middleware('test');
+	//Route::get('/{id}/{dd}', 'TestController@index')->middleware('test');
 
 	// Route::get('/{id}/{dd}', function($test, $test2){
 	// 	dd($test);
 	// })->middleware(['api','test']);
 
-	// Route::get('/', function(){
-	// 	return \SME\Support\View::make('test');
-	// })->name('test');
+	Route::get('/', function(){
+		$testList = \App\Models\Test2::get();
+		//$testList->offsetUnset(0);
+		dd($testList);
+		return \SME\Support\View::make('test',[
+			'testList' => $testList
+		]);
+	})->name('test');
 	Route::post('/submit', function(){
 		SME\Core\Request\Request::validate([
 			'checkbox' => 'accepted',

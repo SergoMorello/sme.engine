@@ -1,8 +1,8 @@
 <?php
 namespace SME\Core\Model;
 
-class ModelObject extends ModelCore {
-	private $__paginate, $__count;
+class ModelObject extends ModelCore implements \ArrayAccess, \Countable {
+	private $__paginate, $__count, $__lastKey;
 
 	public function __construct($result = []) {
 		$this->__count = 0;
@@ -14,18 +14,44 @@ class ModelObject extends ModelCore {
 		return $this;
 	}
 
+	public function offsetSet($offset, $value) {
+        if (is_null($offset)) {
+			$this->__lastKey = $this->getLastKey() + 1;
+            $this->{$this->__lastKey} = $value;
+        } else {
+            $this->{$offset} = $value;
+        }
+    }
+
+    public function offsetExists($offset) {
+        return isset($this->{$offset});
+    }
+
+    public function offsetUnset($offset) {
+        unset($this->{$offset});
+    }
+
+    public function offsetGet($offset) {
+        return isset($this->{$offset}) ? $this->{$offset} : null;
+    }
+
+	public function getLastKey() {
+		return is_null($this->__lastKey) ? null : intval($this->__lastKey);
+	}
+
 	private function setVars($result) {
 		if (is_array($result) || is_object($result)) {
 			foreach($result as $key => $value) {
-				$this->$key = $value; 
+				$this->$key = $value;
+				$this->__lastKey = $key;
 				++$this->__count;
 			}	
 		}
 	}
-
+	
 	private function getVars() {
 		$vars = get_object_vars($this);
-		unset($vars['__paginate'], $vars['__count']);
+		unset($vars['__paginate'], $vars['__count'], $vars['__lastKey']);
 		return $vars;
 	}
 

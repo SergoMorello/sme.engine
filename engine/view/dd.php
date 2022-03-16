@@ -48,10 +48,35 @@
 	.string:before, .string:after {
 		content: '"';
 	}
+	.toggle {
+		cursor: pointer;
+	}
+	.child_block {
+		display: none;
+		padding: 0;
+		transition: 0.5s;
+	}
+	.show {
+		display: inline;
+	}
 @endsection
 
 @section('content')
 	<div class='block'>
 		{!!$data!!}
 	</div>
+	
 @endsection
+<script>
+	document.addEventListener("DOMContentLoaded", function() {
+		listenToggle();
+	});
+	function listenToggle() {
+		for (let obj of document.getElementsByClassName('toggle')) {
+			obj.addEventListener('click', toggleInput);
+		}
+	}
+	function toggleInput(evt) {
+		this.nextSibling.classList.toggle('show');
+	}
+</script>
