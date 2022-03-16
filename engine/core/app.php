@@ -49,9 +49,7 @@ class App extends Core {
 		self::include('engine.core.configure');
 		
 		self::$configure = true;
-		
-		self::include('app.appService');
-		
+			
 		$this->appService = new \App\appService;
 		
 		$this->defaultService('register');
@@ -61,8 +59,6 @@ class App extends Core {
 		Request::__init();
 		
 		RouteCore::__init();
-		
-		ControllerCore::__init();
 		
 		$this->defaultService('boot');
 		
@@ -180,52 +176,43 @@ class App extends Core {
 	}
 
 	private function defaultService($method) {
+		if (self::isConsole())
+			return;
 		if (method_exists($this->appService, $method))
 			$this->appService->$method();	
 	}
 
 	public static function __return($result) {
+		$result = (is_object($result) && method_exists($result, '__toString')) ? (string)$result : $result;
 		$result = ((is_array($result) || is_object($result)) && !$result instanceof ResponseObject) ? Response::json($result) : $result;
 		exit((string)$result);
 	}
 
 	private function run() {
+		$request = new \SME\Http\Request;
+		$route = RouteCore::getRoute();
+		$run = null;
 
-		$route = \Route::getRoute();
-		
-		if (!$route)
-			abort(404);
-		
-		if (!$this->checkMethod($route['method'] ?? ''))
-			abort(405);
+		if (isset($route['code']))
+			abort($route['code']);
 
-		$routeCallback = function($route) {
-			$return = (object)[
-				'call' => null,
-				'props' => $route['props'] ?? []
+		$runClosure = function($request) use (&$route) {
+			return (object)[
+				'closure' => $route['callback']->closure,
+				'request' => $request
 			];
-
-			if (is_callable($route['callback'])) {
-				$return->call = $route['callback'];
-			}else{
-				$controller = strpos($route['callback']->controller, '\\') ? 
-					$route['callback']->controller : 
-					'App\\Controllers\\'.str_replace('/','\\', $route['callback']->controller);
-				try {
-				$return->call = [new $controller, $route['callback']->method];
-				}catch(\Error $e) {
-					throw new \Exception('Controller "'.$controller.'" not found',1);
-				}
-			}
-			
-			return Middleware::check($route['middleware'] ?? null, $return, new request);
 		};
-
-		$callback = $routeCallback($route);
-		self::__return(call_user_func_array(
-			$callback->call, 
-			array_values($callback->props)
-		));
+		
+		if (App::isConsole())
+			$run = $runClosure([$request]);
+		else
+			$run = Middleware::check($route['middleware'] ?? null, $request, $runClosure, $route);
+		
+		if ($run->closure && $run->request)
+			self::__return(call_user_func_array(
+				$run->closure, 
+				array_values($run->request)
+			));
 
 	}
 }

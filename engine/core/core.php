@@ -15,7 +15,7 @@ abstract class Core {
 			
 			$argvConsole = $_SERVER['argv'];
 			if (!isset($argvConsole[1]))
-				throw new Exceptions\Console('', [
+				throw new \SME\Exceptions\Console('', [
 					'message' => 'Comand list:',
 					'routes' => \Route::__list('command')
 				]);
@@ -58,7 +58,7 @@ abstract class Core {
 		return htmlspecialchars(addslashes($data));
 	}
 	
-	protected function checkMethod($method) {
+	protected static function checkMethod($method) {
 		if (App::isConsole())
 			return strtolower($method)=='command' ? true : false;
 		else

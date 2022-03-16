@@ -10,6 +10,7 @@ return [
 		'e',
 		'trans',
 		'view',
+		'url',
 		'response',
 		'dd',
 		'route',

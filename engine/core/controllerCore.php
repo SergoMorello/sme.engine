@@ -7,19 +7,6 @@ class ControllerCore extends Core {
 	
 	private static $model;
 	
-	private static function getPath($file, $default) {
-		return preg_match('/[.\/]+/', $file) ? $file : $default.'.'.$file;
-	}
-
-	public static function __init() {
-		App::include('app.Controllers.Controller');
-		foreach(RouteCore::getRoutes() as $page)
-			if (!$page)
-				continue;
-			if (!is_callable($page['callback'])) {
-				App::include(self::getPath($page['callback']->controller, 'app.controllers'));
-			}
-	}
 
 	public static function model($model = null) {
 		

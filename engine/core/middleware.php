@@ -25,41 +25,47 @@ class Middleware extends Core {
 			}	
 		}
 	}
-
-	private static function checkResponse($obj) {
-		if (is_object($obj) && property_exists($obj, 'call') && property_exists($obj, 'props'))
-			return $obj;
-		else
-			return App::__return($obj);
-	}
 	
-	public static function check($arrCheck, $controllerReturn, $request) {
-		$arrCheck = is_array($arrCheck) ? $arrCheck : [$arrCheck];
-		
-		$nextClosure = function($request) use (&$controllerReturn){
-			if (!App::isConsole())
-				array_unshift($controllerReturn->props, $request);
-			return (object)[
-				'call' => $controllerReturn->call,
-				'props' => $controllerReturn->props
-			];
+	public static function check($arrCheck, $request, $runClosure, $route) {
+		$arrCheck = is_array($arrCheck) ? $arrCheck : (is_null($arrCheck) ? null : [$arrCheck]);
+
+		$args = count($route['args']) > 0 ? $route['args'] : null;
+
+		$nextClosure = function(...$req) use (&$request, &$runClosure, &$route, &$args) {
+			$return = (object)['__next' => null];
+			if (isset($req[0]) && is_object($req[0]) && $req[0] instanceof $request)
+				$return->__next = $args ?? [$req];
+			else
+				$return->__next = $req;
+			return $return;
 		};
 
-		foreach($arrCheck as $mdw) {
+		$check = function($name) use (&$request, &$nextClosure) {
 			foreach(self::$addMiddleware as $mw) {
-				if ($mdw == $mw['name']) {
+				if ($name == $mw['name']) {
 					if (is_callable($mw['obj']) && $mw['obj'] instanceof \Closure)
-						self::checkResponse($mw['obj']($request, $nextClosure));
+						return $mw['obj']($request, $nextClosure);
 					else{
-						self::checkResponse((new $mw['obj'])->handle($request, $nextClosure));
+						return (new $mw['obj'])->handle($request, $nextClosure);
 					}
 				}
 			}
-		}
+		};
 		
-		return $nextClosure($request);
+		if ($arrCheck && count($arrCheck)) {
+			$nextRequest = null;
+			foreach($arrCheck as $mdw) {
+				if (!$nextRequest = $check($mdw))
+					break;
+			}
+			if (isset($nextRequest->__next))
+				return $runClosure($nextRequest->__next);
+			else
+				App::__return($nextRequest);
+		}else
+			return $runClosure($args ?? [$request]);
 	}
-	
+
 	public static function declare($name, $obj = NULL) {
 		self::$addMiddleware[] = ['name' => $name, 'obj' => $obj];
 	}

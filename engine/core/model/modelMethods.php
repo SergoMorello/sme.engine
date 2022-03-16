@@ -1,8 +1,10 @@
 <?php
 namespace SME\Core\Model;
 
+use SME\Http\Request;
+
 class ModelMethods extends ModelSql {
-	public function __init($table) {
+	public function __invoke($table) {
 		$this->setTableName($table);
 		return $this;
 	}
@@ -31,11 +33,29 @@ class ModelMethods extends ModelSql {
 		return $this->where('id','=',$id);
 	}
 
+	public function paginate($num) {
+		$page = Request::route('page');
+		$page = $page < 1 ? 1 : $page;
+		$count = $this->count();
+		$pages = ceil($count / $num);
+		$page = $pages >= $page ? $page : $pages;
+		$ofsbgn = ($page * $num) - $num;
+
+		$this->limit($ofsbgn, $num);
+		$query = self::dblink()->get_list($this->strQuerySelect());
+		$countPage = count($query);
+		return (new modelObject($query))([
+			'paginate' => new Paginate($count, $num, $page, $pages, $countPage)
+		]);
+	}
+
 	private function getValues($values, $onlyValues = false) {
 		$return = [];
 		if (!is_array($values))
 			return $return;
 		foreach($values as $key => $value) {
+			if (is_null($value))
+				continue;
 			$value = self::value($value);
 			if ($onlyValues) 
 				$return[] = $value;
@@ -63,8 +83,8 @@ class ModelMethods extends ModelSql {
 	public function update($props) {
 		if (is_array($props) && count($props)) {
 			$arrQuery = $this->getValues($props);
-
-			$this->isUpdate = self::dblink()->query("UPDATE `".$this->getTableName()."` SET ".implode(",",$arrQuery)." WHERE ".$this->srtWhere());
+			if (count($arrQuery))
+				$this->isUpdate = self::dblink()->query("UPDATE `".$this->getTableName()."` SET ".implode(",",$arrQuery)." WHERE ".$this->srtWhere());
 			return new modelObject($this);
 		}
 	}

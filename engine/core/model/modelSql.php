@@ -24,9 +24,9 @@ class ModelSql extends ModelCore {
 
 	//WHERE
 	public function where(...$data) {
-        $this->genParams($data, function($a, $b, $c){
-            return $a.$b.self::value($c);
-        }, $this->__query->where, ['b'=>'=']);
+		$this->genParams($data, function($a, $b, $c){
+			return $a.$b.self::value($c);
+		}, $this->__query->where, ['b'=>'=']);
         return $this;
 	}
 
@@ -39,15 +39,20 @@ class ModelSql extends ModelCore {
 	}
 
 	//LIMIT
-	public function limit($limit) {
-		$this->__query->limit[0] = $limit;
+	public function limit(...$data) {
+		// $this->__query->limit[] = $limit;
+		// if (is_numeric($limit2))
+		// 	$this->__query->limit[] = $limit2;
+		$this->genParams($data, function($a, $b, $c){
+			return $a.$b.$c;
+		}, $this->__query->limit, ['b'=>',']);
 		return $this;
 	}
 
 	//ORDER BY
 	public function orderBy(...$data) {
         $this->genParams($data, function($a, $b, $c){
-            return "`".$a."` ".strtoupper($c);
+            return $a." ".strtoupper($c);
         }, $this->__query->orderBy,['c'=>'DESC']);
         return $this;
 	}
@@ -60,14 +65,15 @@ class ModelSql extends ModelCore {
 
 	//LEFT JOIN
 	public function leftJoin($table, $callback) {
-		return $callback(new class($table, $this->getTableName()) extends ModelMethods {
+		return $callback(new class($table, $this->getTableName(), $this->__query) extends ModelMethods {
 			private $query, $joinTable, $count, $index;
 
-			public function __construct($table, $curentTable) {
+			public function __construct($table, $curentTable, $query) {
 				$this->joinTable = $table;
 				$this->setTableName($curentTable);
 				$this->count = 0;
 				$this->query = [];
+				$this->__query = $query;
 				$this->index = isset($this->__query->leftJoin) ? array_key_last($this->__query->leftJoin) + 1 : 0;
 			}
 
@@ -81,7 +87,7 @@ class ModelSql extends ModelCore {
 
 			public function on(...$props) {
                 $this->genParams($props, function($a, $b, $c){
-                    return $this->split().$a.' '.$b.' '.self::value($c);
+                    return $this->split().$a.' '.$b.' '.$c;
                 }, $this->query, ['b' => '=']);
 
 				$this->joinSave();
@@ -115,8 +121,8 @@ class ModelSql extends ModelCore {
 	}
 
 	protected function strLimit() {
-		if (isset($this->__query->limit[0]) && $this->__query->limit[0])
-			return " LIMIT ".$this->__query->limit[0];
+		if (($this->__query->limit[0] ?? false))
+			return " LIMIT ".implode(',', $this->__query->limit);
 	}
 
 	protected function srtOrderBy() {

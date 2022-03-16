@@ -16,4 +16,8 @@ class DB {
 			}
 		};
 	}
+
+	public static function table($name) {
+		return (new ModelMethods)($name);
+	}
 }

@@ -73,6 +73,14 @@ class RouteCore extends Core {
 		return self::$routes;
 	}
 	
+	public static function current() {
+		return new class extends RouteCore {
+			public function getName() {
+				return self::getCurrent()->name ?? null;
+			}
+		};
+	}
+
 	public static function getCurrent($var=null) {
 		return is_null($var) ? (object)self::$current : (is_string($var) ? self::$current[$var] ?? null : (object)self::$current);
 	}
@@ -104,13 +112,7 @@ class RouteCore extends Core {
 			}
 		}
 		
-		$params['callback'] = is_string($params['callback']) ? (function($callback) {
-			$split = explode("@",$callback);
-			return (object)[
-				'controller' => $split[0],
-				'method' => $split[1] ?? ''
-			];
-		})($params['callback'])	: $params['callback'];
+		$params['callback'] = $this->__routeCallback($params['callback']);
 		
 		if (!App::isConfigure())
 			$params['system'] = true;
@@ -120,6 +122,53 @@ class RouteCore extends Core {
 		return $this;
 	}
 	
+	private function __routeCallback($callback) {
+		$obj = (object)[
+			'controller' => null,
+			'method' => null,
+			'args' => null,
+			'closure' => null
+		];
+
+		if (is_string($callback)) {
+			$split = explode("@", $callback);
+			$obj->controller = $split[0] ?? null;
+			$obj->method = $split[1] ?? null;
+		}
+
+		if (is_array($callback)) {
+			$obj->controller = $callback[0] ?? null;
+			$obj->method = $callback[1] ?? null;
+		}
+
+		if ($obj->controller && $obj->method) {
+			$obj->controller = strpos($obj->controller, '\\') ? $obj->controller : '\\App\\Controllers\\'.str_replace('/','\\', $obj->controller);
+			try {
+				$contr = new $obj->controller;
+				$method = new \ReflectionMethod($contr, $obj->method);
+				$obj->closure = $method->getClosure($contr);
+			}catch(\Throwable $e) {
+				throw new \Exception('Controller "'.$obj->controller.'" not found', 1);
+			}
+		}
+		
+		if (is_callable($callback) && $callback instanceof \Closure) {
+			$obj->closure = $callback;
+		}
+
+		$test = new \ReflectionFunction($obj->closure);
+		$args = [];
+		foreach($test->getParameters() as $arg) {
+			try {
+				if ($class = $arg->getClass())
+					$args[] = new $class->name;
+			}catch(\Throwable $e) {}
+		}
+		$obj->args = $args;
+		
+		return $obj;
+	}
+
 	protected function saveRoute() {
 		if (!isset($this->route['url']))
 			return;
@@ -140,36 +189,40 @@ class RouteCore extends Core {
 	}
 
 	private static function urlMatch($url) {
-		$allowChars = '0-9A-Za-z\\.\\-';
+		$varChars = '0-9A-Za-z\\.\\-';
 		if (App::isConsole()) {
+			$consoleChars = '\\-\\w\\\\\\\\';
 			return preg_replace([
-				'`\{['.$allowChars.']{0,10}\}`is',
-				'`(.*)\{['.$allowChars.']{0,10}\?\}(.*)`isU'
+				'`\{['.$varChars.']{0,10}\}`is',
+				'`[\s|]\{['.$varChars.']{0,10}\?\}`is'
 			],
 			[
-				'([\w\\\\\\\\]+)',
-				'\\1([\w\\\\\\\\]*)|\s'
+				'(['.$consoleChars.']+)',
+				'[\s|]*(['.$consoleChars.']+|['.$consoleChars.']*)'
 			],$url);
-		}	
-		else{
+		}else{
 			return preg_replace([
 				'`/`is',
-				'`\{['.$allowChars.']{0,10}\}`is',
-				'`\\\/\{['.$allowChars.']{0,10}\?\}`is'
+				'`\{['.$varChars.']{0,10}\}`is',
+				'`\\\/\{['.$varChars.']{0,10}\?\}`is'
 			],
 			[
 				'\/',
-				'(['.$allowChars.']{1,})',
-				'[\/|]{0,1}(['.$allowChars.']{0,})'
+				'(['.$varChars.']{1,})',
+				'[\/|]{0,1}(['.$varChars.']{0,})'
 			],$url).'[\/|\s]{0,}';
 		}	
 	}
 
 	public static function getRoute() {
 		$routes = self::getRoutes();
-		
+
+		$code = 404;
+
 		if (count($routes))
 			foreach($routes as $route) {
+				
+
 				$request = Core::request();
 
 				//Получаем переменные в консоли
@@ -184,7 +237,12 @@ class RouteCore extends Core {
 				
 				//Определяем нужный маршрут
 				if (preg_match('/\s'.self::urlMatch($route['url']).'\s/is', ' '.$request->get.' ', $matchUrl)) {
-					
+
+					if (!self::checkMethod($route['method'])) {
+						$code = 405;
+						continue;
+					}
+
 					//Получаем названия переменных из маршрута
 					if (preg_match_all("/\{(.*)\}/isU", $route['url'], $matchVars)) {
 						
@@ -197,12 +255,13 @@ class RouteCore extends Core {
 							if (isset($route['where'])) {
 								$where = (isset($route['where'][0]) && is_array($route['where'][0])) ? $route['where'][0] : $route['where'];
 								if (isset($where[$varName]) && !empty($varValue) && !preg_match('/^'.$where[$varName].'$/isU', $varValue))
-									return [];
+									return ['code' => 500];
 							}
-
+							
 							$route['props'][$varName] = $varValue;
 						}
 					}
+					$route['args'] = array_merge($route['callback']->args ?? [], $route['props'] ?? []);
 					
 					if (isset($route['props']))
 						self::$props = $route['props'];
@@ -211,6 +270,6 @@ class RouteCore extends Core {
 				}
 			}
 			
-		return [];
+		return ['code' => $code];
 	}
 }
