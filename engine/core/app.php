@@ -204,7 +204,7 @@ class App extends Core {
 		};
 		
 		if (App::isConsole())
-			$run = $runClosure([$request]);
+			$run = $runClosure($route['args'] ?? [$request]);
 		else
 			$run = Middleware::check($route['middleware'] ?? null, $request, $runClosure, $route);
 		

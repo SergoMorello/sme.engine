@@ -156,9 +156,9 @@ class RouteCore extends Core {
 			$obj->closure = $callback;
 		}
 
-		$test = new \ReflectionFunction($obj->closure);
+		$function = new \ReflectionFunction($obj->closure);
 		$args = [];
-		foreach($test->getParameters() as $arg) {
+		foreach($function->getParameters() as $arg) {
 			try {
 				if ($class = $arg->getClass())
 					$args[] = new $class->name;
