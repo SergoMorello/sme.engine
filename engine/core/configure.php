@@ -17,6 +17,12 @@ if (App::isConsole()) {
 	header('Content-Type: text/html; charset=utf-8');
 }
 
+// Init
+
+Env::init();
+
+Middleware::init();
+
 // Config
 
 Config::set('app', App::include('config.app'));
@@ -27,11 +33,6 @@ Config::set('storage', App::include('config.storage'));
 
 Config::set('cache', App::include('config.cache'));
 
-// Init
-
-Env::init();
-
-Middleware::init();
 
 App::include('engine.support.app');
 

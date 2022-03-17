@@ -7,13 +7,11 @@ class Config extends Core {
 
 	public static function set(...$vars) {
 		if (count($vars)==2) {
-			self::$config[$vars[0]] = $vars[1];
+			self::$config[$vars[0]] = isset(self::$config[$vars[0]]) ? array_replace_recursive(self::$config[$vars[0]], $vars[1]) : $vars[1];
 			return;
 		}
-		
 	}
 	
-
 	public static function get($params) {
 		if (empty($params)) {
 			return (object)self::$config;
