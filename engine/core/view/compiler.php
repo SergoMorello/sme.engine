@@ -12,12 +12,12 @@ class Compiler extends Core {
 
 	static $_section;
 
-	protected static function _genCache($path) {
+	protected static function genCache($path) {
 		Config::set('cache', [
 			'stores' => [
 				'__compiler_index' => [
 					'driver' => 'file',
-					'path' => base_path('storage/.compiler/index')
+					'path' => storage_path('.compiler/index')
 				]
 			]
 		]);
@@ -25,7 +25,7 @@ class Compiler extends Core {
 		Config::set('storage', [
 			[
 				'name' => '__compiler_view',
-				'path' => base_path('storage/.compiler/view'),
+				'path' => storage_path('.compiler/view'),
 				'default' => false
 			]
 		]);	
@@ -39,7 +39,7 @@ class Compiler extends Core {
 			$cacheIndex->put($hashName, $hashMod);
 			$storageView->put($hashName, self::compile(file_get_contents($path)));
 		};
-
+		
 		if ($cacheIndex->has($hashName)) {
 			if ($cacheIndex->get($hashName) == $hashMod) {
 				if ($storageView->exists($hashName)) {
@@ -54,50 +54,6 @@ class Compiler extends Core {
 			$putCache();
 		}
 		return $storageView->path($hashName);
-	}
-
-	protected static function genCache($view, $dirV) {
-		
-		if (!file_exists(Core::dirCache))
-					if (!mkdir(Core::dirCache))
-						die('cache dir, error create');
-		if (!file_exists(self::dirCompiler))
-					if (!mkdir(self::dirCompiler))
-						die('cache dir, error create');
-		
-		if (Config::get('app.debug'))
-			return 1;
-		
-		$cacheViewName = md5($dirV.$view);
-		$cacheViewIndex = self::dirCompiler.".index";
-		$md5Hash = md5_file($dirV.$view.".php");
-		$createIndex = function($cacheViewIndex,$obj) {
-			if (file_put_contents($cacheViewIndex,json_encode((is_callable($obj) ? $obj() : $obj))))
-				return true;
-		};
-		if (file_exists($cacheViewIndex)) {
-			$cacheIndex = json_decode(file_get_contents($cacheViewIndex));
-			$checkIndex = function($cacheIndex,$cacheViewName) {
-				foreach($cacheIndex as $key=>$index) {
-					if ($index->name==$cacheViewName)
-						return $key;
-				}
-				return -1;
-			};
-			$keyIndex = $checkIndex($cacheIndex,$cacheViewName);
-			if ($keyIndex>=0) {
-				if ($cacheIndex[$keyIndex]->hash!=$md5Hash) {
-					$cacheIndex[$keyIndex]->hash = $md5Hash;
-					return $createIndex($cacheViewIndex,$cacheIndex);
-				}
-			}else{
-				$cacheIndex[] = ['name'=>$cacheViewName,'hash'=>$md5Hash];
-				return $createIndex($cacheViewIndex,$cacheIndex);
-			}
-		}else
-			return $createIndex($cacheViewIndex,function() use ($cacheViewName,$md5Hash) {
-				return [['name'=>$cacheViewName,'hash'=>$md5Hash]];
-			});
 	}
 
 	public function setSection($name, $buffer) {

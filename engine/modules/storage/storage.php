@@ -8,13 +8,13 @@ class Storage extends Core {
 	
 	private static $props=[];
 
-	public static function disk($name="") {
+	public static function disk($name = '') {
 		if (!empty($name))
 			self::$props['disk'] = $name;
 		return (new Storage);
 	}
 	
-	private static function getDisk($name="") {
+	private static function getDisk($name = '') {
 		$name = empty($name) ? self::$props['disk'] ?? NULL : $name;
 		
 		foreach(Config::get('storage') as $disk) {
@@ -25,6 +25,7 @@ class Storage extends Core {
 				return (object)$disk;
 		}
 	}
+
 	private static function makeFolders($path) {
 		$arrFolders = explode('/',$path);
 		if (count($arrFolders)<=1)
@@ -41,7 +42,8 @@ class Storage extends Core {
 
 		mkdir($fullPath, 0777, true);
 	}
-	public static function put($name,$data) {
+
+	public static function put($name, $data) {
 		self::makeFolders($name);
 		$fullPath = self::getDisk()->path.'/'.$name;
 		if (file_put_contents($fullPath, $data))
