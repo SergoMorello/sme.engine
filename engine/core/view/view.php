@@ -58,13 +58,15 @@ class View extends Compiler {
 			foreach(self::$shareVars as $nameVar => $valueVar)
 				$data[$nameVar] = $valueVar;
 
-			$cacheViewPath = self::dirCompiler.md5($result->path->dir . $result->path->view);
+			//$cacheViewPath = self::dirCompiler.md5($result->path->dir . $result->path->view);
 			
-			if (Compiler::genCache($result->path->view, $result->path->dir))
-				file_put_contents(
-					$cacheViewPath,
-					Compiler::compile(file_get_contents($result->path->full))
-				);
+			$cacheViewPath = Compiler::_genCache($result->path->full);
+			
+			// if (Compiler::genCache($result->path->view, $result->path->dir))
+			// 	file_put_contents(
+			// 		$cacheViewPath,
+			// 		Compiler::compile(file_get_contents($result->path->full))
+			// 	);
 
 			
 			$connect = function($__file, $__data, $__system) {

@@ -3,7 +3,7 @@
 return [
 	[
 		'name' => 'local',
-		'path' => '.local',
+		'path' => base_path('storage/.local'),
 		'default' => true
 	]
 ];

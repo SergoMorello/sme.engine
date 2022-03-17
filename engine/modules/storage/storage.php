@@ -34,7 +34,7 @@ class Storage extends Core {
 
 		$folders = implode('/',$arrFolders);
 		
-		$fullPath = STORAGE.self::getDisk()->path.'/'.$folders;
+		$fullPath = self::getDisk()->path.'/'.$folders;
 
 		if (empty($folders) || file_exists($fullPath))
 			return;
@@ -43,28 +43,28 @@ class Storage extends Core {
 	}
 	public static function put($name,$data) {
 		self::makeFolders($name);
-		$fullPath = STORAGE.self::getDisk()->path.'/'.$name;
+		$fullPath = self::getDisk()->path.'/'.$name;
 		if (file_put_contents($fullPath, $data))
 			return $fullPath;
 	}
 	
 	public static function get($name) {
-		return file_get_contents(STORAGE.self::getDisk()->path.'/'.$name);
+		return file_get_contents(self::getDisk()->path.'/'.$name);
 	}
 	
 	public static function exists($name) {
-		return file_exists(STORAGE.self::getDisk()->path.'/'.$name);
+		return file_exists(self::getDisk()->path.'/'.$name);
 	}
 	
 	public static function path($name) {
 		if (self::exists($name))
-			return STORAGE.self::getDisk()->path.'/'.$name;
+			return self::getDisk()->path.'/'.$name;
 	}
 	
 	public static function delete($name) {
 		$names = is_array($name) ? $name : [$name];
 		foreach($names as $name)
-			if (!unlink(STORAGE.self::getDisk()->path.'/'.$name))
+			if (!unlink(self::getDisk()->path.'/'.$name))
 				return false;
 		return true;
 	}

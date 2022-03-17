@@ -2,13 +2,59 @@
 namespace SME\Core\View;
 
 use SME\Core\Core;
-use SME\Core\config;
+use SME\Core\Config;
+use SME\Modules\Cache;
+use SME\Modules\Storage;
 
-class compiler extends Core {
+class Compiler extends Core {
 
 	const dirCompiler = STORAGE.'.cache/compiler/';
 
 	static $_section;
+
+	protected static function _genCache($path) {
+		Config::set('cache', [
+			'stores' => [
+				'__compiler_index' => [
+					'driver' => 'file',
+					'path' => base_path('storage/.compiler/index')
+				]
+			]
+		]);
+
+		Config::set('storage', [
+			[
+				'name' => '__compiler_view',
+				'path' => base_path('storage/.compiler/view'),
+				'default' => false
+			]
+		]);	
+
+		$cacheIndex = Cache::store('__compiler_index');
+		$storageView = Storage::disk('__compiler_view');
+		$hashName = md5($path);
+		$hashMod = md5($hashName.filemtime($path));
+
+		$putCache = function() use (&$cacheIndex, &$storageView, &$hashName, &$hashMod, &$path) {
+			$cacheIndex->put($hashName, $hashMod);
+			$storageView->put($hashName, self::compile(file_get_contents($path)));
+		};
+
+		if ($cacheIndex->has($hashName)) {
+			if ($cacheIndex->get($hashName) == $hashMod) {
+				if ($storageView->exists($hashName)) {
+					return $storageView->path($hashName);
+				}else{
+					$putCache();
+				}
+			}else{
+				$putCache();
+			}
+		}else{
+			$putCache();
+		}
+		return $storageView->path($hashName);
+	}
 
 	protected static function genCache($view, $dirV) {
 		
