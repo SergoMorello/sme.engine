@@ -14,6 +14,8 @@ Route::group(['prefix' => 'test'], function(){
 	// })->middleware(['api','test']);
 
 	Route::get('/', function(){
+		cache(['test' => 1231]);
+		dd(cache()->get('test'));
 		$testList = \App\Models\Test2::get();
 		//$testList->offsetUnset(0);
 		dd($testList);

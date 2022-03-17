@@ -9,6 +9,7 @@ return [
 		'httpClient/httpRequest',
 
 		//Cacher
+		'cache/object',
 		'cache/cache',
 		'cache/helper',
 
