@@ -1,9 +1,13 @@
 <?php
-
+// Only local driver
 return [
-	[
-		'name' => 'local',
-		'path' => storage_path('.local'),
-		'default' => true
+	'default' => 'local',
+	
+	'disks' => [
+
+		'local' => [
+			'driver' => 'local',
+			'root' => storage_path('.local')
+		]
 	]
 ];

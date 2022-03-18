@@ -23,10 +23,11 @@ class Compiler extends Core {
 		]);
 
 		Config::set('storage', [
-			[
-				'name' => '__compiler_view',
-				'path' => storage_path('.compiler/view'),
-				'default' => false
+			'disks' => [
+				'__compiler_view' => [
+					'driver' => 'local',
+					'root' => storage_path('.compiler/view')
+				]
 			]
 		]);	
 

@@ -9,11 +9,13 @@ return [
 		'httpClient/httpRequest',
 
 		//Cacher
+		'cache/index',
 		'cache/object',
 		'cache/cache',
 		'cache/helper',
 
 		//Storage
+		'storage/object',
 		'storage/storage',
 
 		//Cookie

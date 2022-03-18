@@ -22,13 +22,16 @@ class View extends Compiler {
 	private static function getViewPath($view, $system = false) {
 		$view = str_replace(".", "/", $view);
 		$path = $system ? SVIEW : VIEW;
-		
-		if ($isPHP = is_file($path.$view.".php") || $isHTML = is_file($path.$view.".html")) {
+		$isPHP = false;
+		$isHTML = false;
+		if (($isPHP = is_file($path.$view.".php")) || ($isHTML = is_file($path.$view.".html"))) {
 			$ext = '';
-			if (isset($isHTML))
+			
+			if ($isHTML)
 				$ext = 'html';
-			if (isset($isPHP))
+			if ($isPHP)
 				$ext = 'php';
+
 			return (object)[
 				'dir' => $path,
 				'view' => $view,

@@ -1,10 +1,28 @@
 <?php
 namespace SME\Modules;
 
+use SME\Modules\Storage\Object;
 use SME\Core\Core;
 use SME\Core\Config;
 
-class Storage extends Core {
+class Storage {
+	public static function __callStatic($name, $arg) {
+		return self::callMethod($name, $arg);
+	}
+
+	public function __call($name, $arg) {
+		return self::callMethod($name, $arg);
+	}
+
+	private static function callMethod($name, $arg) {
+		$obj = new Object;
+		if (!method_exists($obj, $name))
+			throw new \Exception('Method "'.$name.'" not fount in Storage class', 1);
+		return $obj->$name(...$arg);
+	}
+}
+
+class _Storage extends Core {
 	
 	private static $props=[];
 
@@ -14,7 +32,22 @@ class Storage extends Core {
 		return (new Storage);
 	}
 	
-	private static function getDisk($name = '') {
+	private static function getDisk($disk = '') {
+
+		$disk = is_null($disk) ? config('cache.default') : $disk;
+		if (!is_null($this->store))
+			$store = $this->store;
+		$path = config('cache.stores.'.$store)['path'] ?? null;
+		if ($path)
+			return $path;
+		else
+			throw new \Exception('Store '.$store.' not found in config cache', 1);
+
+
+
+
+
+		return;
 		$name = empty($name) ? self::$props['disk'] ?? NULL : $name;
 		
 		foreach(Config::get('storage') as $disk) {
@@ -27,25 +60,23 @@ class Storage extends Core {
 	}
 
 	private static function makeFolders($path) {
-		$arrFolders = explode('/',$path);
-		if (count($arrFolders)<=1)
+		$splitPath = explode('/', $path);
+		if (count($splitPath)<=1)
 			return;
 			
-		array_pop($arrFolders);
+		array_pop($splitPath);
 
-		$folders = implode('/',$arrFolders);
-		
-		$fullPath = self::getDisk()->path.'/'.$folders;
+		$folders = implode('/', $splitPath);
 
-		if (empty($folders) || file_exists($fullPath))
+		if (empty($folders) || is_dir($folders))
 			return;
 
-		mkdir($fullPath, 0777, true);
+		mkdir($folders, 0777, true);
 	}
 
 	public static function put($name, $data) {
-		self::makeFolders($name);
 		$fullPath = self::getDisk()->path.'/'.$name;
+		self::makeFolders($fullPath);
 		if (file_put_contents($fullPath, $data))
 			return $fullPath;
 	}
