@@ -2,6 +2,7 @@
 namespace SME\Modules\Cache;
 
 class Index {
+	const typeEncode = 2;
 	private $cachePath;
 
 	function __construct($cachePath) {
@@ -29,7 +30,8 @@ class Index {
 	}
 
 	private function update($obj = '') {
-		file_put_contents($this->cachePath.'.index',(empty($obj) ? '[]' : json_encode($obj)));
+		$data = (self::typeEncode == 1) ? (empty($obj) ? 'a:0:{}' : serialize($obj)) : (empty($obj) ? '[]' : json_encode($obj));
+		file_put_contents($this->cachePath.'.index', $data);
 	}
 
 	private function remArrKey($arr, $key) {
@@ -43,7 +45,8 @@ class Index {
 	}
 
 	public function get($key = '') {
-		$res = json_decode(file_get_contents($this->cachePath.'.index'));
+		$data = file_get_contents($this->cachePath.'.index');
+		$res = (self::typeEncode == 1) ? unserialize($data) : json_decode($data);
 		if (empty($key))
 			return $res;
 		foreach($res as $line)

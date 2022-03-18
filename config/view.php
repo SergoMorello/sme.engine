@@ -5,5 +5,5 @@ return [
 		app_path('View')
 	],
 
-	'compiled' => storage_path('.compiler')
+	'compiled' => storage_path('.cache/.compiler')
 ];

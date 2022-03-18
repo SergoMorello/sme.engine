@@ -12,7 +12,7 @@ class Compiler extends Core {
 
 	static $_section;
 
-	protected static function genCache($path) {
+	private static function setConfig() {
 		$dir = Config::get('view.compiled') ?? storage_path('.compiler');
 		Config::set('cache', [
 			'stores' => [
@@ -31,6 +31,10 @@ class Compiler extends Core {
 				]
 			]
 		]);	
+	}
+
+	protected static function genCache($path) {
+		self::setConfig();
 
 		$cacheIndex = Cache::store('__compiler_index');
 		$storageView = Storage::disk('__compiler_view');
@@ -189,8 +193,10 @@ class Compiler extends Core {
 	}
 
 	public static function flush() {
-		foreach(glob(self::dirCompiler.'*') as $file)
-			@unlink($file);
-		return file_put_contents(self::dirCompiler.'.index','[]');
+		self::setConfig();
+		$cacheIndex = Cache::store('__compiler_index');
+		$storageView = Storage::disk('__compiler_view');
+		$storageView->delete($storageView->allFiles());
+		return $cacheIndex->flush();
 	}
 }

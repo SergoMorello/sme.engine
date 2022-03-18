@@ -16,7 +16,7 @@ class Env extends Core {
 			'stores' => [
 				'__config' => [
 					'driver' => 'file',
-					'path' => base_path('storage/.config')
+					'path' => storage_path('.cache/.config')
 				]
 			]
 		]);
@@ -53,7 +53,7 @@ class Env extends Core {
 	}
 
 	public static function __cacheClear() {
-		return self::$cache->forget(self::cacheName);
+		return self::$cache->flush();
 	}
 
 	public static function get($name, $default = '') {

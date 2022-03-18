@@ -4,6 +4,7 @@ namespace SME\Core\Configure;
 use SME\Core\Request\Request;
 use SME\Core\Env;
 use SME\Core\Log;
+use SME\Core\View\View;
 
 // Console
 \Console::command("serve",function() {

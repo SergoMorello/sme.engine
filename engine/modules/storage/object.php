@@ -58,6 +58,10 @@ class Object {
 			return $this->getDisk().'/'.$name;
 	}
 	
+	public function allFiles($path = '') {
+		return array_diff(scandir($this->getDisk().'/'.$path), ['..', '.']);
+	}
+
 	public function delete($name) {
 		$names = is_array($name) ? $name : [$name];
 		foreach($names as $name)

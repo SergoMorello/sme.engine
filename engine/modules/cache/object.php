@@ -50,6 +50,10 @@ class Object {
 			return empty($default) ? NULL : $default;
 	}
 
+	public function getAllKeys() {
+		return $this->index()->get();
+	}
+
 	public function pull($key) {
 		$res = $this->get($key);
 		$this->forget($key);
