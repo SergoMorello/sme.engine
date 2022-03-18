@@ -1,0 +1,13 @@
+<?php
+namespace App\Providers__CLASS__;
+
+class __NAME__ {
+
+	public function register() {
+		//
+	}
+
+	public function boot() {
+		//
+	}
+}

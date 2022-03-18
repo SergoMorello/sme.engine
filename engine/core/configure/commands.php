@@ -97,7 +97,7 @@ use SME\Core\Log;
 			if (is_null($gff))
 				return;
 			$path = $gff->path.$gff->file.'.php';
-			$file = file_get_contents(ENGINE.'/make/controller.php');
+			$file = file_get_contents(ENGINE.'/make/controller.ptpl');
 			$file = str_replace(['__NAME__', '__CLASS__'], [$gff->file, $gff->class], $file);
 			
 			if (file_exists($path))
@@ -110,7 +110,7 @@ use SME\Core\Log;
 			if (is_null($gff))
 				return;
 			$path = $gff->path.$gff->file.'.php';
-			$file = file_get_contents(ENGINE.'/make/model.php');
+			$file = file_get_contents(ENGINE.'/make/model.ptpl');
 			$file = str_replace(['__NAME__', '__CLASS__'], [$gff->file, $gff->class], $file);
 
 			if (file_exists($path))
@@ -123,13 +123,26 @@ use SME\Core\Log;
 			if (is_null($gff))
 				return;
 			$path = $gff->path.$gff->file.'.php';
-			$file = file_get_contents(ENGINE.'/make/middleware.php');
+			$file = file_get_contents(ENGINE.'/make/middleware.ptpl');
 			$file = str_replace(['__NAME__', '__CLASS__'], [$gff->file, $gff->class], $file);
 			
 			if (file_exists($path))
 				return Log::info('Middleware exists');
 			if (file_put_contents($path, $file))
 				Log::info('Middleware created');
+		break;
+		case 'provider':
+			$gff = $getFoldersFile($name, PROVIDERS);
+			if (is_null($gff))
+				return;
+			$path = $gff->path.$gff->file.'.php';
+			$file = file_get_contents(ENGINE.'/make/provider.ptpl');
+			$file = str_replace(['__NAME__', '__CLASS__'], [$gff->file, $gff->class], $file);
+			
+			if (file_exists($path))
+				return Log::info('Provider exists');
+			if (file_put_contents($path, $file))
+				Log::info('Provider created');
 		break;
 		default:
 			Log::info('Example - make:controller MainController');

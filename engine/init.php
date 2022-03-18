@@ -11,6 +11,7 @@ define('MODEL',ROOT.'/app/Models/');
 define('VIEW',ROOT.'/app/View/');
 define('EXCEPTIONS',ROOT.'/app/Exceptions/');
 define('MIDDLEWARE',ROOT.'/app/Middleware/');
+define('PROVIDERS',ROOT.'/app/Providers/');
 define('STORAGE',ROOT.'/storage/');
 define('LOGS',ROOT.'/storage/.logs/');
 define('ENGINE',ROOT.'/engine/');
