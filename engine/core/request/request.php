@@ -8,12 +8,13 @@ use SME\Modules\storage;
 use SME\Core\Request\Objects\Files;
 
 class Request extends Core {
-	private static $_server, $_get, $_post, $_files, $_headers;
+	private static $_server, $_get, $_post, $_session, $_files, $_headers;
 	
 	public static function __init() {
 		self::$_server = $_SERVER;
 		self::$_get = Core::guardData($_GET);
 		self::$_post = Core::guardData($_POST);
+		self::$_session = new Session($_SESSION);
 		self::$_files = $_FILES;
 		self::$_headers = self::getallheaders();
 	}
@@ -30,6 +31,10 @@ class Request extends Core {
 			return (object)self::$_server;
 		return self::$_server[$var] ?? null;
 	}
+
+	public static function session() {
+		return self::$_session;
+	} 
 
 	public static function all() {
 		return [

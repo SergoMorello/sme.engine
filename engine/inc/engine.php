@@ -30,6 +30,7 @@ return [
 		'request/validate',
 		'request/objects/file',
 		'request/objects/files',
+		'request/session',
 		'request/request',
 		'daten/daten_object',
 		'daten/daten',

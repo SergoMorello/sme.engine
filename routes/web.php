@@ -14,8 +14,10 @@ Route::group(['prefix' => 'test'], function(){
 	// })->middleware(['api','test']);
 
 	Route::get('/', function(){
-		$storage = \SME\Modules\Storage::class;
-		return \SME\Core\App::startTime();
+		//request()->session()->put('test', 123);
+		//request()->session()->flush();
+		//session(['test' => 123]);
+		dd(session('test'));
 		//dd($storage::put('12/34/56/test.txt', 123));
 		//return view('test');
 		$testList = \App\Models\Test2::get();

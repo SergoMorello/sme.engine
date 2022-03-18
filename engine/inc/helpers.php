@@ -14,6 +14,7 @@ return [
 		'response',
 		'dd',
 		'route',
+		'session',
 		'request',
 		'abort',
 		'asset',

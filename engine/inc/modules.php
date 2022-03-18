@@ -22,10 +22,6 @@ return [
 		'cookie/cookie',
 		'cookie/helper',
 
-		//Session
-		'session/session',
-		'session/helper',
-
 		//Redirect
 		'redirect/redirect',
 		'redirect/helper',

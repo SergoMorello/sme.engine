@@ -1,6 +1,7 @@
 <?php
 namespace SME\Core\View;
 
+use SME\Core\Request\Request;
 use SME\Core\Response\Response;
 use SME\Core\Exception;
 use SME\Core\Config;
@@ -10,7 +11,7 @@ class View extends Compiler {
 	private static $shareVars = [];
 
 	public function __destruct() {
-		session()->delete([
+		Request::session()->forget([
 			'__oldInputs',
 			'__withErrors'
 		]);
