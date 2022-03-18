@@ -81,7 +81,7 @@ Compiler::declare('extends',function($arg, $append) {
 	
 	$append("<?php ob_end_clean(); echo \$this->addView(".$arg.", [], \$__system); echo \$this->getSection('__view.".$varSection."'); ?>");
 	
-	return "<?php ob_start(function(\$b){self::\$_section['__view.".$varSection."']=\$b;}); ?>";
+	return "<?php ob_start(function(\$b){self::\$__section['__view.".$varSection."']=\$b;}); ?>";
 });
 
 // INCLUDE

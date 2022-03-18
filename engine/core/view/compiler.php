@@ -1,16 +1,16 @@
 <?php
 namespace SME\Core\View;
 
-use SME\Core\Core;
 use SME\Core\Config;
 use SME\Modules\Cache;
 use SME\Modules\Storage;
 
-class Compiler extends Core {
+class Compiler {
 
 	const dirCompiler = STORAGE.'.cache/compiler/';
 
-	static $_section;
+	protected static $__section;
+	private static $__compilerFnc = [];
 
 	private static function setConfig() {
 		$dir = Config::get('view.compiled') ?? storage_path('.compiler');
@@ -63,11 +63,11 @@ class Compiler extends Core {
 	}
 
 	public function setSection($name, $buffer) {
-		self::$_section[$name] = $buffer;
+		self::$__section[$name] = $buffer;
 	}
 
 	public function getSection($name) {
-		return self::$_section[$name] ?? NULL;
+		return self::$__section[$name] ?? NULL;
 	}
 
 	protected static function compile($buffer) {
@@ -122,10 +122,10 @@ class Compiler extends Core {
 
 		$buffer = preg_replace_callback(['/\@([a-z0-9]{1,})[\r\n|\n|\s]/isU','/\@([^()\n\@]{0,})(\(((?>[^()\n]|(?2))*)\))/isU'], function($var) use (&$append, &$splitArg) {
 			
-			if (count(self::$arrCompilerView)) {
+			if (count(self::$__compilerFnc)) {
 				$name = $var[1] ?? '';
 				$args = (isset($var[3]) && $var[3]) ? $splitArg($var[3]) : [];
-				foreach(self::$arrCompilerView as $rule) {
+				foreach(self::$__compilerFnc as $rule) {
 					if ($name == $rule['name']) {
 						if (count($args) <= (new \ReflectionFunction($rule['return']))->getNumberOfParameters()) {
 							$args[] = &$append;		
@@ -186,7 +186,7 @@ class Compiler extends Core {
 	}
 
 	public static function declare($name, $return) {
-		self::$arrCompilerView[] = [
+		self::$__compilerFnc[] = [
 			'name' => $name,
 			'return' => $return
 		];

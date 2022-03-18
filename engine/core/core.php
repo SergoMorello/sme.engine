@@ -2,13 +2,6 @@
 namespace SME\Core;
 
 abstract class Core {
-	static $arrError=[],
-			$arrCompilerView=[];
-	
-	const dirM = APP.'Model/';
-	const dirV = APP.'View/';
-	const dirC = APP.'Controller/';
-	const dirCache = STORAGE.'.cache/';
 	
 	protected static function request() {
 		if (App::isConsole()) {
