@@ -3,6 +3,7 @@ namespace SME\Core\View;
 
 use SME\Core\Response\Response;
 use SME\Core\Exception;
+use SME\Core\Config;
 
 class View extends Compiler {	
 	
@@ -20,8 +21,9 @@ class View extends Compiler {
 	}
 
 	private static function getViewPath($view, $system = false) {
+		$pathView = Config::get('view.paths')[0] ?? app_path('View');
 		$view = str_replace(".", "/", $view);
-		$path = $system ? SVIEW : VIEW;
+		$path = $system ? SVIEW : $pathView;
 		$isPHP = false;
 		$isHTML = false;
 		if (($isPHP = is_file($path.$view.".php")) || ($isHTML = is_file($path.$view.".html"))) {

@@ -9,7 +9,7 @@ use SME\Core\Model\ModelCore;
 
 class App extends Core {
 	
-	private $appService;
+	private $providers;
 	
 	private static $console,
 		$dev,
@@ -49,10 +49,10 @@ class App extends Core {
 		self::include('engine.core.configure');
 		
 		self::$configure = true;
-			
-		$this->appService = new \App\appService;
+
+		$this->providers = [];
 		
-		$this->defaultService('register');
+		$this->serviceProviders('register');
 		
 		$this->singletonInit();
 		
@@ -60,7 +60,7 @@ class App extends Core {
 		
 		RouteCore::__init();
 		
-		$this->defaultService('boot');
+		$this->serviceProviders('boot');
 		
 		$this->run();
 		
@@ -175,11 +175,21 @@ class App extends Core {
 		}
 	}
 
-	private function defaultService($method) {
+	private function serviceProviders($method) {
 		if (self::isConsole())
 			return;
-		if (method_exists($this->appService, $method))
-			$this->appService->$method();	
+		
+		foreach(Config::get('app.providers') as $key => $provider) {
+			if (!isset($this->providers[$key])) {
+				try {
+					$this->providers[$key] = new $provider;
+				} catch (\Throwable $e) {
+					throw new \Exception('Providers: '.$e->getMessage(), 1);
+				}
+			}
+			if (method_exists($this->providers[$key], $method))
+				$this->providers[$key]->$method();	
+		}
 	}
 
 	public static function __return($result) {

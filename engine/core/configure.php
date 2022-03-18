@@ -33,6 +33,8 @@ Config::set('storage', App::include('config.storage'));
 
 Config::set('cache', App::include('config.cache'));
 
+Config::set('view', App::include('config.view'));
+
 
 App::include('engine.support.app');
 

@@ -15,5 +15,9 @@ return [
 
 	'locale' => 'en',
 
-	'fallback_locale' => 'en'
+	'fallback_locale' => 'en',
+
+	'providers' => [
+		App\Providers\AppServiceProvider::class
+	]
 ];

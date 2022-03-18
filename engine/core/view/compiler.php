@@ -13,11 +13,12 @@ class Compiler extends Core {
 	static $_section;
 
 	protected static function genCache($path) {
+		$dir = Config::get('view.compiled') ?? storage_path('.compiler');
 		Config::set('cache', [
 			'stores' => [
 				'__compiler_index' => [
 					'driver' => 'file',
-					'path' => storage_path('.compiler/index')
+					'path' => $dir.'index/'
 				]
 			]
 		]);
@@ -26,7 +27,7 @@ class Compiler extends Core {
 			'disks' => [
 				'__compiler_view' => [
 					'driver' => 'local',
-					'root' => storage_path('.compiler/view')
+					'root' => $dir.'view/'
 				]
 			]
 		]);	

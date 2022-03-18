@@ -1,13 +1,19 @@
 <?php
 
-function base_path($path = null) {
+function path($path = null, $root = ROOT) {
 	if (!is_string($path))
-		return ROOT;
-	return is_null($path) ? ROOT : ROOT.$path.'/';
+		return $root;
+	return is_null($path) ? $root : $root.$path.'/';
+}
+
+function base_path($path = null) {
+	return path($path, ROOT);
 }
 
 function storage_path($path = null) {
-	if (!is_string($path))
-		return STORAGE;
-	return is_null($path) ? STORAGE : STORAGE.$path.'/';
+	return path($path, STORAGE);
+}
+
+function app_path($path = null) {
+	return path($path, APP);
 }
