@@ -54,7 +54,8 @@ class App extends Core {
 		
 		$this->singletonInit();
 		
-		Request::__init();
+		if (!$console)
+			Request::__init();
 		
 		RouteCore::__init();
 		
