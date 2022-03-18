@@ -41,6 +41,10 @@ abstract class Core {
 		}
 	}
 	
+	public static function startTime() {
+		return microtime(true) - SME_START;
+	}
+
 	public static function call($callback, $props=[]) {
 		$callback = explode("@",$callback);
 		$callback = is_callable($callback[0]) ? $callback[0] : [new $callback[0],$callback[1]];

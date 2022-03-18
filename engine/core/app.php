@@ -41,8 +41,6 @@ class App extends Core {
 			return false;
 
 		Exception::__init();
-		
-		$this->checkFolders();
 
 		$this->autoload();
 
@@ -98,15 +96,6 @@ class App extends Core {
 
 	public static function setLocale($locale) {
 		self::$locale = $locale;
-	}
-
-	private function checkFolders() {
-		if (!self::isDev())
-			return;
-		foreach(get_defined_constants(true)['user'] as $folder) {
-			if (!file_exists($folder))
-				mkdir($folder);
-		}
 	}
 
 	public static function isConsole() {

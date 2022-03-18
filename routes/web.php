@@ -15,7 +15,7 @@ Route::group(['prefix' => 'test'], function(){
 
 	Route::get('/', function(){
 		$storage = \SME\Modules\Storage::class;
-
+		return \SME\Core\App::startTime();
 		//dd($storage::put('12/34/56/test.txt', 123));
 		//return view('test');
 		$testList = \App\Models\Test2::get();

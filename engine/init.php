@@ -1,7 +1,9 @@
 <?php
 ini_set('error_reporting', E_ALL);
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+ini_set('display_errors', true);
+ini_set('display_startup_errors', true);
+
+define('SME_START', microtime(true));
 define('ROOT',realpath(__DIR__ .'/..').'/');
 define('ROUTES',ROOT.'/routes/');
 define('APP',ROOT.'/app/');
