@@ -14,21 +14,7 @@ Route::group(['prefix' => 'test'], function(){
 	// })->middleware(['api','test']);
 
 	Route::get('/', function(){
-		//request()->session()->put('test', 123);
-		//request()->session()->flush();
-		//session(['test' => 123]);
-		$test = new SME\Http\Cookie;
-		$test = $test->queue('test', 123);
-		$test = $test->queue('test2', 1234);
-		return response('test')->cookie($test);
-		//dd($storage::put('12/34/56/test.txt', 123));
-		//return view('test');
-		$testList = \App\Models\Test2::get();
-		//$testList->offsetUnset(0);
-		dd($testList);
-		return \SME\Support\View::make('test',[
-			'testList' => $testList
-		]);
+		return \SME\Support\View::make('test');
 	})->name('test');
 	Route::post('/submit', function(){
 		SME\Core\Request\Request::validate([

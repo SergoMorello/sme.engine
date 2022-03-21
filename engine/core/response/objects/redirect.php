@@ -1,12 +1,12 @@
 <?php
-namespace SME\Modules;
+namespace SME\Core\Response\Objects;
 
 use SME\Core\Request\Request;
 use SME\Core\Response\Response;
 
-class Redirect extends Request {
+class Redirect {
 
-	public static function route($name,$props=[]) {
+	public static function route($name, $props = []) {
 		return self::rdr(route($name,$props));
 	}
 

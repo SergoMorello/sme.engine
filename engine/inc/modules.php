@@ -18,10 +18,6 @@ return [
 		'storage/object',
 		'storage/storage',
 
-		//Redirect
-		'redirect/redirect',
-		'redirect/helper',
-
 		//Compressor
 		'compressor/compressor',
 		'compressor/helper'

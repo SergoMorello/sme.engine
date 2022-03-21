@@ -12,6 +12,7 @@ return [
 		'view',
 		'url',
 		'cookie',
+		'redirect',
 		'response',
 		'dd',
 		'route',
