@@ -6,8 +6,8 @@ use SME\Core\Config;
 class Object {
 	private $disk;
 
-	private function getDisk($disk = '') {
-
+	private function getDisk($disk = null) {
+		
 		$disk = is_null($disk) ? config('storage.default') : $disk;
 		if (!is_null($this->disk))
 			$disk = $this->disk;

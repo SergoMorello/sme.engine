@@ -43,11 +43,17 @@ class File {
 		return $this->size;
 	}
 
-	public function store($path = '', $disk = '') {
-		return Storage::disk($disk)->put($path.'/'.$this->name, $this->getData());
+	public function store($path = '', $disk = null) {
+		$storage = new Storage;
+		if (is_string($disk))
+			$storage->disk($disk);
+		return $storage->put($path.'/'.$this->name, $this->getData());
 	}
 
-	public function storeAs($path, $name, $disk = '') {
-		return Storage::disk($disk)->put($path.'/'.$name, $this->getData());
+	public function storeAs($path, $name, $disk = null) {
+		$storage = new Storage;
+		if (is_string($disk))
+			$storage->disk($disk);
+		return $storage->put($path.'/'.$name, $this->getData());
 	}
 }
