@@ -18,10 +18,6 @@ return [
 		'storage/object',
 		'storage/storage',
 
-		//Cookie
-		'cookie/cookie',
-		'cookie/helper',
-
 		//Redirect
 		'redirect/redirect',
 		'redirect/helper',

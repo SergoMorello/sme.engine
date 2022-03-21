@@ -11,6 +11,7 @@ return [
 		'trans',
 		'view',
 		'url',
+		'cookie',
 		'response',
 		'dd',
 		'route',

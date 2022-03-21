@@ -17,7 +17,10 @@ Route::group(['prefix' => 'test'], function(){
 		//request()->session()->put('test', 123);
 		//request()->session()->flush();
 		//session(['test' => 123]);
-		dd(session('test'));
+		$test = new SME\Http\Cookie;
+		$test = $test->queue('test', 123);
+		$test = $test->queue('test2', 1234);
+		return response('test')->cookie($test);
 		//dd($storage::put('12/34/56/test.txt', 123));
 		//return view('test');
 		$testList = \App\Models\Test2::get();

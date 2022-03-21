@@ -1,5 +1,5 @@
 <?php
-namespace SME\Core\Request;
+namespace SME\Core\Request\Objects;
 
 class Session {
 	private $__session;

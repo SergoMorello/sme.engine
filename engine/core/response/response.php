@@ -24,7 +24,7 @@ class Response {
 	}
 
 	public static function make($content, $code = 200) {
-		$response = new ResponseObject([
+		$response = new Object([
 			'content' => $content,
 			'code' => $code
 		]);
